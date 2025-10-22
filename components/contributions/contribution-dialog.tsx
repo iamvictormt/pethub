@@ -3,32 +3,13 @@
 import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Heart, Sparkles, Shield, Crown } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Heart, DollarSign, AlertCircle } from "lucide-react"
 import ContributionCheckout from "./contribution-checkout"
-import { CONTRIBUTION_TIERS, formatCurrency } from "@/lib/contribution-tiers"
 
-const TIER_STYLES = {
-  supporter: {
-    icon: Heart,
-    color: "text-pink-600",
-    bgColor: "bg-pink-100",
-  },
-  friend: {
-    icon: Sparkles,
-    color: "text-blue-600",
-    bgColor: "bg-blue-100",
-  },
-  hero: {
-    icon: Shield,
-    color: "text-green-600",
-    bgColor: "bg-green-100",
-  },
-  champion: {
-    icon: Crown,
-    color: "text-orange-600",
-    bgColor: "bg-orange-100",
-  },
-}
+const MINIMUM_AMOUNT = 500 // R$ 5.00 in cents
+const SUGGESTED_AMOUNTS = [1000, 2500, 5000, 10000] // R$ 10, 25, 50, 100
 
 interface ContributionDialogProps {
   open: boolean
@@ -36,80 +17,185 @@ interface ContributionDialogProps {
 }
 
 export default function ContributionDialog({ open, onOpenChange }: ContributionDialogProps) {
-  const [selectedTier, setSelectedTier] = useState<string | null>(null)
+  const [customAmount, setCustomAmount] = useState<string>("")
+  const [amountInCents, setAmountInCents] = useState<number | null>(null)
+  const [error, setError] = useState<string>("")
 
   const handleClose = () => {
-    setSelectedTier(null)
+    setCustomAmount("")
+    setAmountInCents(null)
+    setError("")
     onOpenChange(false)
+  }
+
+  const handleAmountChange = (value: string) => {
+    // Remove tudo que não for número
+    const numericValue = value.replace(/\D/g, "");
+
+    // Converte para número e divide por 100 para inserir vírgula
+    const floatValue = parseFloat(numericValue) / 100;
+
+    // Se não tiver valor, reseta
+    if (!numericValue) {
+      setCustomAmount("");
+      return;
+    }
+
+    // Formata em formato brasileiro de moeda
+    const formatted = floatValue.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    setCustomAmount(formatted);
+
+    // Validação simples (exemplo)
+    if (floatValue < 5) {
+      setError("O valor mínimo é R$ 5,00");
+    } else {
+      setError("");
+    }
+  };
+
+  const handleSuggestedAmount = (cents: number) => {
+    const reais = (cents / 100).toFixed(2).replace(".", ",")
+    setCustomAmount(reais)
+    setError("")
+  }
+
+  const handleContinue = () => {
+    // Convert to cents
+    const valueStr = customAmount.replace(",", ".")
+    const valueInReais = Number.parseFloat(valueStr)
+
+    if (isNaN(valueInReais) || valueInReais <= 0) {
+      setError("Por favor, insira um valor válido")
+      return
+    }
+
+    const cents = Math.round(valueInReais * 100)
+
+    if (cents < MINIMUM_AMOUNT) {
+      setError(`O valor mínimo é R$ ${(MINIMUM_AMOUNT / 100).toFixed(2).replace(".", ",")}`)
+      return
+    }
+
+    console.log("[v0] Amount in cents:", cents)
+    setAmountInCents(cents)
+  }
+
+  const formatCurrency = (cents: number) => {
+    return `R$ ${(cents / 100).toFixed(2).replace(".", ",")}`
   }
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        {!selectedTier ? (
+      <DialogContent className="max-w-2xl">
+        {!amountInCents ? (
           <>
             <DialogHeader>
-              <DialogTitle className="text-2xl font-bold">Escolha o valor da sua contribuição</DialogTitle>
+              <DialogTitle className="text-2xl font-bold">Quanto você gostaria de contribuir?</DialogTitle>
               <DialogDescription>
-                Selecione um dos valores abaixo. Você poderá pagar com cartão de crédito ou PIX.
+                Escolha um valor sugerido ou insira o valor que desejar. Mínimo: {formatCurrency(MINIMUM_AMOUNT)}
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid gap-4 py-4 sm:grid-cols-2">
-              {CONTRIBUTION_TIERS.map((tier) => {
-                const style = TIER_STYLES[tier.id as keyof typeof TIER_STYLES]
-                const Icon = style.icon
-                return (
-                  <button
-                    key={tier.id}
-                    onClick={() => {
-                      console.log("[v0] Selected tier:", tier.id)
-                      setSelectedTier(tier.id)
-                    }}
-                    className="group relative overflow-hidden rounded-2xl border-2 border-border bg-card p-6 text-left transition-all hover:border-orange-alert hover:shadow-lg"
-                  >
-                    <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${style.bgColor}`}>
-                      <Icon className={`h-6 w-6 ${style.color}`} />
-                    </div>
-                    <div className="mb-2 text-3xl font-bold">{formatCurrency(tier.amountInCents)}</div>
-                    <div className="mb-1 text-lg font-semibold">{tier.name}</div>
-                    <div className="text-sm text-muted-foreground">{tier.description}</div>
-                    {tier.popular && (
-                      <div className="absolute top-4 right-4 rounded-full bg-orange-alert px-3 py-1 text-xs font-semibold text-white">
-                        Popular
-                      </div>
-                    )}
-                    <div className="mt-4 text-sm font-medium text-orange-alert opacity-0 transition-opacity group-hover:opacity-100">
-                      Selecionar →
-                    </div>
-                  </button>
-                )
-              })}
+            <div className="space-y-6 py-4">
+              {/* Suggested Amounts */}
+              <div>
+                <Label className="mb-3 block text-sm font-medium">Valores sugeridos</Label>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  {SUGGESTED_AMOUNTS.map((cents) => (
+                    <Button
+                      key={cents}
+                      variant="outline"
+                      onClick={() => handleSuggestedAmount(cents)}
+                      className="h-16 text-lg font-semibold hover:border-orange-alert hover:bg-orange-alert/5"
+                    >
+                      {formatCurrency(cents)}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Amount Input */}
+  <div>
+      <Label htmlFor="custom-amount" className="mb-2 block text-sm font-medium">
+        Ou insira um valor personalizado
+      </Label>
+      <div className="relative">
+        <DollarSign className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          id="custom-amount"
+          type="text"
+          inputMode="numeric"
+          placeholder="0,00"
+          value={customAmount}
+          onChange={(e) => handleAmountChange(e.target.value)}
+          className="h-14 pl-10 text-lg font-semibold"
+        />
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+          BRL
+        </span>
+      </div>
+      {error && (
+        <div className="mt-2 flex items-center gap-2 text-sm text-red-600">
+          <AlertCircle className="h-4 w-4" />
+          <span>{error}</span>
+        </div>
+      )}
+    </div>
+
+              {/* Info Box */}
+              <div className="rounded-lg border bg-muted/50 p-4">
+                <div className="mb-2 flex items-center gap-2">
+                  <Heart className="h-5 w-5 text-orange-alert" fill="currentColor" />
+                  <span className="font-semibold">Sua contribuição ajuda a:</span>
+                </div>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  <li>• Manter a plataforma gratuita para todos</li>
+                  <li>• Reunir mais pets com suas famílias</li>
+                  <li>• Desenvolver novos recursos</li>
+                </ul>
+              </div>
+
+              {/* Payment Methods */}
+              <div className="rounded-lg bg-blue-50 p-4 text-sm">
+                <p className="mb-1 font-medium text-blue-900">💳 Formas de pagamento</p>
+                <p className="text-blue-700">
+                  Pagamento via cartão de crédito com processamento instantâneo. Sua compra é protegida e processada com segurança pelo Stripe.
+                </p>
+              </div>
             </div>
 
-            <div className="rounded-lg bg-muted p-4 text-sm text-muted-foreground">
-              <p className="font-medium text-foreground mb-1">💳 Formas de pagamento</p>
-              <p>Cartão de crédito (processamento instantâneo) ou PIX (QR Code gerado na próxima etapa)</p>
-            </div>
+            <Button
+              onClick={handleContinue}
+              disabled={!customAmount}
+              size="lg"
+              className="w-full bg-orange-alert text-orange-alert-foreground hover:bg-orange-alert/90"
+            >
+              Continuar para Pagamento
+            </Button>
           </>
         ) : (
           <>
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold">Finalize sua contribuição</DialogTitle>
               <DialogDescription>
-                Complete o pagamento de forma segura através do Stripe. Seu nome aparecerá na lista de contribuintes.
+                Valor: <span className="font-semibold text-orange-alert">{formatCurrency(amountInCents)}</span> -
+                Complete o pagamento de forma segura através do Stripe.
               </DialogDescription>
             </DialogHeader>
 
             <div className="py-4">
-              <ContributionCheckout tierId={selectedTier} />
+              <ContributionCheckout amountInCents={amountInCents} />
             </div>
 
             <Button
               variant="outline"
               onClick={() => {
-                console.log("[v0] Going back to tier selection")
-                setSelectedTier(null)
+                console.log("[v0] Going back to amount selection")
+                setAmountInCents(null)
               }}
               className="w-full"
             >

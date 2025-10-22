@@ -7,13 +7,13 @@ import { startContributionCheckout } from "@/app/actions/contributions"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
-export default function ContributionCheckout({ tierId }: { tierId: string }) {
+export default function ContributionCheckout({ amountInCents }: { amountInCents: number }) {
   const [error, setError] = useState<string | null>(null)
 
   const fetchClientSecret = useCallback(async () => {
     try {
-      console.log("[v0] Fetching client secret for tier:", tierId)
-      const clientSecret = await startContributionCheckout(tierId)
+      console.log("[v0] Fetching client secret for amount:", amountInCents)
+      const clientSecret = await startContributionCheckout(amountInCents)
       console.log("[v0] Received client secret:", !!clientSecret)
 
       if (!clientSecret) {
@@ -26,7 +26,7 @@ export default function ContributionCheckout({ tierId }: { tierId: string }) {
       setError(err instanceof Error ? err.message : "Failed to start checkout")
       throw err
     }
-  }, [tierId])
+  }, [amountInCents])
 
   if (error) {
     return (

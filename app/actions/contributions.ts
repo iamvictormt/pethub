@@ -1,20 +1,18 @@
 "use server"
 
 import { stripe } from "@/lib/stripe"
-import { CONTRIBUTION_TIERS } from "@/lib/contribution-tiers"
 import { createClient as createSupabaseClient } from "@/lib/supabase/server"
 import { createClient } from "@supabase/supabase-js"
 
-export async function startContributionCheckout(tierId: string) {
-  console.log("[v0] Starting checkout for tier:", tierId)
+const MINIMUM_AMOUNT = 500 // R$ 5.00 in cents
 
-  const tier = CONTRIBUTION_TIERS.find((t) => t.id === tierId)
-  if (!tier) {
-    console.error("[v0] Tier not found:", tierId)
-    throw new Error(`Contribution tier with id "${tierId}" not found`)
+export async function startContributionCheckout(amountInCents: number) {
+  console.log("[v0] Starting checkout for amount:", amountInCents)
+
+  // Validate minimum amount
+  if (amountInCents < MINIMUM_AMOUNT) {
+    throw new Error(`Minimum contribution amount is R$ ${(MINIMUM_AMOUNT / 100).toFixed(2)}`)
   }
-
-  console.log("[v0] Found tier:", tier.name, tier.amountInCents)
 
   const supabase = await createSupabaseClient()
   const {
@@ -34,17 +32,17 @@ export async function startContributionCheckout(tierId: string) {
           price_data: {
             currency: "brl",
             product_data: {
-              name: tier.name,
-              description: tier.description,
+              name: "Contribuição PetHub",
+              description: "Apoio para manter a plataforma gratuita e ajudar mais pets",
             },
-            unit_amount: tier.amountInCents,
+            unit_amount: amountInCents,
           },
           quantity: 1,
         },
       ],
       mode: "payment",
       metadata: {
-        tier_id: tierId,
+        amount_in_cents: amountInCents.toString(),
         user_id: user?.id || "anonymous",
       },
       customer_email: user?.email,
@@ -72,7 +70,7 @@ export async function startContributionCheckout(tierId: string) {
 
       const { error } = await supabaseAdmin.from("contributions").insert({
         user_id: user.id,
-        amount_in_cents: tier.amountInCents,
+        amount_in_cents: amountInCents,
         currency: "BRL",
         stripe_session_id: session.id,
         status: "pending",

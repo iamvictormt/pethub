@@ -1,8 +1,43 @@
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { MapPin, Heart, Search, Shield, Users, Clock, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { MapPin, Heart, Search, Shield, Users, Clock, CheckCircle2, ArrowRight, Sparkles } from "lucide-react"
+import { createClient } from "@/lib/supabase/server"
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = await createClient()
+
+  // Fetch real statistics
+  const [petsReunitedResult, activeUsersResult, recentReunitedResult] = await Promise.all([
+    supabase.from("pets").select("id", { count: "exact", head: true }).eq("status", "REUNITED"),
+    supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase
+      .from("pets")
+      .select("created_at, updated_at")
+      .eq("status", "REUNITED")
+      .not("updated_at", "is", null)
+      .order("updated_at", { ascending: false })
+      .limit(10),
+  ])
+
+  const petsReunited = petsReunitedResult.count || 0
+  const activeUsers = activeUsersResult.count || 0
+
+  // Calculate average time to reunite (in hours)
+  let avgTimeHours = 24
+  if (recentReunitedResult.data && recentReunitedResult.data.length > 0) {
+    const times = recentReunitedResult.data
+      .filter((pet) => pet.created_at && pet.updated_at)
+      .map((pet) => {
+        const created = new Date(pet.created_at!).getTime()
+        const updated = new Date(pet.updated_at!).getTime()
+        return (updated - created) / (1000 * 60 * 60) // Convert to hours
+      })
+
+    if (times.length > 0) {
+      avgTimeHours = Math.round(times.reduce((a, b) => a + b, 0) / times.length)
+    }
+  }
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Hero Section */}
@@ -10,9 +45,11 @@ export default function HomePage() {
         <div className="container mx-auto max-w-7xl px-4">
           {/* Announcement Badge */}
           <div className="mb-8 flex justify-center">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-background/80 px-4 py-2 text-sm font-medium shadow-sm backdrop-blur">
-              <Sparkles className="h-4 w-4 text-orange-alert" fill="currentColor" />
-              <span> Mais de 1.200 pets devolvidos à suas famílias</span>
+            <div className="mb-8 flex justify-center">
+              <div className="inline-flex items-center gap-2 rounded-full border border-orange-alert/20 bg-orange-alert/10 px-4 py-2 text-sm font-medium text-orange-alert backdrop-blur">
+                <Sparkles className="h-4 w-4 text-orange-alert" fill="currentColor" />
+                Um sistema para todos
+              </div>
             </div>
           </div>
 
@@ -42,15 +79,15 @@ export default function HomePage() {
               {/* Stats */}
               <div className="mt-12 grid grid-cols-3 gap-6 pt-2">
                 <div>
-                  <div className="text-3xl font-bold text-orange-alert">1.2k+</div>
+                  <div className="text-3xl font-bold text-orange-alert">{petsReunited}+</div>
                   <div className="text-sm text-muted-foreground">Pets devolvidos</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-blue-pethub">5k+</div>
+                  <div className="text-3xl font-bold text-blue-pethub">{activeUsers}+</div>
                   <div className="text-sm text-muted-foreground">Usuários ativos</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-foreground">24h</div>
+                  <div className="text-3xl font-bold text-foreground">{avgTimeHours}h</div>
                   <div className="text-sm text-muted-foreground">Tempo médio</div>
                 </div>
               </div>
@@ -293,5 +330,5 @@ export default function HomePage() {
         </div>
       </section>
     </div>
-  );
+  )
 }
