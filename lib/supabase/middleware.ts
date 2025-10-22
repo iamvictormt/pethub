@@ -25,12 +25,19 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
+  const publicPaths = ["/", "/auth", "/api/webhooks", "/pets", "/contribuir", "/contribuintes"]
+
+  const isPublicPath = publicPaths.some((path) => request.nextUrl.pathname.startsWith(path))
+
+  if (isPublicPath) {
+    return supabaseResponse
+  }
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Redirect to login if not authenticated and trying to access protected routes
-  if (!user && !request.nextUrl.pathname.startsWith("/auth") && request.nextUrl.pathname !== "/") {
+  if (!user) {
     const url = request.nextUrl.clone()
     url.pathname = "/auth/login"
     return NextResponse.redirect(url)
