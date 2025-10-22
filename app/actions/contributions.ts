@@ -2,7 +2,8 @@
 
 import { stripe } from "@/lib/stripe"
 import { CONTRIBUTION_TIERS } from "@/lib/contribution-tiers"
-import { createClient } from "@/lib/supabase/server"
+import { createClient as createSupabaseClient } from "@/lib/supabase/server"
+import { createClient } from "@supabase/supabase-js"
 
 export async function startContributionCheckout(tierId: string) {
   console.log("[v0] Starting checkout for tier:", tierId)
@@ -15,7 +16,7 @@ export async function startContributionCheckout(tierId: string) {
 
   console.log("[v0] Found tier:", tier.name, tier.amountInCents)
 
-  const supabase = await createClient()
+  const supabase = await createSupabaseClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -27,7 +28,7 @@ export async function startContributionCheckout(tierId: string) {
     const session = await stripe.checkout.sessions.create({
       ui_mode: "embedded",
       redirect_on_completion: "never",
-      payment_method_types: ["card"], // Support both card and PIX
+      payment_method_types: ["card"],
       line_items: [
         {
           price_data: {
@@ -58,7 +59,18 @@ export async function startContributionCheckout(tierId: string) {
     }
 
     if (user) {
-      const { error } = await supabase.from("contributions").insert({
+      const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false,
+          },
+        },
+      )
+
+      const { error } = await supabaseAdmin.from("contributions").insert({
         user_id: user.id,
         amount_in_cents: tier.amountInCents,
         currency: "BRL",
@@ -70,7 +82,7 @@ export async function startContributionCheckout(tierId: string) {
 
       if (error) {
         console.error("[v0] Failed to create contribution record:", error)
-        // Don't throw here, allow payment to proceed
+        throw new Error("Failed to create contribution record")
       } else {
         console.log("[v0] Created pending contribution:", session.id)
       }
