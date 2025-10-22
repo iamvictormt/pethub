@@ -1,8 +1,14 @@
+'use client';
+
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Heart, Coffee, Users, Shield, Sparkles, TrendingUp, Zap, CheckCircle2, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import ContributionDialog from '@/components/contributions/contribution-dialog';
 
 export default function ContribuirPage() {
+  const [showContributionDialog, setShowContributionDialog] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -193,9 +199,13 @@ export default function ContribuirPage() {
               <Button
                 size="lg"
                 variant="outline"
+                onClick={() => {
+                  console.log('[v0] Opening contribution dialog');
+                  setShowContributionDialog(true);
+                }}
                 className="w-full border-2 border-orange-alert/20 hover:border-orange-alert/40 hover:bg-orange-alert/5 bg-transparent"
               >
-                <Coffee className="h-5 w-5" />
+                <Coffee className="mr-2 h-5 w-5" />
                 Fazer uma Doação
               </Button>
             </div>
@@ -242,7 +252,7 @@ export default function ContribuirPage() {
               </div>
             </div>
             <blockquote className="mb-6 text-xl font-medium leading-relaxed text-foreground md:text-2xl">
-              "Anunciar no PetHub trouxe novos clientes para minha pet shop e ainda ajudo famílias a encontrarem seus
+              "Anunciar no PetHub trouxe novos clientes para minha pet shop e ainda ajuda famílias a encontrarem seus
               pets. É gratificante fazer parte dessa comunidade."
             </blockquote>
             <div className="text-sm font-medium text-muted-foreground">
@@ -284,6 +294,8 @@ export default function ContribuirPage() {
           </div>
         </div>
       </section>
+
+      <ContributionDialog open={showContributionDialog} onOpenChange={setShowContributionDialog} />
     </div>
   );
 }
