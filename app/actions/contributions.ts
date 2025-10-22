@@ -41,9 +41,8 @@ export async function startContributionCheckout(tierId: string) {
     customer_email: user?.email,
   });
 
-  // Create pending contribution record
   if (user) {
-    await supabase.from('contributions').insert({
+    const { data, error } = await supabase.from('contributions').insert({
       user_id: user.id,
       amount_in_cents: tier.amountInCents,
       currency: 'BRL',
@@ -52,6 +51,13 @@ export async function startContributionCheckout(tierId: string) {
       contributor_name: user.user_metadata?.name || user.email?.split('@')[0],
       contributor_email: user.email,
     });
+
+    if (error) {
+      console.error('[v0] Failed to create contribution record:', error);
+      throw new Error('Failed to create contribution record');
+    }
+
+    console.log('[v0] Created pending contribution:', session.id);
   }
 
   return session.client_secret;

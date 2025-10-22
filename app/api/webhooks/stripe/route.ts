@@ -1,6 +1,13 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseAdmin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+});
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -23,9 +30,9 @@ export async function POST(req: NextRequest) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
 
-    // Update contribution status
-    const supabase = await createClient();
-    await supabase
+    console.log('[v0] Processing checkout.session.completed:', session.id);
+
+    const { data, error } = await supabaseAdmin
       .from('contributions')
       .update({
         status: 'completed',
@@ -33,9 +40,20 @@ export async function POST(req: NextRequest) {
         payment_method: session.payment_method_types?.[0] || 'card',
         updated_at: new Date().toISOString(),
       })
-      .eq('stripe_session_id', session.id);
+      .eq('stripe_session_id', session.id)
+      .select();
 
-    console.log('[v0] Contribution completed:', session.id);
+    if (error) {
+      console.error('[v0] Failed to update contribution:', error);
+      return NextResponse.json({ error: 'Database update failed' }, { status: 500 });
+    }
+
+    if (!data || data.length === 0) {
+      console.error('[v0] No contribution found for session:', session.id);
+      return NextResponse.json({ error: 'Contribution not found' }, { status: 404 });
+    }
+
+    console.log('[v0] Contribution completed successfully:', data[0]);
   }
 
   return NextResponse.json({ received: true });
