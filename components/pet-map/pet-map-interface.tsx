@@ -34,7 +34,7 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
   const [filteredPets, setFilteredPets] = useState<Pet[]>(pets);
   const searchParams = useSearchParams();
   const router = useRouter();
-  const viewMode = (searchParams.get('view') as 'map' | 'list') || 'map';
+  const viewMode = (searchParams.get('view') as 'list' | 'map') || 'list';
 
   const setViewMode = (mode: 'map' | 'list') => {
     const params = new URLSearchParams(searchParams.toString());
@@ -91,7 +91,7 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
     setPetTypes([]);
     setDistance(10);
     setSortBy('recent');
-    setUserLocation(null);
+    // setUserLocation(null);
   };
 
   useEffect(() => {
@@ -136,17 +136,6 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
       <div className="container mx-auto px-4 py-4 md:px-6 lg:px-8 justify-center flex">
         <div className="inline-flex items-center gap-1 rounded-full bg-muted p-1">
           <button
-            onClick={() => setViewMode('map')}
-            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
-              viewMode === 'map'
-                ? 'bg-background text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Map className="h-4 w-4" />
-            <span className="hidden sm:inline">Mapa</span>
-          </button>
-          <button
             onClick={() => setViewMode('list')}
             className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
               viewMode === 'list'
@@ -156,6 +145,17 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
           >
             <List className="h-4 w-4" />
             <span className="hidden sm:inline">Lista</span>
+          </button>
+          <button
+            onClick={() => setViewMode('map')}
+            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all cursor-pointer ${
+              viewMode === 'map'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Map className="h-4 w-4" />
+            <span className="hidden sm:inline">Mapa</span>
           </button>
         </div>
       </div>

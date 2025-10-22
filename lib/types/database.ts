@@ -1,4 +1,4 @@
-export type PetStatus = "LOST" | "FOUND" | "REUNITED"
+export type PetStatus = "LOST" | "FOUND" | "REUNITED" | "ADOPTION"
 export type UserRole = "USER" | "PETSHOP"
 export type PetType = "DOG" | "CAT" | "BIRD" | "OTHER"
 

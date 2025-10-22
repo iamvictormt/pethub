@@ -76,14 +76,14 @@ export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
       <Card>
         <CardContent className="space-y-3 p-4">
           <Button onClick={handleShare} variant="outline" className="w-full justify-start bg-transparent" size="lg">
-            <Share2 className="mr-2 h-5 w-5" />
+            <Share2 className="h-5 w-5" />
             Compartilhar
           </Button>
 
           {!userId && (
             <Button asChild variant="outline" className="w-full justify-start bg-transparent" size="lg">
               <a href="/auth/login">
-                <Flag className="mr-2 h-5 w-5" />
+                <Flag className="h-5 w-5" />
                 Fazer Login para Comentar
               </a>
             </Button>
@@ -96,7 +96,7 @@ export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
               className="w-full justify-start bg-green-found text-green-found-foreground hover:bg-green-found/90"
               size="lg"
             >
-              <CheckCircle className="mr-2 h-5 w-5" />
+              <CheckCircle className="h-5 w-5" />
               Marcar como Devolvido
             </Button>
           )}
@@ -104,7 +104,7 @@ export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
           {isOwner && (
             <>
               <Button variant="outline" className="w-full justify-start bg-transparent" size="lg">
-                <Edit className="mr-2 h-5 w-5" />
+                <Edit className="h-5 w-5" />
                 Editar Reporte
               </Button>
 
@@ -115,7 +115,7 @@ export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
                 className="w-full justify-start"
                 size="lg"
               >
-                <Trash2 className="mr-2 h-5 w-5" />
+                <Trash2 className="h-5 w-5" />
                 Excluir Reporte
               </Button>
             </>

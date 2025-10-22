@@ -51,7 +51,7 @@ export default async function PetProfilePage({ params }: { params: Promise<{ id:
   const isOwner = user?.id === pet.user_id
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-8">
+    <div className="container mx-auto max-w-7xl px-4 py-8">
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Main Content */}
         <div className="space-y-6 lg:col-span-2">

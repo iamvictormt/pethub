@@ -31,17 +31,10 @@ export default function HomePage() {
 
               {/* CTA Buttons */}
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Button asChild size="lg" className="group bg-orange-alert text-lg hover:bg-orange-alert/90">
+                <Button asChild size="lg" className="group bg-orange-alert hover:bg-orange-alert/90">
                   <Link href="/pets">
-                    <Search className="mr-2 h-5 w-5" />
                     Buscar Pets Perdidos
                     <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                  </Link>
-                </Button>
-                <Button asChild size="lg" variant="outline" className="border-2 text-lg bg-transparent">
-                  <Link href="/reportar">
-                    <MapPin className="mr-2 h-5 w-5" />
-                    Reportar Pet
                   </Link>
                 </Button>
               </div>
@@ -284,8 +277,8 @@ export default function HomePage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Button asChild size="lg" variant="secondary" className="bg-white text-orange-alert hover:bg-white/90">
               <Link href="/contribuir">
-                <Heart className="mr-2 h-5 w-5" />
                 Contribuir Agora
+                <Heart className="h-5 w-5" />
               </Link>
             </Button>
             <Button

@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { SliderInput } from '@/components/ui/slider-input';
 import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { Filter, X, MapPin } from 'lucide-react';
+import { Filter, X, MapPin, Sparkles } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 interface MapFiltersProps {
@@ -34,95 +34,150 @@ export function MapFilters({
   onRequestLocation,
   onClearFilters,
 }: MapFiltersProps) {
+  const hasActiveFilters = status.length > 0 || petTypes.length > 0 || userLocation !== null;
+
   const FilterContent = () => (
     <div className="space-y-6 p-6">
-      <div className="space-y-2">
-        <h2 className="text-2xl font-bold">Filtros</h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground"
-          onClick={onClearFilters}
-        >
-          <X className="mr-2 h-4 w-4" />
-          Limpar filtros
-        </Button>
-      </div>
-
-      <div className="space-y-2">
-        <Button
-          onClick={onRequestLocation}
-          variant={userLocation ? 'default' : 'outline'}
-          className={`w-full ${userLocation ? 'bg-pink-500 hover:bg-pink-600' : ''}`}
-        >
-          <MapPin className="mr-2 h-4 w-4" />
-          {userLocation ? 'Localização ativa' : 'Próximo a mim'}
-        </Button>
-        {userLocation && (
-          <p className="text-center text-xs text-muted-foreground">Mostrando pets em um raio de {distance}km</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-alert to-pink-500 shadow-lg">
+            <Sparkles className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold">Filtros</h2>
+            <p className="text-sm text-muted-foreground">Refine sua busca</p>
+          </div>
+        </div>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-muted-foreground hover:text-foreground"
+            onClick={onClearFilters}
+          >
+            <X className="mr-2 h-4 w-4" />
+            Limpar
+          </Button>
         )}
       </div>
 
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Status</h3>
-        <div className="flex gap-2">
+      {/* Location */}
+      <div className="space-y-3 rounded-xl bg-muted/30 p-4">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-4 w-4 text-orange-alert" />
+          <label className="text-sm font-semibold">Localização</label>
+        </div>
+        <Button
+          onClick={onRequestLocation}
+          variant={userLocation ? 'default' : 'outline'}
+          size="lg"
+          className={`w-full ${
+            userLocation
+              ? 'bg-gradient-to-r from-orange-alert to-pink-500 text-white shadow-lg'
+              : 'hover:border-orange-alert/50'
+          }`}
+        >
+          <MapPin className="mr-2 h-4 w-4" />
+          {userLocation ? '📍 Localização ativa' : 'Ativar localização'}
+        </Button>
+        {userLocation && (
+          <>
+            <p className="rounded-lg bg-background/50 p-2 text-center text-sm font-medium">Raio: {distance}km</p>
+            <SliderInput value={distance} onChange={setDistance} min={1} max={50} unit="km" />
+          </>
+        )}
+      </div>
+
+      {/* Status */}
+      <div className="space-y-3 rounded-xl bg-muted/30 p-4">
+        <h3 className="text-sm font-semibold">Status do Pet</h3>
+        <div className="grid grid-cols-2 gap-2">
           <Button
             onClick={() =>
               setStatus(status.includes('LOST') ? status.filter((s) => s !== 'LOST') : [...status, 'LOST'])
             }
             variant={status.includes('LOST') ? 'default' : 'outline'}
-            className={`flex-1 ${status.includes('LOST') ? 'bg-pink-500 hover:bg-pink-600' : ''}`}
+            size="lg"
+            className={`flex-col gap-1 ${
+              status.includes('LOST')
+                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                : 'hover:border-orange-500/50'
+            }`}
           >
-            Perdidos
+            <span className="text-2xl">😢</span>
+            <span className="text-xs font-semibold">Perdidos</span>
           </Button>
           <Button
             onClick={() =>
               setStatus(status.includes('FOUND') ? status.filter((s) => s !== 'FOUND') : [...status, 'FOUND'])
             }
             variant={status.includes('FOUND') ? 'default' : 'outline'}
-            className={`flex-1 ${status.includes('FOUND') ? 'bg-pink-500 hover:bg-pink-600' : ''}`}
+            size="lg"
+            className={`flex-col gap-1 ${
+              status.includes('FOUND')
+                ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
+                : 'hover:border-blue-500/50'
+            }`}
           >
-            Encontrados
+            <span className="text-2xl">🎉</span>
+            <span className="text-xs font-semibold">Encontrados</span>
+          </Button>
+          <Button
+            onClick={() =>
+              setStatus(status.includes('ADOPTION') ? status.filter((s) => s !== 'ADOPTION') : [...status, 'ADOPTION'])
+            }
+            variant={status.includes('ADOPTION') ? 'default' : 'outline'}
+            size="lg"
+            className={`col-span-2 flex-col gap-1 ${
+              status.includes('ADOPTION')
+                ? 'bg-green-500 text-white shadow-lg shadow-green-500/30'
+                : 'hover:border-green-500/50'
+            }`}
+          >
+            <span className="text-2xl">💚</span>
+            <span className="text-xs font-semibold">Para Adoção</span>
           </Button>
         </div>
       </div>
 
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Tipo de Pet</h3>
+      {/* Pet Types */}
+      <div className="space-y-3 rounded-xl bg-muted/30 p-4">
+        <h3 className="text-sm font-semibold">Tipo de Animal</h3>
         <div className="grid grid-cols-2 gap-2">
           {[
-            { id: 'DOG', label: 'Cachorro' },
-            { id: 'CAT', label: 'Gato' },
-            { id: 'BIRD', label: 'Pássaro' },
-            { id: 'OTHER', label: 'Outro' },
+            { id: 'DOG', label: 'Cachorro', emoji: '🐕' },
+            { id: 'CAT', label: 'Gato', emoji: '🐈' },
+            { id: 'BIRD', label: 'Pássaro', emoji: '🦜' },
+            { id: 'OTHER', label: 'Outro', emoji: '🐾' },
           ].map((type) => (
             <Button
               key={type.id}
               onClick={() =>
                 setPetTypes(petTypes.includes(type.id) ? petTypes.filter((t) => t !== type.id) : [...petTypes, type.id])
               }
-              variant={petTypes.includes(type.id) ? 'secondary' : 'outline'}
-              className="justify-start"
-              size="sm"
+              variant={petTypes.includes(type.id) ? 'default' : 'outline'}
+              size="lg"
+              className={`gap-2 ${
+                petTypes.includes(type.id)
+                  ? 'bg-gradient-to-r from-pink-500 to-orange-alert text-white shadow-lg'
+                  : 'hover:border-pink-500/50'
+              }`}
             >
-              {type.label}
+              <span className="text-lg">{type.emoji}</span>
+              <span className="text-sm font-semibold">{type.label}</span>
             </Button>
           ))}
         </div>
       </div>
 
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Distância máxima</h3>
-        <SliderInput value={distance} onChange={setDistance} min={1} max={50} unit="km" />
-      </div>
-
-      <div className="space-y-3">
-        <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">Ordenar por</h3>
+      {/* Sort */}
+      <div className="space-y-3 rounded-xl bg-muted/30 p-4">
+        <h3 className="text-sm font-semibold">Ordenar por</h3>
         <SelectDropdown
           options={[
-            { value: 'recent', label: 'Mais recentes' },
-            { value: 'distance', label: 'Mais próximos' },
-            { value: 'oldest', label: 'Mais antigos' },
+            { value: 'recent', label: '⏰ Mais recentes' },
+            { value: 'distance', label: '📍 Mais próximos' },
+            { value: 'oldest', label: '📅 Mais antigos' },
           ]}
           value={sortBy}
           onChange={setSortBy}
@@ -137,14 +192,14 @@ export function MapFilters({
         <SheetTrigger asChild>
           <Button
             size="lg"
-            className="h-14 w-14 rounded-full bg-orange-alert text-orange-alert-foreground shadow-lg hover:bg-orange-alert/90"
+            className="h-14 w-14 rounded-full bg-gradient-to-br from-orange-alert to-pink-500 text-white shadow-xl hover:shadow-2xl"
           >
             <Filter className="h-6 w-6" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="h-[80vh]">
+        <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
           <SheetHeader>
-            <SheetTitle>Filtros</SheetTitle>
+            <SheetTitle>Filtros Inteligentes</SheetTitle>
           </SheetHeader>
           <FilterContent />
         </SheetContent>

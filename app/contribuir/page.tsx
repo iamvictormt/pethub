@@ -195,7 +195,7 @@ export default function ContribuirPage() {
                 variant="outline"
                 className="w-full border-2 border-orange-alert/20 hover:border-orange-alert/40 hover:bg-orange-alert/5 bg-transparent"
               >
-                <Coffee className="mr-2 h-5 w-5" />
+                <Coffee className="h-5 w-5" />
                 Fazer uma Doação
               </Button>
             </div>

@@ -115,8 +115,11 @@ export function Navbar() {
                       </DropdownMenuItem>
                     </>
                   )}
-                  <DropdownMenuItem onClick={handleSignOut}>
-                    <LogOut className="h-4 w-4" />
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-600"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
                     Sair
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -202,7 +205,7 @@ export function Navbar() {
                     await handleSignOut();
                     setIsMenuOpen(false);
                   }}
-                  className="w-full justify-start"
+                  className="w-full justify-start text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-600"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   Sair

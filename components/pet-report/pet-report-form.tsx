@@ -141,6 +141,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
             options={[
               { id: "LOST", label: "Perdido - Estou procurando meu pet" },
               { id: "FOUND", label: "Encontrado - Encontrei um pet" },
+              { id: "ADOPTION", label: "Adoção - Disponível para adoção" },
             ]}
             value={status}
             onChange={(value) => setStatus(value as PetStatus)}
@@ -320,7 +321,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
       >
         {isLoading ? (
           <>
-            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            <Loader2 className="h-5 w-5 animate-spin" />
             Reportando...
           </>
         ) : (

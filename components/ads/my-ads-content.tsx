@@ -65,7 +65,7 @@ export function MyAdsContent({ profile, ads: initialAds }: MyAdsContentProps) {
         </div>
         <Button asChild size="lg">
           <Link href="/anunciar">
-            <Plus className="mr-2 h-5 w-5" />
+            <Plus className="h-5 w-5" />
             Criar Anúncio
           </Link>
         </Button>

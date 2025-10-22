@@ -195,6 +195,8 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
           ? calculateDistance(userLocation.lat, userLocation.lng, pet.latitude, pet.longitude)
           : undefined
 
+        const markerColor = pet.status === "LOST" ? "#F97316" : pet.status === "ADOPTION" ? "#22C55E" : "#3B82F6"
+
         return (
           <button
             key={pet.id}
@@ -217,10 +219,7 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
               xmlns="http://www.w3.org/2000/svg"
               className="drop-shadow-lg"
             >
-              <path
-                d="M20 0C9 0 0 9 0 20c0 15 20 28 20 28s20-13 20-28c0-11-9-20-20-20z"
-                fill={pet.status === "LOST" ? "#F97316" : "#3B82F6"}
-              />
+              <path d="M20 0C9 0 0 9 0 20c0 15 20 28 20 28s20-13 20-28c0-11-9-20-20-20z" fill={markerColor} />
               <circle cx="20" cy="20" r="8" fill="white" />
             </svg>
 
@@ -235,6 +234,22 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
           </button>
         )
       })}
+
+      {/* User Location Marker */}
+      {userLocation && (
+        <div
+          className="absolute -translate-x-1/2 -translate-y-1/2 z-[5]"
+          style={{
+            left: `calc(50% + ${latLngToPixel(userLocation.lat, userLocation.lng).x}px)`,
+            top: `calc(50% + ${latLngToPixel(userLocation.lat, userLocation.lng).y}px)`,
+          }}
+        >
+          {/* Pulsing outer circle */}
+          <div className="absolute inset-0 -m-2 animate-ping rounded-full bg-purple-500 opacity-75" />
+          {/* Inner circle */}
+          <div className="relative h-4 w-4 rounded-full border-2 border-white bg-purple-500 shadow-lg" />
+        </div>
+      )}
 
       {/* Map Controls */}
       <div className="absolute bottom-4 right-4 flex flex-col gap-2 z-10">
@@ -284,6 +299,14 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-blue-500" />
             <span>Pet Encontrado</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded-full bg-green-500" />
+            <span>Para Adoção</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded-full bg-purple-500" />
+            <span>Você está aqui</span>
           </div>
         </div>
       </div>

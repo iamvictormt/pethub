@@ -9,8 +9,10 @@ interface PetMarkerPopupProps {
 }
 
 export function PetMarkerPopup({ pet, distance }: PetMarkerPopupProps) {
-  const statusColor = pet.status === "LOST" ? "text-orange-alert" : "text-blue-pethub"
-  const statusBg = pet.status === "LOST" ? "bg-orange-alert/10" : "bg-blue-pethub/10"
+  const statusColor =
+    pet.status === "LOST" ? "text-orange-alert" : pet.status === "ADOPTION" ? "text-green-500" : "text-blue-pethub"
+  const statusBg =
+    pet.status === "LOST" ? "bg-orange-alert/10" : pet.status === "ADOPTION" ? "bg-green-500/10" : "bg-blue-pethub/10"
 
   const petTypeLabels: Record<string, string> = {
     DOG: "Cachorro",
@@ -43,7 +45,7 @@ export function PetMarkerPopup({ pet, distance }: PetMarkerPopupProps) {
   const infoText = buildInfoText()
 
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full h-full space-y-3">
       {/* Pet Image */}
       {pet.photo_url && (
         <div className="relative h-40 w-full overflow-hidden rounded-lg">
@@ -63,7 +65,13 @@ export function PetMarkerPopup({ pet, distance }: PetMarkerPopupProps) {
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-lg font-semibold leading-tight">{pet.name}</h3>
           <span className={`rounded-full px-2 py-1 text-xs font-medium whitespace-nowrap ${statusBg} ${statusColor}`}>
-            {pet.status === "LOST" ? "Perdido" : pet.status === "FOUND" ? "Encontrado" : "Devolvido"}
+            {pet.status === "LOST"
+              ? "Perdido"
+              : pet.status === "FOUND"
+                ? "Encontrado"
+                : pet.status === "ADOPTION"
+                  ? "Adoção"
+                  : "Reunido"}
           </span>
         </div>
 
