@@ -7,13 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TextInput } from '@/components/ui/text-input';
 import { RadioGroup } from '@/components/ui/radio-group';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, useRef } from 'react';
 import { Camera } from 'lucide-react';
 import { formatPhoneBR } from '@/lib/utils';
 import { validateImageFile } from '@/lib/image-validation';
+import { toast } from '@/hooks/use-toast';
 
 export default function SignUpPage() {
   const [name, setName] = useState('');
@@ -71,7 +71,8 @@ export default function SignUpPage() {
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}`,
+          emailRedirectTo:
+            process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/confirm`,
           data: {
             name,
             phone,
@@ -106,9 +107,44 @@ export default function SignUpPage() {
 
       router.push('/auth/sign-up-success');
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Ocorreu um erro ao criar a conta');
+      if (error instanceof Error) {
+        if (
+          error.message.includes('already registered') ||
+          error.message.includes('User already registered') ||
+          error.message.includes('duplicate')
+        ) {
+          toast({
+            title: 'Erro ao criar conta!',
+            description: 'Este email já está cadastrado. Por favor, faça login ou use outro email.',
+          });
+        } else if (error.message.includes('Invalid email')) {
+          toast({
+            title: 'Erro ao criar conta!',
+            description: 'Email inválido. Por favor, verifique o endereço de email.',
+          });
+        } else if (error.message.includes('Password')) {
+          toast({
+            title: 'Erro ao criar conta!',
+            description: 'A senha deve ter pelo menos 6 caracteres.',
+          });
+        } else {
+          toast({
+            title: 'Erro ao criar conta!',
+            description: error.message,
+          });
+        }
+      } else {
+        toast({
+          title: 'Erro ao criar conta!',
+          description: 'Ocorreu um erro ao criar a conta. Por favor, tente novamente.',
+        });
+      }
     } finally {
       setIsLoading(false);
+      toast({
+        title: 'Conta criada com sucesso!',
+        description: 'Por favor, verifique seu email para confirmar sua conta.',
+      });
     }
   };
 
@@ -225,7 +261,6 @@ export default function SignUpPage() {
               >
                 {isLoading || isUploadingAvatar ? (
                   <span className="flex items-center gap-2">
-                    <LoadingSpinner size="sm" />
                     {isUploadingAvatar ? 'Enviando foto...' : 'Criando conta...'}
                   </span>
                 ) : (

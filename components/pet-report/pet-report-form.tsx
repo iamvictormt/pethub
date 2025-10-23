@@ -15,6 +15,7 @@ import { LocationPicker } from './location-picker';
 import type { PetStatus, PetType } from '@/lib/types/database';
 import { formatPhoneBR } from '@/lib/utils';
 import { validateImageFile } from '@/lib/image-validation';
+import { toast } from '@/hooks/use-toast';
 
 interface PetReportFormProps {
   userId: string;
@@ -43,7 +44,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
   const [contactName, setContactName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
   const [contactEmail, setContactEmail] = useState('');
-  const [lastSeenDate, setLastSeenDate] = useState('');
+  const [lastSeenDate, setLastSeenDate] = useState(new Date().toISOString().split('T')[0]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -115,8 +116,15 @@ export function PetReportForm({ userId }: PetReportFormProps) {
 
       if (insertError) throw insertError;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ocorreu um erro ao reportar o pet');
+      toast({
+        title: 'Erro ao reportar pet!',
+        description: '' + (err instanceof Error ? err.message : 'Ocorreu um erro ao reportar o pet'),
+      });
     } finally {
+      toast({
+        title: 'Pet reportado com sucesso!',
+        description: 'Obrigado por ajudar a reunir pets perdidos com seus donos.',
+      });
       router.push('/meus-pets');
       setIsLoading(false);
     }
@@ -124,12 +132,6 @@ export function PetReportForm({ userId }: PetReportFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <LoadingSpinner size="lg" />
-        </div>
-      )}
-
       {/* Status Selection */}
       <Card>
         <CardContent className="pt-6">
@@ -152,11 +154,11 @@ export function PetReportForm({ userId }: PetReportFormProps) {
           <h2 className="text-xl font-semibold">Informações do Pet</h2>
 
           <TextInput
-            label="Nome do Pet"
+            label={`Nome do Pet ${status === 'FOUND' ? '(se souber)' : ''}`}
             placeholder="Ex: Rex, Mimi..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
+            required={status !== 'FOUND'}
           />
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -173,7 +175,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
             />
 
             <TextInput
-              label="Raça"
+              label="Raça (se souber)"
               placeholder="Ex: Labrador, Siamês..."
               value={breed}
               onChange={(e) => setBreed(e.target.value)}
@@ -184,6 +186,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
               placeholder="Ex: Marrom, Preto..."
               value={color}
               onChange={(e) => setColor(e.target.value)}
+              required
             />
           </div>
 
@@ -204,6 +207,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                 setAge(numberValue.toString());
               }}
               helperText="Aproximada, se não souber exatamente"
+              required
             />
 
             <div className="space-y-2">
@@ -213,6 +217,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                 className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none ring-ring transition-colors focus:border-ring focus:ring-2"
                 value={lastSeenDate}
                 onChange={(e) => setLastSeenDate(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -224,6 +229,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
               placeholder="Descreva características marcantes, comportamento, etc..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              required
             />
           </div>
 
@@ -232,7 +238,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
             <label className="text-sm font-medium">Foto do Pet</label>
             <div className="flex flex-col gap-4">
               {photoPreview && (
-                <div className="relative h-48 w-full overflow-hidden rounded-xl">
+                <div className="relative h-[50vh] w-full overflow-hidden rounded-xl">
                   <img src={photoPreview || '/placeholder.svg'} alt="Preview" className="h-full w-full object-cover" />
                 </div>
               )}

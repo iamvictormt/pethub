@@ -9,6 +9,7 @@ import { TextInput } from '@/components/ui/text-input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { toast } from '@/hooks/use-toast';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -32,7 +33,27 @@ export default function LoginPage() {
       router.push('/');
       router.refresh();
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Ocorreu um erro ao fazer login');
+      if (error instanceof Error) {
+        if (error.message === 'Email not confirmed') {
+          toast({
+            title: 'Email não confirmado',
+            description: 'Por favor, verifique seu email e confirme sua conta antes de entrar.',
+          });
+          return;
+        } else if (error.message === 'Invalid login credentials') {
+          toast({
+            title: 'Credenciais inválidas',
+            description: 'O email ou a senha estão incorretos. Tente novamente.',
+          });
+          return;
+        } else {
+          toast({
+            title: 'Erro ao entrar',
+            description: error.message || 'Ocorreu um erro ao tentar entrar. Tente novamente mais tarde.',
+          });
+          return;
+        }
+      }
     } finally {
       setIsLoading(false);
     }

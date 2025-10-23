@@ -2,15 +2,17 @@
 
 import type React from 'react';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { TextInput } from '@/components/ui/text-input';
+import { SelectDropdown } from '@/components/ui/select-dropdown';
 import { Edit, MapPin, Calendar, Phone, Mail, Camera, Plus, ExternalLink, Eye, EyeOff } from 'lucide-react';
 import type { Profile, Advertisement } from '@/lib/types/database';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { validateImageFile } from '@/lib/image-validation';
+import { formatPhoneBR } from '@/lib/utils';
 
 interface PetshopProfileProps {
   profile: Profile | null;
@@ -21,12 +23,45 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(profile?.name || '');
   const [phone, setPhone] = useState(profile?.phone || '');
-  const [bio, setBio] = useState('');
+  const [state, setState] = useState(profile?.state || '');
+  const [city, setCity] = useState(profile?.city || '');
+  const [bio, setBio] = useState(profile?.bio || '');
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const supabase = createClient();
+
+  const [states, setStates] = useState<{ value: string; label: string }[]>([]);
+  const [cities, setCities] = useState<{ value: string; label: string }[]>([]);
+
+  useEffect(() => {
+    fetch('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((s: any) => ({
+          value: s.sigla,
+          label: s.nome,
+        }));
+        setStates(formatted);
+      })
+      .catch((err) => console.error('Erro ao carregar estados:', err));
+  }, []);
+
+  useEffect(() => {
+    if (!state) return;
+
+    fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios`)
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data.map((c: any) => ({
+          value: c.nome,
+          label: c.nome,
+        }));
+        setCities(formatted);
+      })
+      .catch((err) => console.error('Erro ao carregar cidades:', err));
+  }, [state]);
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -73,12 +108,28 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
   const handleSave = async () => {
     if (!profile) return;
 
-    const { error } = await supabase.from('profiles').update({ name, phone }).eq('id', profile.id);
+    console.log('[v0] Saving petshop profile:', { name, phone, state, city, bio });
 
-    if (!error) {
-      setIsEditing(false);
-      router.refresh();
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        name,
+        phone,
+        state,
+        city,
+        bio,
+      })
+      .eq('id', profile.id);
+
+    if (error) {
+      console.error('[v0] Error saving petshop profile:', error);
+      alert('Erro ao salvar perfil: ' + error.message);
+      return;
     }
+
+    console.log('[v0] Petshop profile saved successfully');
+    setIsEditing(false);
+    router.refresh();
   };
 
   const toggleAdStatus = async (adId: string, currentStatus: boolean) => {
@@ -188,7 +239,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                         </div>
                         <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
                           <MapPin className="h-4 w-4 shrink-0" />
-                          <span>Brasil</span>
+                          <span>{city && state ? `${city}, ${state}` : 'Brasil'}</span>
                         </div>
                         <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="h-4 w-4 shrink-0" />
@@ -259,7 +310,10 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                   {isEditing ? (
                     <TextInput
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={(e) => setPhone(formatPhoneBR(e.target.value))}
+                      onBlur={() => {
+                        if (phone.length < 14) setPhone('');
+                      }}
                       placeholder="(00) 00000-0000"
                       icon={<Phone className="h-4 w-4" />}
                     />
@@ -267,6 +321,44 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                     <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-3">
                       <Phone className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">{phone || 'Não informado'}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">Estado</label>
+                  {isEditing ? (
+                    <SelectDropdown
+                      value={state}
+                      onChange={(value) => {
+                        setState(value);
+                        setCity(''); // reseta cidade ao mudar estado
+                      }}
+                      options={states}
+                      placeholder="Selecione o estado"
+                    />
+                  ) : (
+                    <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-3">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{state || 'Não informado'}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Cidade */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-muted-foreground">Cidade</label>
+                  {isEditing ? (
+                    <SelectDropdown
+                      value={city}
+                      onChange={setCity}
+                      options={cities}
+                      placeholder={state ? 'Selecione a cidade' : 'Selecione o estado primeiro'}
+                      disabled={!state}
+                    />
+                  ) : (
+                    <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-3">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">{city || 'Não informado'}</span>
                     </div>
                   )}
                 </div>

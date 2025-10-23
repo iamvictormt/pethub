@@ -6,6 +6,7 @@ import "./globals.css"
 import { Navbar } from "@/components/layout/navbar"
 import { MobileNav } from "@/components/layout/mobile-nav"
 import { Footer } from "@/components/layout/footer"
+import { Toaster } from "@/components/ui/toaster"
 
 const _poppins = Poppins({
   subsets: ["latin"],
@@ -31,13 +32,15 @@ export default async function RootLayout({
       <body className={`font-sans antialiased ${_poppins.variable}`}>
         <Navbar />
 
-        <main className="md:min-h-screen">{children}</main>
+        <main>{children}</main>
 
         <Footer />
 
         {/* <MobileNav /> */}
 
         <Analytics />
+
+        <Toaster />
       </body>
     </html>
   )

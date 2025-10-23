@@ -16,6 +16,7 @@ import type { Pet, PetStatus, PetType } from '@/lib/types/database';
 import Link from 'next/link';
 import { formatPhoneBR } from '@/lib/utils';
 import { validateImageFile } from '@/lib/image-validation';
+import { toast } from '@/hooks/use-toast';
 
 interface PetEditFormProps {
   pet: Pet;
@@ -43,7 +44,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
   const [contactName, setContactName] = useState(pet.contact_name);
   const [contactPhone, setContactPhone] = useState(pet.contact_phone);
   const [contactEmail, setContactEmail] = useState(pet.contact_email || '');
-  const [lastSeenDate, setLastSeenDate] = useState(pet.last_seen_date || '');
+  const [lastSeenDate, setLastSeenDate] = useState(new Date(pet.last_seen_date || '').toISOString().split('T')[0]);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -118,20 +119,21 @@ export function PetEditForm({ pet }: PetEditFormProps) {
       router.push('/meus-pets');
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ocorreu um erro ao atualizar o pet');
+      toast({
+        title: 'Erro ao salvar pet!',
+        description: '' + (err instanceof Error ? err.message : 'Ocorreu um erro ao salvar o pet'),
+      });
     } finally {
+      toast({
+        title: 'Pet salvo com sucesso!',
+        description: 'As informações do pet foram atualizadas.',
+      });
       setIsLoading(false);
     }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {isLoading && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm">
-          <LoadingSpinner size="lg" />
-        </div>
-      )}
-
       {/* Status Selection */}
       <Card>
         <CardContent className="pt-6">
@@ -154,11 +156,11 @@ export function PetEditForm({ pet }: PetEditFormProps) {
           <h2 className="text-xl font-semibold">Informações do Pet</h2>
 
           <TextInput
-            label="Nome do Pet"
+            label={`Nome do Pet ${status === 'FOUND' ? '(se souber)' : ''}`}
             placeholder="Ex: Rex, Mimi..."
             value={name}
             onChange={(e) => setName(e.target.value)}
-            required
+            required={status !== 'FOUND'}
           />
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -175,7 +177,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
             />
 
             <TextInput
-              label="Raça"
+              label="Raça (se souber)"
               placeholder="Ex: Labrador, Siamês..."
               value={breed}
               onChange={(e) => setBreed(e.target.value)}
@@ -186,6 +188,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
               placeholder="Ex: Marrom, Preto..."
               value={color}
               onChange={(e) => setColor(e.target.value)}
+              required
             />
           </div>
 
@@ -206,6 +209,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
                 setAge(numberValue.toString());
               }}
               helperText="Aproximada, se não souber exatamente"
+              required
             />
 
             <div className="space-y-2">
@@ -215,6 +219,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
                 className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none ring-ring transition-colors focus:border-ring focus:ring-2"
                 value={lastSeenDate}
                 onChange={(e) => setLastSeenDate(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -226,6 +231,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
               placeholder="Descreva características marcantes, comportamento, etc..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              required
             />
           </div>
 
@@ -234,7 +240,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
             <label className="text-sm font-medium">Foto do Pet</label>
             <div className="flex flex-col gap-4">
               {photoPreview && (
-                <div className="relative h-48 w-full overflow-hidden rounded-xl">
+                <div className="relative h-[50vh] w-full overflow-hidden rounded-xl">
                   <img src={photoPreview || '/placeholder.svg'} alt="Preview" className="h-full w-full object-cover" />
                 </div>
               )}

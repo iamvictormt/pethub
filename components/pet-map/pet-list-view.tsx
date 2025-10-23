@@ -233,12 +233,17 @@ export function PetListView({
                       </div>
 
                       <div className="p-4">
-                        <h3 className="mb-2 text-lg font-semibold">{pet.name}</h3>
-
+                        <h3 className="mb-2 text-lg font-semibold">{pet.name || 'Não informado'}</h3>
                         <div className="space-y-1 text-sm text-muted-foreground">
                           <div className="flex items-center gap-2">
-                            <span className="capitalize">{pet.type.toLowerCase()}</span>
-                            {pet.breed && <span>• {pet.breed}</span>}
+                            {pet.type === 'DOG'
+                              ? 'Cachorro'
+                              : pet.type === 'CAT'
+                              ? 'Gato'
+                              : pet.type === 'BIRD'
+                              ? 'Pássaro'
+                              : 'Outro'}
+                            {pet.breed && ` • ${pet.breed}`}
                           </div>
 
                           <div className="flex items-center gap-1">
