@@ -248,7 +248,9 @@ export function PetListView({
 
                           <div className="flex items-center gap-1">
                             <MapPin className="h-3 w-3" />
-                            <span className="line-clamp-1">{pet.location_description}</span>
+                            <span className="line-clamp-1">
+                              {pet.location_description || `Localização não especificada`}
+                            </span>
                           </div>
 
                           <div className="flex items-center gap-1">
