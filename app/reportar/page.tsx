@@ -13,15 +13,20 @@ export default async function ReportarPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <div className="mb-8 space-y-2">
-        <h1 className="text-3xl font-bold text-balance">Reportar Pet</h1>
-        <p className="text-muted-foreground text-pretty">
-          Preencha as informações abaixo para ajudar a reunir pets com seus tutores
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-background to-blue-50">
+      <div className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
+        <div className="mb-12 space-y-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-balance bg-gradient-to-r from-orange-alert via-orange-600 to-blue-600 bg-clip-text text-transparent">
+            Reportar Pet
+          </h1>
+          <p className="text-lg text-muted-foreground text-pretty max-w-2xl mx-auto">
+            Preencha as informações abaixo para ajudar a reunir pets com seus tutores. Quanto mais detalhes, maiores as
+            chances de sucesso!
+          </p>
+        </div>
 
-      <PetReportForm userId={user.id} />
+        <PetReportForm userId={user.id} />
+      </div>
     </div>
   )
 }
