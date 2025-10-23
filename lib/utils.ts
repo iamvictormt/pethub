@@ -5,18 +5,21 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const formatPhoneBR = (value: string) => {
-  let digits = value.replace(/\D/g, "");
+export function formatPhoneBR(value: string): string {
+  // Remove all non-numeric characters
+  const numbers = value.replace(/\D/g, "")
 
-  if (digits.length > 11) digits = digits.slice(0, 11);
+  // Limit to 11 digits (Brazilian phone format)
+  const limited = numbers.slice(0, 11)
 
-  if (digits.length > 6) {
-    digits = digits.replace(/(\d{2})(\d{5})(\d{0,4})/, "($1) $2-$3");
-  } else if (digits.length > 2) {
-    digits = digits.replace(/(\d{2})(\d{0,5})/, "($1) $2");
+  // Format based on length
+  if (limited.length <= 2) {
+    return limited
+  } else if (limited.length <= 6) {
+    return `(${limited.slice(0, 2)}) ${limited.slice(2)}`
+  } else if (limited.length <= 10) {
+    return `(${limited.slice(0, 2)}) ${limited.slice(2, 6)}-${limited.slice(6)}`
   } else {
-    digits = digits.replace(/(\d*)/, "($1");
+    return `(${limited.slice(0, 2)}) ${limited.slice(2, 7)}-${limited.slice(7)}`
   }
-
-  return digits;
-};
+}

@@ -1,108 +1,99 @@
-"use client"
+'use client';
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { TextInput } from "@/components/ui/text-input"
-import { RadioGroup } from "@/components/ui/radio-group"
-import { SelectDropdown } from "@/components/ui/select-dropdown"
-import { Upload, MapPin, ArrowLeft } from "lucide-react"
-import { LoadingSpinner } from "@/components/ui/loading-spinner"
-import { LocationPicker } from "./location-picker"
-import type { Pet, PetStatus, PetType } from "@/lib/types/database"
-import Link from "next/link"
-import { formatPhoneBR } from "@/lib/utils"
+import type React from 'react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { TextInput } from '@/components/ui/text-input';
+import { RadioGroup } from '@/components/ui/radio-group';
+import { SelectDropdown } from '@/components/ui/select-dropdown';
+import { Upload, MapPin, ArrowLeft } from 'lucide-react';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { LocationPicker } from './location-picker';
+import type { Pet, PetStatus, PetType } from '@/lib/types/database';
+import Link from 'next/link';
+import { formatPhoneBR } from '@/lib/utils';
+import { validateImageFile } from '@/lib/image-validation';
 
 interface PetEditFormProps {
-  pet: Pet
+  pet: Pet;
 }
 
 export function PetEditForm({ pet }: PetEditFormProps) {
-  const router = useRouter()
-  const supabase = createClient()
+  const router = useRouter();
+  const supabase = createClient();
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [photoFile, setPhotoFile] = useState<File | null>(null)
-  const [photoPreview, setPhotoPreview] = useState<string | null>(pet.photo_url || null)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(pet.photo_url || null);
 
-  const [status, setStatus] = useState<PetStatus>(pet.status)
-  const [name, setName] = useState(pet.name)
-  const [type, setType] = useState<PetType>(pet.type)
-  const [breed, setBreed] = useState(pet.breed || "")
-  const [color, setColor] = useState(pet.color || "")
-  const [age, setAge] = useState(pet.age?.toString() || "")
-  const [description, setDescription] = useState(pet.description || "")
-  const [latitude, setLatitude] = useState(pet.latitude?.toString() || "")
-  const [longitude, setLongitude] = useState(pet.longitude?.toString() || "")
-  const [locationDescription, setLocationDescription] = useState(pet.location_description || "")
-  const [contactName, setContactName] = useState(pet.contact_name)
-  const [contactPhone, setContactPhone] = useState(pet.contact_phone)
-  const [contactEmail, setContactEmail] = useState(pet.contact_email || "")
-  const [lastSeenDate, setLastSeenDate] = useState(pet.last_seen_date || "")
+  const [status, setStatus] = useState<PetStatus>(pet.status);
+  const [name, setName] = useState(pet.name);
+  const [type, setType] = useState<PetType>(pet.type);
+  const [breed, setBreed] = useState(pet.breed || '');
+  const [color, setColor] = useState(pet.color || '');
+  const [age, setAge] = useState(pet.age?.toString() || '');
+  const [description, setDescription] = useState(pet.description || '');
+  const [latitude, setLatitude] = useState(pet.latitude?.toString() || '');
+  const [longitude, setLongitude] = useState(pet.longitude?.toString() || '');
+  const [locationDescription, setLocationDescription] = useState(pet.location_description || '');
+  const [contactName, setContactName] = useState(pet.contact_name);
+  const [contactPhone, setContactPhone] = useState(pet.contact_phone);
+  const [contactEmail, setContactEmail] = useState(pet.contact_email || '');
+  const [lastSeenDate, setLastSeenDate] = useState(pet.last_seen_date || '');
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setPhotoFile(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result as string)
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        setError(validation.error || 'Arquivo inválido');
+        return;
       }
-      reader.readAsDataURL(file)
-    }
-  }
 
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLatitude(position.coords.latitude.toString())
-          setLongitude(position.coords.longitude.toString())
-        },
-        (error) => {
-          setError("Não foi possível obter sua localização. Por favor, insira manualmente.")
-        },
-      )
-    } else {
-      setError("Geolocalização não é suportada pelo seu navegador.")
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     try {
       // Validate required fields
       if (!name || !contactName || !contactPhone || !latitude || !longitude) {
-        throw new Error("Por favor, preencha todos os campos obrigatórios")
+        throw new Error('Por favor, preencha todos os campos obrigatórios');
       }
 
-      let photoUrl = pet.photo_url
+      let photoUrl = pet.photo_url;
 
       if (photoFile) {
-        const fileExt = photoFile.name.split(".").pop()
-        const fileName = `${pet.user_id}-${Date.now()}.${fileExt}`
+        const fileExt = photoFile.name.split('.').pop();
+        const fileName = `${pet.user_id}-${Date.now()}.${fileExt}`;
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("pet-photos")
-          .upload(fileName, photoFile)
+          .from('pet-photos')
+          .upload(fileName, photoFile);
 
-        if (uploadError) throw uploadError
+        if (uploadError) throw uploadError;
 
         const {
           data: { publicUrl },
-        } = supabase.storage.from("pet-photos").getPublicUrl(fileName)
+        } = supabase.storage.from('pet-photos').getPublicUrl(fileName);
 
-        photoUrl = publicUrl
+        photoUrl = publicUrl;
       }
 
       const { error: updateError } = await supabase
-        .from("pets")
+        .from('pets')
         .update({
           name,
           type,
@@ -120,18 +111,18 @@ export function PetEditForm({ pet }: PetEditFormProps) {
           contact_email: contactEmail || null,
           last_seen_date: lastSeenDate || null,
         })
-        .eq("id", pet.id)
+        .eq('id', pet.id);
 
-      if (updateError) throw updateError
+      if (updateError) throw updateError;
 
-      router.push("/meus-pets")
-      router.refresh()
+      router.push('/meus-pets');
+      router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Ocorreu um erro ao atualizar o pet")
+      setError(err instanceof Error ? err.message : 'Ocorreu um erro ao atualizar o pet');
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -147,9 +138,9 @@ export function PetEditForm({ pet }: PetEditFormProps) {
           <RadioGroup
             label="Status do Pet"
             options={[
-              { id: "LOST", label: "Perdido - Estou procurando meu pet" },
-              { id: "FOUND", label: "Encontrado - Encontrei um pet" },
-              { id: "ADOPTION", label: "Adoção - Disponível para adoção" },
+              { id: 'LOST', label: 'Perdido - Estou procurando meu pet' },
+              { id: 'FOUND', label: 'Encontrado - Encontrei um pet' },
+              { id: 'ADOPTION', label: 'Adoção - Disponível para adoção' },
             ]}
             value={status}
             onChange={(value) => setStatus(value as PetStatus)}
@@ -174,10 +165,10 @@ export function PetEditForm({ pet }: PetEditFormProps) {
             <SelectDropdown
               label="Tipo de Animal"
               options={[
-                { value: "DOG", label: "Cachorro" },
-                { value: "CAT", label: "Gato" },
-                { value: "BIRD", label: "Pássaro" },
-                { value: "OTHER", label: "Outro" },
+                { value: 'DOG', label: 'Cachorro' },
+                { value: 'CAT', label: 'Gato' },
+                { value: 'BIRD', label: 'Pássaro' },
+                { value: 'OTHER', label: 'Outro' },
               ]}
               value={type}
               onChange={(value) => setType(value as PetType)}
@@ -244,13 +235,13 @@ export function PetEditForm({ pet }: PetEditFormProps) {
             <div className="flex flex-col gap-4">
               {photoPreview && (
                 <div className="relative h-48 w-full overflow-hidden rounded-xl">
-                  <img src={photoPreview || "/placeholder.svg"} alt="Preview" className="h-full w-full object-cover" />
+                  <img src={photoPreview || '/placeholder.svg'} alt="Preview" className="h-full w-full object-cover" />
                 </div>
               )}
               <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/30 px-4 py-8 transition-colors hover:bg-muted/50">
                 <Upload className="h-5 w-5 text-muted-foreground" />
                 <span className="text-sm text-muted-foreground">
-                  {photoPreview ? "Clique para alterar a foto" : "Clique para fazer upload da foto"}
+                  {photoPreview ? 'Clique para alterar a foto' : 'Clique para fazer upload da foto'}
                 </span>
                 <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
               </label>
@@ -266,8 +257,8 @@ export function PetEditForm({ pet }: PetEditFormProps) {
             latitude={latitude}
             longitude={longitude}
             onLocationChange={(lat, lng) => {
-              setLatitude(lat)
-              setLongitude(lng)
+              setLatitude(lat);
+              setLongitude(lng);
             }}
             locationDescription={locationDescription}
             onDescriptionChange={setLocationDescription}
@@ -295,6 +286,9 @@ export function PetEditForm({ pet }: PetEditFormProps) {
               placeholder="(00) 00000-0000"
               value={contactPhone}
               onChange={(e) => setContactPhone(formatPhoneBR(e.target.value))}
+              onBlur={() => {
+                if (contactPhone.length < 14) setContactPhone('');
+              }}
               required
             />
           </div>
@@ -326,9 +320,9 @@ export function PetEditForm({ pet }: PetEditFormProps) {
           className="flex-1 bg-orange-alert text-orange-alert-foreground hover:bg-orange-alert/90"
           disabled={isLoading}
         >
-          {isLoading ? "Salvando..." : "Salvar Alterações"}
+          {isLoading ? 'Salvando...' : 'Salvar Alterações'}
         </Button>
       </div>
     </form>
-  )
+  );
 }

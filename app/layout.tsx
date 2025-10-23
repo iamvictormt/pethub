@@ -35,7 +35,7 @@ export default async function RootLayout({
 
         <Footer />
 
-        <MobileNav />
+        {/* <MobileNav /> */}
 
         <Analytics />
       </body>

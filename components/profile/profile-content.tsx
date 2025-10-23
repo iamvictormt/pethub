@@ -11,6 +11,7 @@ import type { Profile, Pet } from '@/lib/types/database';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { validateImageFile } from '@/lib/image-validation';
 
 interface ProfileContentProps {
   profile: Profile | null;
@@ -32,6 +33,12 @@ export function ProfileContent({ profile, pets }: ProfileContentProps) {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !profile) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      alert(validation.error);
+      return;
+    }
 
     setIsUploadingAvatar(true);
 

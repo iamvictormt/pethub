@@ -16,7 +16,7 @@ export default async function ReportarPage() {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-background to-blue-50">
       <div className="container mx-auto max-w-4xl px-4 py-16 md:py-24">
         <div className="mb-12 space-y-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-balance bg-gradient-to-r from-orange-alert via-orange-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold text-balance text-orange-alert">
             Reportar Pet
           </h1>
           <p className="text-lg text-muted-foreground text-pretty max-w-2xl mx-auto">

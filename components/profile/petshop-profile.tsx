@@ -1,86 +1,93 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useState, useRef } from "react"
-import { Button } from "@/components/ui/button"
-import { TextInput } from "@/components/ui/text-input"
-import { Edit, MapPin, Calendar, Phone, Mail, Camera, Plus, ExternalLink, Eye, EyeOff } from "lucide-react"
-import type { Profile, Advertisement } from "@/lib/types/database"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
+import { useState, useRef } from 'react';
+import { Button } from '@/components/ui/button';
+import { TextInput } from '@/components/ui/text-input';
+import { Edit, MapPin, Calendar, Phone, Mail, Camera, Plus, ExternalLink, Eye, EyeOff } from 'lucide-react';
+import type { Profile, Advertisement } from '@/lib/types/database';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { validateImageFile } from '@/lib/image-validation';
 
 interface PetshopProfileProps {
-  profile: Profile | null
-  advertisements: Advertisement[]
+  profile: Profile | null;
+  advertisements: Advertisement[];
 }
 
 export function PetshopProfile({ profile, advertisements }: PetshopProfileProps) {
-  const [isEditing, setIsEditing] = useState(false)
-  const [name, setName] = useState(profile?.name || "")
-  const [phone, setPhone] = useState(profile?.phone || "")
-  const [bio, setBio] = useState("")
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
-  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || "")
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const router = useRouter()
-  const supabase = createClient()
+  const [isEditing, setIsEditing] = useState(false);
+  const [name, setName] = useState(profile?.name || '');
+  const [phone, setPhone] = useState(profile?.phone || '');
+  const [bio, setBio] = useState('');
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || '');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || !profile) return
+    const file = e.target.files?.[0];
+    if (!file || !profile) return;
 
-    setIsUploadingAvatar(true)
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      alert(validation.error);
+      return;
+    }
+
+    setIsUploadingAvatar(true);
 
     try {
-      const fileExt = file.name.split(".").pop()
-      const fileName = `${profile.id}/${Date.now()}.${fileExt}`
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${profile.id}/${Date.now()}.${fileExt}`;
 
-      const { error: uploadError } = await supabase.storage.from("profile-avatars").upload(fileName, file, {
+      const { error: uploadError } = await supabase.storage.from('profile-avatars').upload(fileName, file, {
         upsert: true,
-      })
+      });
 
-      if (uploadError) throw uploadError
+      if (uploadError) throw uploadError;
 
       const {
         data: { publicUrl },
-      } = supabase.storage.from("profile-avatars").getPublicUrl(fileName)
+      } = supabase.storage.from('profile-avatars').getPublicUrl(fileName);
 
       const { error: updateError } = await supabase
-        .from("profiles")
+        .from('profiles')
         .update({ avatar_url: publicUrl })
-        .eq("id", profile.id)
+        .eq('id', profile.id);
 
-      if (updateError) throw updateError
+      if (updateError) throw updateError;
 
-      setAvatarUrl(publicUrl)
-      router.refresh()
+      setAvatarUrl(publicUrl);
+      router.refresh();
     } catch (error) {
-      console.error("Error uploading avatar:", error)
+      console.error('Error uploading avatar:', error);
     } finally {
-      setIsUploadingAvatar(false)
+      setIsUploadingAvatar(false);
     }
-  }
+  };
 
   const handleSave = async () => {
-    if (!profile) return
+    if (!profile) return;
 
-    const { error } = await supabase.from("profiles").update({ name, phone }).eq("id", profile.id)
+    const { error } = await supabase.from('profiles').update({ name, phone }).eq('id', profile.id);
 
     if (!error) {
-      setIsEditing(false)
-      router.refresh()
+      setIsEditing(false);
+      router.refresh();
     }
-  }
+  };
 
   const toggleAdStatus = async (adId: string, currentStatus: boolean) => {
-    await supabase.from("advertisements").update({ is_active: !currentStatus }).eq("id", adId)
-    router.refresh()
-  }
+    await supabase.from('advertisements').update({ is_active: !currentStatus }).eq('id', adId);
+    router.refresh();
+  };
 
-  const activeAds = advertisements.filter((ad) => ad.is_active)
-  const inactiveAds = advertisements.filter((ad) => !ad.is_active)
+  const activeAds = advertisements.filter((ad) => ad.is_active);
+  const inactiveAds = advertisements.filter((ad) => !ad.is_active);
 
   return (
     <div className="min-h-screen bg-background">
@@ -136,7 +143,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                   <div className="h-32 w-32 overflow-hidden rounded-2xl md:h-40 md:w-40">
                     {avatarUrl ? (
                       <img
-                        src={avatarUrl || "/placeholder.svg"}
+                        src={avatarUrl || '/placeholder.svg'}
                         alt={profile?.name}
                         className="h-full w-full object-cover"
                       />
@@ -186,7 +193,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                         <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="h-4 w-4 shrink-0" />
                           <span className="text-balance">
-                            Membro desde {new Date(profile?.created_at || "").toLocaleDateString("pt-BR")}
+                            Membro desde {new Date(profile?.created_at || '').toLocaleDateString('pt-BR')}
                           </span>
                         </div>
                       </div>
@@ -227,7 +234,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                         />
                       ) : (
                         <p className="text-pretty text-sm text-muted-foreground">
-                          {bio || "Petshop dedicado ao bem-estar e felicidade dos seus pets."}
+                          {bio || 'Petshop dedicado ao bem-estar e felicidade dos seus pets.'}
                         </p>
                       )}
                     </div>
@@ -259,7 +266,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                   ) : (
                     <div className="flex items-center gap-2 rounded-lg bg-muted/50 p-3">
                       <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{phone || "Não informado"}</span>
+                      <span className="text-sm">{phone || 'Não informado'}</span>
                     </div>
                   )}
                 </div>
@@ -285,7 +292,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                   >
                     <div className="aspect-video w-full bg-muted">
                       <img
-                        src={ad.image_url || "/placeholder.svg"}
+                        src={ad.image_url || '/placeholder.svg'}
                         alt={ad.title}
                         className="h-full w-full object-cover transition-transform group-hover:scale-105"
                       />
@@ -307,11 +314,11 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                         <span
                           className={`inline-block rounded-full px-2 py-1 text-xs font-medium ${
                             ad.is_active
-                              ? "bg-green-found/10 text-green-found"
-                              : "bg-muted-foreground/10 text-muted-foreground"
+                              ? 'bg-green-found/10 text-green-found'
+                              : 'bg-muted-foreground/10 text-muted-foreground'
                           }`}
                         >
-                          {ad.is_active ? "Ativo" : "Inativo"}
+                          {ad.is_active ? 'Ativo' : 'Inativo'}
                         </span>
                         {ad.link_url && (
                           <a
@@ -348,5 +355,5 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
         </div>
       </div>
     </div>
-  )
+  );
 }

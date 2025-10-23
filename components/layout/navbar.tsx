@@ -1,130 +1,160 @@
-'use client';
+"use client"
 
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@/components/ui/dropdown-menu';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Menu, User, LogOut, Store, Search, AlertTriangle, Map } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
-import type { User as SupabaseUser } from '@supabase/supabase-js';
-import type { Profile } from '@/lib/types/database';
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Menu, User, LogOut, Store, AlertTriangle, Search, Heart, Users, X } from "lucide-react"
+import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
+import { useRouter, usePathname } from "next/navigation"
+import type { User as SupabaseUser } from "@supabase/supabase-js"
+import type { Profile } from "@/lib/types/database"
+import { cn } from "@/lib/utils"
 
 export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const router = useRouter();
-  const supabase = createClient();
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const router = useRouter()
+  const pathname = usePathname()
+  const supabase = createClient()
 
   useEffect(() => {
     const getUser = async () => {
       const {
         data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
+      } = await supabase.auth.getUser()
+      setUser(user)
 
       if (user) {
-        const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-
-        setProfile(profileData);
+        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+        setProfile(profileData)
       } else {
-        setProfile(null);
+        setProfile(null)
       }
-    };
+    }
 
-    getUser();
+    getUser()
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null);
+      setUser(session?.user ?? null)
 
       if (session?.user) {
-        const { data: profileData } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-
-        setProfile(profileData);
+        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single()
+        setProfile(profileData)
       } else {
-        setProfile(null);
+        setProfile(null)
       }
-    });
+    })
 
-    return () => subscription.unsubscribe();
-  }, [supabase]);
+    return () => subscription.unsubscribe()
+  }, [supabase])
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
-    router.refresh();
-  };
+    await supabase.auth.signOut()
+    router.push("/")
+    router.refresh()
+  }
 
-  const isPetshop = profile?.role === 'PETSHOP';
+  const isPetshop = profile?.role === "PETSHOP"
+
+  const navLinks = [
+    { href: "/pets", label: "Buscar Pets", icon: Search },
+    { href: "/contribuir", label: "Doar", icon: Heart },
+    { href: "/contribuintes", label: "Contribuintes", icon: Users },
+  ]
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4 py-8 max-w-7xl">
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
+      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold text-foreground">PetHub</span>
+        <Link href="/" className="group flex items-center gap-2 transition-opacity hover:opacity-80">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-alert to-orange-alert/80">
+            <span className="text-lg font-bold text-white">P</span>
+          </div>
+          <span className="text-xl font-bold tracking-tight">PetHub</span>
         </Link>
 
+        {/* Desktop Navigation Links */}
+        <div className="hidden items-center gap-1 md:flex">
+          {navLinks.map((link) => {
+            const Icon = link.icon
+            const isActive = pathname === link.href
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all",
+                  isActive
+                    ? "bg-orange-alert/10 text-orange-alert"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                {link.label}
+              </Link>
+            )
+          })}
+        </div>
+
         {/* Desktop Actions */}
-        <div className="hidden items-center gap-4 md:flex">
-          <Button asChild className="bg-purple-500 text-white hover:bg-purple-500/90">
-            <Link href="/pets">
-              <Search className="h-4 w-4" />
-              Buscar Pets
-            </Link>
-          </Button>
+        <div className="hidden items-center gap-3 md:flex">
           {user ? (
             <>
               {isPetshop ? (
-                <Button asChild className="bg-blue-pethub text-blue-pethub-foreground hover:bg-blue-pethub/90">
+                <Button asChild size="sm" className="bg-blue-pethub hover:bg-blue-pethub/90">
                   <Link href="/anunciar">
                     <Store className="mr-2 h-4 w-4" />
                     Anunciar
                   </Link>
                 </Button>
               ) : (
-                <Button asChild className="bg-orange-alert text-orange-alert-foreground hover:bg-orange-alert/90">
+                <Button asChild size="sm" className="bg-orange-alert hover:bg-orange-alert/90">
                   <Link href="/reportar">
-                    <AlertTriangle className="h-4 w-4" />
-                    Reportar Pet
+                    <AlertTriangle className="mr-2 h-4 w-4" />
+                    Reportar
                   </Link>
                 </Button>
               )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="rounded-full">
-                    <User className="h-5 w-5" />
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full">
+                    <User className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem asChild>
-                    <Link href="/perfil">Meu Perfil</Link>
+                    <Link href="/perfil" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Meu Perfil
+                    </Link>
                   </DropdownMenuItem>
                   {isPetshop ? (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link href="/meus-anuncios">Meus Anúncios</Link>
-                      </DropdownMenuItem>
-                    </>
+                    <DropdownMenuItem asChild>
+                      <Link href="/meus-anuncios" className="cursor-pointer">
+                        <Store className="mr-2 h-4 w-4" />
+                        Meus Anúncios
+                      </Link>
+                    </DropdownMenuItem>
                   ) : (
-                    <>
-                      <DropdownMenuItem asChild>
-                        <Link href="/meus-pets">Meus Pets</Link>
-                      </DropdownMenuItem>
-                    </>
+                    <DropdownMenuItem asChild>
+                      <Link href="/meus-pets" className="cursor-pointer">
+                        <AlertTriangle className="mr-2 h-4 w-4" />
+                        Meus Pets
+                      </Link>
+                    </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem
-                    onClick={handleSignOut}
-                    className="text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-600"
-                  >
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-600">
                     <LogOut className="mr-2 h-4 w-4" />
                     Sair
                   </DropdownMenuItem>
@@ -132,34 +162,71 @@ export function Navbar() {
               </DropdownMenu>
             </>
           ) : (
-            <>
-              <Button variant="ghost" asChild>
-                <Link href="/auth/login">Entrar</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/auth/sign-up">Cadastrar</Link>
-              </Button>
-            </>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <User className="mr-2 h-4 w-4" />
+                  Conta
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuItem asChild>
+                  <Link href="/auth/login" className="cursor-pointer">
+                    Entrar
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/auth/sign-up" className="cursor-pointer">
+                    Cadastrar
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
 
         {/* Mobile Menu Button */}
-        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-          <Menu className="h-6 w-6" />
+        <Button variant="ghost" size="icon" className="h-9 w-9 md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
       </div>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="border-t border-border bg-background md:hidden">
-          <div className="container mx-auto flex flex-col gap-2 p-4">
+        <div className="border-t bg-background md:hidden">
+          <div className="container mx-auto space-y-1 p-4">
+            {/* Mobile Nav Links */}
+            {navLinks.map((link) => {
+              const Icon = link.icon
+              const isActive = pathname === link.href
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                    isActive
+                      ? "bg-orange-alert/10 text-orange-alert"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  )}
+                >
+                  <Icon className="h-4 w-4" />
+                  {link.label}
+                </Link>
+              )
+            })}
+
+            <div className="my-3 border-t" />
+
+            {/* Mobile User Actions */}
             {user ? (
               <>
                 {isPetshop ? (
                   <Button
                     asChild
-                    className="w-full bg-blue-pethub text-blue-pethub-foreground hover:bg-blue-pethub/90"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="w-full justify-start bg-blue-pethub hover:bg-blue-pethub/90"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     <Link href="/anunciar">
                       <Store className="mr-2 h-4 w-4" />
@@ -169,64 +236,67 @@ export function Navbar() {
                 ) : (
                   <Button
                     asChild
-                    className="w-full bg-orange-alert text-orange-alert-foreground hover:bg-orange-alert/90"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    className="w-full justify-start bg-orange-alert hover:bg-orange-alert/90"
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     <Link href="/reportar">
-                      <AlertTriangle className="h-4 w-4" />
+                      <AlertTriangle className="mr-2 h-4 w-4" />
                       Reportar Pet
                     </Link>
                   </Button>
                 )}
-                <Button
-                  variant="ghost"
-                  asChild
-                  className="w-full justify-start"
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+
+                <Link
+                  href="/perfil"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                 >
-                  <Link href="/perfil">Meu Perfil</Link>
-                </Button>
+                  <User className="h-4 w-4" />
+                  Meu Perfil
+                </Link>
+
                 {isPetshop ? (
-                  <Button
-                    variant="ghost"
-                    asChild
-                    className="w-full justify-start"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  <Link
+                    href="/meus-anuncios"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
-                    <Link href="/meus-anuncios">Meus Anúncios</Link>
-                  </Button>
+                    <Store className="h-4 w-4" />
+                    Meus Anúncios
+                  </Link>
                 ) : (
-                  <Button
-                    variant="ghost"
-                    asChild
-                    className="w-full justify-start"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  <Link
+                    href="/meus-pets"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                   >
-                    <Link href="/meus-pets">Meus Pets</Link>
-                  </Button>
+                    <AlertTriangle className="h-4 w-4" />
+                    Meus Pets
+                  </Link>
                 )}
-                <Button
-                  variant="ghost"
+
+                <button
                   onClick={async () => {
-                    await handleSignOut();
-                    setIsMenuOpen(false);
+                    await handleSignOut()
+                    setIsMenuOpen(false)
                   }}
-                  className="w-full justify-start text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-600"
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 "
                 >
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <LogOut className="h-4 w-4" />
                   Sair
-                </Button>
+                </button>
               </>
             ) : (
               <>
-                <Button asChild className="bg-green-500 text-white hover:bg-green-500/90">
-                  <Link href="/pets">Buscar Pets</Link>
-                </Button>
-
-                <Button variant="ghost" asChild className="w-full" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                  <Link href="/auth/login">Entrar</Link>
-                </Button>
-                <Button asChild className="w-full" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                <Link
+                  href="/auth/login"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                >
+                  <User className="h-4 w-4" />
+                  Entrar
+                </Link>
+                <Button asChild className="w-full" onClick={() => setIsMenuOpen(false)}>
                   <Link href="/auth/sign-up">Cadastrar</Link>
                 </Button>
               </>
@@ -235,5 +305,5 @@ export function Navbar() {
         </div>
       )}
     </nav>
-  );
+  )
 }

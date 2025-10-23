@@ -14,6 +14,7 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { LocationPicker } from './location-picker';
 import type { PetStatus, PetType } from '@/lib/types/database';
 import { formatPhoneBR } from '@/lib/utils';
+import { validateImageFile } from '@/lib/image-validation';
 
 interface PetReportFormProps {
   userId: string;
@@ -47,6 +48,12 @@ export function PetReportForm({ userId }: PetReportFormProps) {
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const validation = validateImageFile(file);
+      if (!validation.valid) {
+        setError(validation.error || 'Arquivo inválido');
+        return;
+      }
+
       setPhotoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -275,6 +282,9 @@ export function PetReportForm({ userId }: PetReportFormProps) {
               placeholder="(00) 00000-0000"
               value={contactPhone}
               onChange={(e) => setContactPhone(formatPhoneBR(e.target.value))}
+              onBlur={() => {
+                if (contactPhone.length < 14) setContactPhone('');
+              }}
               required
             />
           </div>
