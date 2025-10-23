@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { MapPin, Calendar, Phone, Mail, User } from "lucide-react"
+import { MapPin, Calendar, Phone, Mail, User, Clock, Palette } from "lucide-react"
 import type { Pet } from "@/lib/types/database"
 
 interface PetDetailsProps {
@@ -13,146 +13,196 @@ interface PetDetailsProps {
 }
 
 export function PetDetails({ pet }: PetDetailsProps) {
-  const statusColor =
-    pet.status === "LOST" ? "bg-orange-alert" : pet.status === "FOUND" ? "bg-blue-pethub" : "bg-green-found"
-  const statusText = pet.status === "LOST" ? "Perdido" : pet.status === "FOUND" ? "Encontrado" : "Devolvido"
+  const statusConfig = {
+    LOST: { color: "bg-orange-alert", text: "Perdido" },
+    FOUND: { color: "bg-blue-pethub", text: "Encontrado" },
+    RETURNED: { color: "bg-green-found", text: "Devolvido" }
+  }
+
+  const status = statusConfig[pet.status as keyof typeof statusConfig] || statusConfig.LOST
+
+  const petTypeEmoji = {
+    DOG: "🐕",
+    CAT: "🐈",
+    BIRD: "🐦",
+  }
+
+  const petTypeName = {
+    DOG: "Cachorro",
+    CAT: "Gato",
+    BIRD: "Pássaro",
+  }
 
   return (
-    <Card>
-      <CardContent className="space-y-6 p-6">
+    <Card className="overflow-hidden">
+      <CardContent className="p-0">
         {/* Pet Photo */}
         {pet.photo_url && (
-          <div className="relative h-96 w-full overflow-hidden rounded-xl">
-            <img src={pet.photo_url || "/placeholder.svg"} alt={pet.name} className="h-full w-full object-cover" />
+          <div className="relative h-[400px] w-full overflow-hidden bg-muted">
+            <img 
+              src={pet.photo_url || "/placeholder.svg"} 
+              alt={pet.name} 
+              className="h-full w-full object-cover" 
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0" />
+            
+            {/* Status Badge */}
+            <div className="absolute left-4 top-4">
+              <span className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold text-white shadow-lg ${status.color}`}>
+                <span className="h-2 w-2 rounded-full bg-white animate-pulse" />
+                {status.text}
+              </span>
+            </div>
           </div>
         )}
 
-        {/* Pet Header */}
-        <div className="space-y-3">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-3xl font-bold">{pet.name}</h1>
-              <p className="text-lg text-muted-foreground">
-                {pet.type === "DOG"
-                  ? "Cachorro"
-                  : pet.type === "CAT"
-                    ? "Gato"
-                    : pet.type === "BIRD"
-                      ? "Pássaro"
-                      : "Outro"}
-                {pet.breed && ` • ${pet.breed}`}
-              </p>
+        <div className="space-y-6 p-6">
+          {/* Pet Header */}
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">{pet.name}</h1>
+            <div className="flex items-center gap-2 text-lg text-muted-foreground">
+              <span>
+                {petTypeEmoji[pet.type as keyof typeof petTypeEmoji] || "🐾"}{" "}
+                {petTypeName[pet.type as keyof typeof petTypeName] || "Outro"}
+              </span>
+              {pet.breed && (
+                <>
+                  <span className="text-muted-foreground/50">•</span>
+                  <span className="font-medium">{pet.breed}</span>
+                </>
+              )}
             </div>
-            <span className={`rounded-full px-4 py-2 text-sm font-semibold text-white ${statusColor}`}>
-              {statusText}
-            </span>
           </div>
 
-          {/* Pet Info Grid */}
-          <div className="grid gap-4 rounded-xl bg-muted/30 p-4 md:grid-cols-2">
-            {pet.color && (
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-background">
-                  <div className="h-4 w-4 rounded-full border-2 border-border" style={{ backgroundColor: pet.color }} />
+          {/* Pet Info Cards */}
+          {(pet.color || pet.age) && (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {pet.color && (
+                <div className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-accent/50">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    <Palette className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cor</p>
+                    <p className="font-semibold truncate">{pet.color}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Cor</p>
-                  <p className="font-medium">{pet.color}</p>
+              )}
+
+              {pet.age && (
+                <div className="flex items-center gap-3 rounded-lg border bg-card p-4 transition-colors hover:bg-accent/50">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    <Calendar className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Idade</p>
+                    <p className="font-semibold truncate">{pet.age} {pet.age === 1 ? 'ano' : 'anos'}</p>
+                  </div>
                 </div>
+              )}
+            </div>
+          )}
+
+          {/* Description */}
+          {pet.description && (
+            <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Descrição</h2>
+              <p className="text-foreground leading-relaxed">{pet.description}</p>
+            </div>
+          )}
+
+          {/* Location */}
+          <div className="space-y-3 rounded-lg border bg-muted/30 p-4">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">Localização</h2>
+            <div className="flex gap-3">
+              <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+              <div className="flex-1 min-w-0 space-y-1">
+                <p className="font-medium leading-relaxed">
+                  {pet.location_description || "Localização não especificada"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {pet.latitude.toFixed(6)}, {pet.longitude.toFixed(6)}
+                </p>
               </div>
-            )}
+            </div>
+          </div>
 
-            {pet.age && (
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-background">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Idade</p>
-                  <p className="font-medium">{pet.age} anos</p>
-                </div>
+          {/* Last Seen */}
+          {pet.last_seen_date && (
+            <div className="flex items-center gap-3 rounded-lg border border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950/30 p-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/50">
+                <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
               </div>
-            )}
-          </div>
-        </div>
-
-        {/* Description */}
-        {pet.description && (
-          <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Descrição</h2>
-            <p className="text-muted-foreground">{pet.description}</p>
-          </div>
-        )}
-
-        {/* Location */}
-        <div className="space-y-2">
-          <h2 className="text-lg font-semibold">Localização</h2>
-          <div className="flex items-start gap-2 text-muted-foreground">
-            <MapPin className="mt-1 h-5 w-5 flex-shrink-0" />
-            <div>
-              <p>{pet.location_description || "Localização não especificada"}</p>
-              <p className="text-sm">
-                Coordenadas: {pet.latitude}, {pet.longitude}
-              </p>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-medium text-orange-700 dark:text-orange-300 uppercase tracking-wider">
+                  Última vez visto
+                </p>
+                <p className="font-semibold text-orange-900 dark:text-orange-100">
+                  {new Date(pet.last_seen_date).toLocaleDateString("pt-BR", { 
+                    dateStyle: "long" 
+                  })}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* Last Seen */}
-        {pet.last_seen_date && (
-          <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Última vez visto</h2>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Calendar className="h-5 w-5" />
-              <p>{new Date(pet.last_seen_date).toLocaleDateString("pt-BR", { dateStyle: "long" })}</p>
-            </div>
-          </div>
-        )}
+          {/* Contact Information */}
+          <div className="space-y-4 rounded-lg border-2 border-primary/20 bg-primary/5 p-5">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-primary">
+              Informações de Contato
+            </h2>
 
-        {/* Contact Information */}
-        <div className="space-y-3 rounded-xl border border-border bg-card p-4">
-          <h2 className="text-lg font-semibold">Informações de Contato</h2>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 group">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background group-hover:bg-primary/10 transition-colors">
+                  <User className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <p className="font-medium">{pet.contact_name}</p>
+              </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <User className="h-5 w-5" />
-              <p>{pet.contact_name}</p>
-            </div>
-
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Phone className="h-5 w-5" />
-              <a href={`tel:${pet.contact_phone}`} className="hover:text-foreground">
-                {pet.contact_phone}
+              <a 
+                href={`tel:${pet.contact_phone}`} 
+                className="flex items-center gap-3 group transition-colors hover:text-primary"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background group-hover:bg-primary/10 transition-colors">
+                  <Phone className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <p className="font-medium">{pet.contact_phone}</p>
               </a>
-            </div>
 
-            {pet.contact_email && (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="h-5 w-5" />
-                <a href={`mailto:${pet.contact_email}`} className="hover:text-foreground">
-                  {pet.contact_email}
+              {pet.contact_email && (
+                <a 
+                  href={`mailto:${pet.contact_email}`} 
+                  className="flex items-center gap-3 group transition-colors hover:text-primary"
+                >
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-background group-hover:bg-primary/10 transition-colors">
+                    <Mail className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                  <p className="font-medium truncate">{pet.contact_email}</p>
                 </a>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
 
-        {/* Posted By */}
-        <div className="flex items-center gap-3 border-t border-border pt-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-            {pet.profiles.avatar_url ? (
-              <img
-                src={pet.profiles.avatar_url || "/placeholder.svg"}
-                alt={pet.profiles.name}
-                className="h-full w-full rounded-full object-cover"
-              />
-            ) : (
-              <User className="h-6 w-6 text-muted-foreground" />
-            )}
-          </div>
-          <div>
-            <p className="text-sm text-muted-foreground">Reportado por</p>
-            <p className="font-medium">{pet.profiles.name}</p>
+          {/* Posted By */}
+          <div className="flex items-center gap-4 border-t pt-6">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/5 ring-2 ring-primary/10">
+              {pet.profiles.avatar_url ? (
+                <img
+                  src={pet.profiles.avatar_url || "/placeholder.svg"}
+                  alt={pet.profiles.name}
+                  className="h-full w-full rounded-full object-cover"
+                />
+              ) : (
+                <User className="h-7 w-7 text-primary" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                Reportado por
+              </p>
+              <p className="font-semibold text-lg truncate">{pet.profiles.name}</p>
+            </div>
           </div>
         </div>
       </CardContent>

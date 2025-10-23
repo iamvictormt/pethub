@@ -4,7 +4,16 @@ import { useState, useMemo } from 'react';
 import type { Pet, Advertisement } from '@/lib/types/database';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Calendar, ChevronLeft, ChevronRight, SlidersHorizontal, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  MapPin,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  SlidersHorizontal,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+} from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { NativeAdCard } from '@/components/ads/native-ad-card';
@@ -232,36 +241,51 @@ export function PetListView({
                         )}
                       </div>
 
-                      <div className="p-4">
-                        <h3 className="mb-2 text-lg font-semibold">{pet.name || 'Não informado'}</h3>
-                        <div className="space-y-1 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-2">
-                            {pet.type === 'DOG'
-                              ? 'Cachorro'
-                              : pet.type === 'CAT'
-                              ? 'Gato'
-                              : pet.type === 'BIRD'
-                              ? 'Pássaro'
-                              : 'Outro'}
-                            {pet.breed && ` • ${pet.breed}`}
-                          </div>
-
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3" />
-                            <span className="line-clamp-1">
-                              {pet.location_description || `Localização não especificada`}
+                       <div className="p-4 space-y-3">
+                        <div>
+                          <h3 className="text-lg font-semibold line-clamp-1 mb-1">{pet.name || 'Não informado'}</h3>
+                          <div className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                            <span>
+                              {pet.type === 'DOG'
+                                ? '🐕 Cachorro'
+                                : pet.type === 'CAT'
+                                ? '🐈 Gato'
+                                : pet.type === 'BIRD'
+                                ? '🐦 Pássaro'
+                                : '🐾 Outro'}
                             </span>
-                          </div>
-
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>{new Date(pet.created_at).toLocaleDateString('pt-BR')}</span>
+                            {pet.breed && (
+                              <>
+                                <span className="text-muted-foreground/50">•</span>
+                                <span className="line-clamp-1">{pet.breed}</span>
+                              </>
+                            )}
                           </div>
                         </div>
 
                         {pet.description && (
-                          <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{pet.description}</p>
+                          <p className="text-sm text-muted-foreground line-clamp-1 leading-relaxed">{pet.description}</p>
                         )}
+
+                        <div className="pt-2 border-t space-y-2">
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                            <span className="line-clamp-1">
+                              {pet.location_description || 'Localização não especificada'}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1.5">
+                              <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+                              <span>{new Date(pet.created_at).toLocaleDateString('pt-BR')}</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <Eye className="h-3.5 w-3.5 flex-shrink-0" />
+                              <span>{pet.view_count || 0}</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </Card>
                   </Link>

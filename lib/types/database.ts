@@ -36,6 +36,7 @@ export interface Pet {
   last_seen_date?: string;
   created_at: string;
   updated_at: string;
+  view_count?: number;
 }
 
 export interface Advertisement {

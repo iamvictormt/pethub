@@ -1,20 +1,21 @@
-import { notFound } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
-import { PetDetails } from "@/components/pet-profile/pet-details"
-import { PetComments } from "@/components/pet-profile/pet-comments"
-import { PetActions } from "@/components/pet-profile/pet-actions"
+import { notFound } from 'next/navigation';
+import { createClient } from '@/lib/supabase/server';
+import { PetDetails } from '@/components/pet-profile/pet-details';
+import { PetComments } from '@/components/pet-profile/pet-comments';
+import { PetActions } from '@/components/pet-profile/pet-actions';
+import { incrementPetView } from '@/lib/actions/pet-views';
 
 export default async function PetProfilePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const supabase = await createClient()
+  const { id } = await params;
+  const supabase = await createClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   // Fetch pet details with owner profile
   const { data: pet, error } = await supabase
-    .from("pets")
+    .from('pets')
     .select(
       `
       *,
@@ -23,18 +24,19 @@ export default async function PetProfilePage({ params }: { params: Promise<{ id:
         name,
         avatar_url
       )
-    `,
+    `
     )
-    .eq("id", id)
-    .single()
+    .eq('id', id)
+    .single();
 
   if (error || !pet) {
-    notFound()
+    notFound();
   }
 
-  // Fetch comments
+  await incrementPetView(id);
+
   const { data: comments } = await supabase
-    .from("comments")
+    .from('comments')
     .select(
       `
       *,
@@ -43,12 +45,12 @@ export default async function PetProfilePage({ params }: { params: Promise<{ id:
         name,
         avatar_url
       )
-    `,
+    `
     )
-    .eq("pet_id", id)
-    .order("created_at", { ascending: false })
+    .eq('pet_id', id)
+    .order('created_at', { ascending: false });
 
-  const isOwner = user?.id === pet.user_id
+  const isOwner = user?.id === pet.user_id;
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
@@ -65,5 +67,5 @@ export default async function PetProfilePage({ params }: { params: Promise<{ id:
         </div>
       </div>
     </div>
-  )
+  );
 }

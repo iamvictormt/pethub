@@ -68,7 +68,7 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/pets", label: "Buscar Pets", icon: Search },
-    { href: "/contribuir", label: "Doar", icon: Heart },
+    { href: "/contribuir", label: "Contribuir", icon: Heart },
     { href: "/contribuintes", label: "Contribuintes", icon: Users },
   ]
 
@@ -77,9 +77,7 @@ export function Navbar() {
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-2 transition-opacity hover:opacity-80">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-alert to-orange-alert/80">
-            <span className="text-lg font-bold text-white">P</span>
-          </div>
+          <img src="/logo-pethub.png" alt="PetHub Logo" className="h-12 w-12" />
           <span className="text-xl font-bold tracking-tight">PetHub</span>
         </Link>
 
