@@ -1,32 +1,32 @@
-"use client"
+'use client';
 
-import { useCallback, useState } from "react"
-import { EmbeddedCheckout, EmbeddedCheckoutProvider } from "@stripe/react-stripe-js"
-import { loadStripe } from "@stripe/stripe-js"
-import { startContributionCheckout } from "@/app/actions/contributions"
+import { useCallback, useState } from 'react';
+import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
+import { startContributionCheckout } from '@/app/actions/contributions';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function ContributionCheckout({ amountInCents }: { amountInCents: number }) {
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null);
 
   const fetchClientSecret = useCallback(async () => {
     try {
-      console.log("[v0] Fetching client secret for amount:", amountInCents)
-      const clientSecret = await startContributionCheckout(amountInCents)
-      console.log("[v0] Received client secret:", !!clientSecret)
+      console.log('[v0] Fetching client secret for amount:', amountInCents);
+      const clientSecret = await startContributionCheckout(amountInCents);
+      console.log('[v0] Received client secret:', !!clientSecret);
 
       if (!clientSecret) {
-        throw new Error("No client secret received")
+        throw new Error('No client secret received');
       }
 
-      return clientSecret
+      return clientSecret;
     } catch (err) {
-      console.error("[v0] Error fetching client secret:", err)
-      setError(err instanceof Error ? err.message : "Failed to start checkout")
-      throw err
+      console.error('[v0] Error fetching client secret:', err);
+      setError(err instanceof Error ? err.message : 'Failed to start checkout');
+      throw err;
     }
-  }, [amountInCents])
+  }, [amountInCents]);
 
   if (error) {
     return (
@@ -34,15 +34,15 @@ export default function ContributionCheckout({ amountInCents }: { amountInCents:
         <p className="text-destructive">Erro ao iniciar checkout: {error}</p>
         <button
           onClick={() => {
-            setError(null)
-            window.location.reload()
+            setError(null);
+            window.location.reload();
           }}
           className="rounded-lg bg-orange-alert px-4 py-2 text-white hover:bg-orange-alert/90"
         >
           Tentar Novamente
         </button>
       </div>
-    )
+    );
   }
 
   return (
@@ -52,12 +52,13 @@ export default function ContributionCheckout({ amountInCents }: { amountInCents:
         options={{
           fetchClientSecret,
           onComplete: () => {
-            console.log("Checkout completed")
+            console.log('[v0] Checkout completed, redirecting to success page');
+            window.location.href = `/contribuir/sucesso?amount=${amountInCents}`;
           },
         }}
       >
         <EmbeddedCheckout />
       </EmbeddedCheckoutProvider>
     </div>
-  )
+  );
 }

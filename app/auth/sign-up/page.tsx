@@ -67,11 +67,13 @@ export default function SignUpPage() {
     }
 
     try {
+      const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin}/auth/confirm`;
+
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL,
+          emailRedirectTo: redirectUrl,
           data: {
             name,
             phone,
