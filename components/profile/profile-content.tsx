@@ -164,7 +164,7 @@ export function ProfileContent({ profile, pets }: ProfileContentProps) {
                   </span>
                 </div>
                 <div className="flex items-center justify-between rounded-lg bg-green-found/10 p-3">
-                  <span className="text-sm font-medium">Devolvidos</span>
+                  <span className="text-sm font-medium">Reunidos</span>
                   <span className="flex h-6 w-6 items-center justify-center rounded-full bg-green-found text-xs font-bold text-white">
                     {reunitedPets.length}
                   </span>
@@ -197,7 +197,7 @@ export function ProfileContent({ profile, pets }: ProfileContentProps) {
                       <p className="text-sm font-semibold text-white">{pet.name}</p>
                       <p className="text-xs text-white/80">
                         {" "}
-                        {pet.status === "LOST" ? "Perdido" : pet.status === "REUNITED" ? "Devolvido" : "Encontrado"}
+                        {pet.status === "LOST" ? "Perdido" : pet.status === "REUNITED" ? "Reunido" : "Encontrado"}
                       </p>
                     </div>
                   </Link>
@@ -414,7 +414,7 @@ export function ProfileContent({ profile, pets }: ProfileContentProps) {
                           {pet.status === "LOST"
                             ? "Perdido"
                             : pet.status === "REUNITED"
-                              ? "Devolvido"
+                              ? "Reunido"
                               : "Encontrado"}{" "}
                         </span>
                       </div>

@@ -80,7 +80,7 @@ export default async function HomePage() {
               <div className="mt-12 grid grid-cols-3 gap-6 pt-2">
                 <div>
                   <div className="text-3xl font-bold text-orange-alert">{petsReunited}+</div>
-                  <div className="text-sm text-muted-foreground">Pets devolvidos</div>
+                  <div className="text-sm text-muted-foreground">Pets reunidos</div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-blue-pethub">{activeUsers}+</div>
@@ -98,7 +98,7 @@ export default async function HomePage() {
               <div className="relative h-[400px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-orange-alert/20 to-blue-pethub/20 shadow-2xl lg:h-[500px]">
                 <img
                   src="/placeholder.svg?height=500&width=600"
-                  alt="Pet devolvido ao dono"
+                  alt="Pet reunido ao dono"
                   className="h-full w-full object-cover"
                 />
                 {/* Floating Card */}
@@ -109,7 +109,7 @@ export default async function HomePage() {
                     </div>
                     <div>
                       <div className="font-semibold">Max encontrado!</div>
-                      <div className="text-sm text-muted-foreground">Devolvido há 2 horas</div>
+                      <div className="text-sm text-muted-foreground">Reunido há 2 horas</div>
                     </div>
                   </div>
                 </div>

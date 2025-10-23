@@ -2,10 +2,9 @@ import Link from "next/link"
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-muted/30">
+    <footer className="bg-muted/30 border-t border-border ">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid gap-8 md:grid-cols-4">
-          {/* About */}
+        {/* <div className="grid gap-8 md:grid-cols-4">
           <div>
             <h3 className="mb-4 text-lg font-semibold">Sobre o PetHub</h3>
             <p className="text-sm text-muted-foreground">
@@ -14,7 +13,6 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Links */}
           <div>
             <h3 className="mb-4 text-lg font-semibold">Links Úteis</h3>
             <ul className="space-y-2 text-sm">
@@ -36,7 +34,6 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Legal */}
           <div>
             <h3 className="mb-4 text-lg font-semibold">Legal</h3>
             <ul className="space-y-2 text-sm">
@@ -53,7 +50,6 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
             <h3 className="mb-4 text-lg font-semibold">Contato</h3>
             <ul className="space-y-2 text-sm text-muted-foreground">
@@ -61,9 +57,9 @@ export function Footer() {
               <li>(11) 9999-9999</li>
             </ul>
           </div>
-        </div>
+        </div> */}
 
-        <div className="mt-8 border-t border-border pt-8 text-center text-sm text-muted-foreground">
+        <div className="text-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} PetHub. Todos os direitos reservados.</p>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import type { Pet } from '@/lib/types/database';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { MapPin, Calendar, Eye } from 'lucide-react';
+import { MapPin, Calendar, Eye, Milestone } from 'lucide-react';
 
 interface PetMarkerPopupProps {
   pet: Pet;
@@ -90,7 +90,7 @@ export function PetMarkerPopup({ pet, distance }: PetMarkerPopupProps) {
 
         {distance !== undefined && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 flex-shrink-0" />
+            <Milestone className="h-4 w-4 flex-shrink-0" />
             <span>{distance < 1 ? `${Math.round(distance * 1000)}m` : `${distance.toFixed(1)}km`} de você</span>
           </div>
         )}

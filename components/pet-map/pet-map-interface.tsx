@@ -160,7 +160,7 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
   }, []);
 
   return (
-    <div className="border-b border-border/50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 py-4 md:px-6 lg:px-8 justify-center flex">
         <div className="inline-flex items-center gap-1 rounded-full bg-muted p-1">
           <button

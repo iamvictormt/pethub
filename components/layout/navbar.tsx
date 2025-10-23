@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import {
   DropdownMenu,
@@ -6,101 +6,107 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Menu, User, LogOut, Store, AlertTriangle, Search, Heart, Users, X } from "lucide-react"
-import { useState, useEffect } from "react"
-import { createClient } from "@/lib/supabase/client"
-import { useRouter, usePathname } from "next/navigation"
-import type { User as SupabaseUser } from "@supabase/supabase-js"
-import type { Profile } from "@/lib/types/database"
-import { cn } from "@/lib/utils"
+} from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Menu, User, LogOut, Store, AlertTriangle, Search, Heart, Users, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter, usePathname } from 'next/navigation';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
+import type { Profile } from '@/lib/types/database';
+import { cn } from '@/lib/utils';
 
 export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [user, setUser] = useState<SupabaseUser | null>(null)
-  const [profile, setProfile] = useState<Profile | null>(null)
-  const router = useRouter()
-  const pathname = usePathname()
-  const supabase = createClient()
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
+  const supabase = createClient();
 
   useEffect(() => {
     const getUser = async () => {
       const {
         data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
+      } = await supabase.auth.getUser();
+      setUser(user);
 
       if (user) {
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", user.id).single()
-        setProfile(profileData)
+        const { data: profileData } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+        setProfile(profileData);
       } else {
-        setProfile(null)
+        setProfile(null);
       }
-    }
+    };
 
-    getUser()
+    getUser();
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null)
+      setUser(session?.user ?? null);
 
       if (session?.user) {
-        const { data: profileData } = await supabase.from("profiles").select("*").eq("id", session.user.id).single()
-        setProfile(profileData)
+        const { data: profileData } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+        setProfile(profileData);
       } else {
-        setProfile(null)
+        setProfile(null);
       }
-    })
+    });
 
-    return () => subscription.unsubscribe()
-  }, [supabase])
+    return () => subscription.unsubscribe();
+  }, [supabase]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut()
-    router.push("/")
-    router.refresh()
-  }
+    await supabase.auth.signOut();
+    router.push('/');
+    router.refresh();
+  };
 
-  const isPetshop = profile?.role === "PETSHOP"
+  const isPetshop = profile?.role === 'PETSHOP';
 
   const navLinks = [
-    { href: "/pets", label: "Buscar Pets", icon: Search },
-    { href: "/contribuir", label: "Contribuir", icon: Heart },
-    { href: "/contribuintes", label: "Contribuintes", icon: Users },
-  ]
+    { href: '/pets', label: 'Buscar Pets', icon: Search },
+    { href: '/contribuir', label: 'Contribuir', icon: Heart },
+    { href: '/contribuintes', label: 'Contribuintes', icon: Users },
+  ];
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/80 backdrop-blur-md">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo */}
-        <Link href="/" className="group flex items-center gap-2 transition-opacity hover:opacity-80">
-          <img src="/logo-pethub.png" alt="PetHub Logo" className="h-12 w-12" />
-          <span className="text-xl font-bold tracking-tight">PetHub</span>
+        <Link href="/" className="group flex items-center gap-2">
+          <img
+            src="/logo-pethub.png"
+            alt="PetHub Logo"
+            className="h-12 w-12 transition-transform duration-300 ease-in-out group-hover:-rotate-12"
+          />
+          <span className="text-xl font-bold tracking-tight transition-opacity duration-300 group-hover:opacity-80">
+            PetHub
+          </span>
         </Link>
 
         {/* Desktop Navigation Links */}
         <div className="hidden items-center gap-1 md:flex">
           {navLinks.map((link) => {
-            const Icon = link.icon
-            const isActive = pathname === link.href
+            const Icon = link.icon;
+            const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all",
+                  'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all',
                   isActive
-                    ? "bg-orange-alert/10 text-orange-alert"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    ? 'bg-orange-alert/10 text-orange-alert'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
                 <Icon className="h-4 w-4" />
                 {link.label}
               </Link>
-            )
+            );
           })}
         </div>
 
@@ -152,7 +158,10 @@ export function Navbar() {
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer text-red-600 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-600">
+                  <DropdownMenuItem
+                    onClick={handleSignOut}
+                    className="cursor-pointer text-red-600 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-600"
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     Sair
                   </DropdownMenuItem>
@@ -195,24 +204,24 @@ export function Navbar() {
           <div className="container mx-auto space-y-1 p-4">
             {/* Mobile Nav Links */}
             {navLinks.map((link) => {
-              const Icon = link.icon
-              const isActive = pathname === link.href
+              const Icon = link.icon;
+              const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsMenuOpen(false)}
                   className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                    'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors',
                     isActive
-                      ? "bg-orange-alert/10 text-orange-alert"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      ? 'bg-orange-alert/10 text-orange-alert'
+                      : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                   )}
                 >
                   <Icon className="h-4 w-4" />
                   {link.label}
                 </Link>
-              )
+              );
             })}
 
             <div className="my-3 border-t" />
@@ -275,8 +284,8 @@ export function Navbar() {
 
                 <button
                   onClick={async () => {
-                    await handleSignOut()
-                    setIsMenuOpen(false)
+                    await handleSignOut();
+                    setIsMenuOpen(false);
                   }}
                   className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 "
                 >
@@ -303,5 +312,5 @@ export function Navbar() {
         </div>
       )}
     </nav>
-  )
+  );
 }

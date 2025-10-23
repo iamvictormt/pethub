@@ -67,6 +67,9 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <Card>
           <CardHeader className="space-y-1">
+            <div className="mx-auto mb-4 flex h-36 w-36 items-center justify-center ">
+              <img src="/logo-pethub.png" alt="PetHub Logo" className="object-contain" />
+            </div>
             <CardTitle className="text-center text-2xl">Bem-vindo de volta!</CardTitle>
             <CardDescription className="text-center">Entre com sua conta para continuar</CardDescription>
           </CardHeader>

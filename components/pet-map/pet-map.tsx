@@ -204,7 +204,7 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
               e.stopPropagation()
               setSelectedPet(isSelected ? null : pet)
             }}
-            className="absolute -translate-x-1/2 -translate-y-full transition-transform hover:scale-110 z-10"
+            className="absolute -translate-x-1/2 -translate-y-full transition-transform hover:scale-110 z-10 cursor-pointer"
             style={{
               left: `calc(50% + ${pos.x}px)`,
               top: `calc(50% + ${pos.y}px)`,

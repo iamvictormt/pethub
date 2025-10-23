@@ -169,12 +169,15 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
                   <span className="text-sm">Apoie uma causa importante</span>
                 </li>
               </ul>
-              <Button asChild size="lg" className="w-full bg-blue-pethub hover:bg-blue-pethub/90">
-                <Link href="/auth/sign-up">
-                  Criar Conta Petshop
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+
+              <div className="space-y-3">
+                <Button size="lg" className="w-full bg-blue-pethub hover:bg-blue-pethub/90" disabled>
+                  Em Breve
+                </Button>
+                <p className="text-center text-xs text-muted-foreground">
+                  O cadastro de petshops estará disponível em breve. Fique atento!
+                </p>
+              </div>
             </div>
 
             {/* Direct Support */}
@@ -213,7 +216,6 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
           </div>
         </div>
       </section>
- 
 
       {/* Testimonial */}
       <section className="border-t bg-background px-4 py-16 md:py-24">

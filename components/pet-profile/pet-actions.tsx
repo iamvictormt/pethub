@@ -158,7 +158,7 @@ export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Marcar como Reunido?</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja marcar {pet.name} como devolvido? Esta ação irá atualizar o status do pet e
+              Tem certeza que deseja marcar {pet.name} como reunido? Esta ação irá atualizar o status do pet e
               notificar que ele foi reencontrado com seu tutor.
             </AlertDialogDescription>
           </AlertDialogHeader>
