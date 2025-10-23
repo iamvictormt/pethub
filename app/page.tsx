@@ -1,6 +1,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { MapPin, Heart, Search, Shield, Users, Clock, CheckCircle2, ArrowRight, Sparkles } from "lucide-react"
+import { MapPin, Heart, Search, Shield, Users, Clock, CheckCircle2, ArrowRight, Sparkles, Dog } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 
 export default async function HomePage() {
@@ -47,8 +47,8 @@ export default async function HomePage() {
           <div className="mb-8 flex justify-center">
             <div className="mb-8 flex justify-center">
               <div className="inline-flex items-center gap-2 rounded-full border border-orange-alert/20 bg-orange-alert/10 px-4 py-2 text-sm font-medium text-orange-alert backdrop-blur">
-                <Sparkles className="h-4 w-4 text-orange-alert" fill="currentColor" />
-                Um sistema para todos
+                <Dog className="h-4 w-4 text-orange-alert" />
+                Juntos por quem amamos
               </div>
             </div>
           </div>

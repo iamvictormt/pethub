@@ -103,14 +103,6 @@ export function MapFilters({
               autoComplete="off"
               className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
-            <Button
-              onClick={handleSearch}
-              size="lg"
-              className="w-full bg-gradient-to-r from-orange-alert to-pink-500 text-white shadow-lg"
-            >
-              <Search className="h-4 w-4 mr-2" />
-              Pesquisar
-            </Button>
           </div>
         </div>
 
@@ -176,7 +168,9 @@ export function MapFilters({
             </Button>
             <Button
               onClick={() =>
-                setStatus(status.includes('ADOPTION') ? status.filter((s) => s !== 'ADOPTION') : [...status, 'ADOPTION'])
+                setStatus(
+                  status.includes('ADOPTION') ? status.filter((s) => s !== 'ADOPTION') : [...status, 'ADOPTION']
+                )
               }
               variant={status.includes('ADOPTION') ? 'default' : 'outline'}
               size="lg"
@@ -205,7 +199,9 @@ export function MapFilters({
               <Button
                 key={type.id}
                 onClick={() =>
-                  setPetTypes(petTypes.includes(type.id) ? petTypes.filter((t) => t !== type.id) : [...petTypes, type.id])
+                  setPetTypes(
+                    petTypes.includes(type.id) ? petTypes.filter((t) => t !== type.id) : [...petTypes, type.id]
+                  )
                 }
                 variant={petTypes.includes(type.id) ? 'default' : 'outline'}
                 size="lg"
@@ -241,7 +237,13 @@ export function MapFilters({
 
   if (isMobile) {
     return (
-      <Sheet>
+      <Sheet
+        onOpenChange={(open) => {
+          if (!open) {
+            handleSearch();
+          }
+        }}
+      >
         <SheetTrigger asChild>
           <Button variant="ghost" size="sm" className="gap-2">
             Mostrar <ChevronUp className="h-4 w-4" />
@@ -251,17 +253,11 @@ export function MapFilters({
           <SheetHeader>
             <SheetTitle>Filtros Inteligentes</SheetTitle>
           </SheetHeader>
-          <div className="overflow-y-auto h-[calc(85vh-80px)]">
-            {FilterContent}
-          </div>
+          <div className="overflow-y-auto h-[calc(85vh-80px)]">{FilterContent}</div>
         </SheetContent>
       </Sheet>
     );
   }
 
-  return (
-    <div className="h-full overflow-y-auto">
-      {FilterContent}
-    </div>
-  );
+  return <div className="h-full overflow-y-auto">{FilterContent}</div>;
 }
