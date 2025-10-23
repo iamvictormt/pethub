@@ -127,6 +127,55 @@ export function LocationPicker({
     onLocationChange(newLat.toString(), newLng.toString());
   };
 
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      setIsDragging(true);
+      setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || e.touches.length !== 1) return;
+
+    const dx = e.touches[0].clientX - dragStart.x;
+    const dy = e.touches[0].clientY - dragStart.y;
+
+    const tileSize = 256;
+    const scale = Math.pow(2, zoom);
+    const metersPerPixel = (40075016.686 * Math.cos((mapCenter.lat * Math.PI) / 180)) / (tileSize * scale);
+
+    const newLng = mapCenter.lng - (dx * metersPerPixel) / 111320;
+    const newLat = mapCenter.lat + (dy * metersPerPixel) / 110540;
+
+    setMapCenter({ lat: newLat, lng: newLng });
+    setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (isDragging) {
+      setIsDragging(false);
+      return;
+    }
+
+    // Handle tap to set location
+    if (e.changedTouches.length === 1) {
+      const rect = mapRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const x = e.changedTouches[0].clientX - rect.left - rect.width / 2;
+      const y = e.changedTouches[0].clientY - rect.top - rect.height / 2;
+
+      const tileSize = 256;
+      const scale = Math.pow(2, zoom);
+      const metersPerPixel = (40075016.686 * Math.cos((mapCenter.lat * Math.PI) / 180)) / (tileSize * scale);
+
+      const newLng = mapCenter.lng + (x * metersPerPixel) / 111320;
+      const newLat = mapCenter.lat - (y * metersPerPixel) / 110540;
+
+      onLocationChange(newLat.toString(), newLng.toString());
+    }
+  };
+
   const { tiles, centerTileX, centerTileY } = getTilesToDisplay();
 
   const hasLocation = latitude && longitude;
@@ -164,6 +213,9 @@ export function LocationPicker({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onClick={handleMapClick}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         style={{ cursor: isDragging ? 'grabbing' : 'crosshair' }}
       >
         <div className="absolute inset-0">

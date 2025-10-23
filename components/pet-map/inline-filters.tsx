@@ -44,12 +44,9 @@ export function InlineFilters({
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-alert to-pink-500 shadow-lg">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
             <div>
               <h3 className="text-xl font-bold tracking-tight">Filtros Inteligentes</h3>
-              <p className="text-sm text-muted-foreground">Encontre o pet perfeito</p>
+              <p className="text-sm text-muted-foreground">Refine sua busca</p>
             </div>
           </div>
           {hasActiveFilters && (

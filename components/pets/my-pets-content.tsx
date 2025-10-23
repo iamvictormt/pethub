@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, MapPin, Trash2, CheckCircle2, Eye } from 'lucide-react';
+import { Plus, MapPin, Trash2, CheckCircle2, Eye, Pencil } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createBrowserClient } from '@supabase/ssr';
@@ -29,7 +29,7 @@ const statusConfig = {
   LOST: { label: 'Perdido', color: 'bg-orange-500', emoji: '🔍' },
   FOUND: { label: 'Encontrado', color: 'bg-blue-500', emoji: '👀' },
   ADOPTION: { label: 'Adoção', color: 'bg-green-500', emoji: '🏠' },
-  REUNITED: { label: 'Reunido', color: 'bg-purple-500', emoji: '❤️' },
+  REUNITED: { label: 'Devolvido', color: 'bg-purple-500', emoji: '❤️' },
 };
 
 const petTypeEmoji = {
@@ -122,7 +122,7 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Reunidos</p>
+              <p className="text-sm text-muted-foreground">Devolvidos</p>
               <p className="text-3xl font-bold mt-1 text-purple-500">{reunitedPets}</p>
             </div>
             <div className="text-3xl">{statusConfig.REUNITED.emoji}</div>
@@ -199,6 +199,15 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
                     </Link>
                   </Button>
 
+                  {pet.status !== 'REUNITED' && (
+                    <Button size="sm" variant="outline" asChild>
+                      <Link href={`/editar-pet/${pet.id}`}>
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Editar
+                      </Link>
+                    </Button>
+                  )}
+
                   {(pet.status === 'LOST' || pet.status === 'FOUND') && (
                     <Button
                       size="sm"
@@ -216,20 +225,22 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
                       ) : (
                         <>
                           <CheckCircle2 className="mr-2 h-4 w-4" />
-                          Reunido
+                          Marcar como Devolvido
                         </>
                       )}
                     </Button>
                   )}
 
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-destructive hover:text-destructive bg-transparent"
-                    onClick={() => setDeleteId(pet.id)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  {pet.status !== 'REUNITED' && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-destructive hover:text-destructive bg-transparent"
+                      onClick={() => setDeleteId(pet.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
 
                 <div className="mt-3 pt-3 text-xs text-muted-foreground">

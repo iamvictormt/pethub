@@ -31,7 +31,7 @@ export default async function RootLayout({
       <body className={`font-sans antialiased ${_poppins.variable}`}>
         <Navbar />
 
-        <main className="min-h-screen">{children}</main>
+        <main className="md:min-h-screen">{children}</main>
 
         <Footer />
 

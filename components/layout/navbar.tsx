@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Menu, User, LogOut, Store, Search, AlertTriangle } from 'lucide-react';
+import { Menu, User, LogOut, Store, Search, AlertTriangle, Map } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -75,6 +75,12 @@ export function Navbar() {
 
         {/* Desktop Actions */}
         <div className="hidden items-center gap-4 md:flex">
+          <Button asChild className="bg-purple-500 text-white hover:bg-purple-500/90">
+            <Link href="/pets">
+              <Search className="h-4 w-4" />
+              Buscar Pets
+            </Link>
+          </Button>
           {user ? (
             <>
               {isPetshop ? (
@@ -213,6 +219,10 @@ export function Navbar() {
               </>
             ) : (
               <>
+                <Button asChild className="bg-green-500 text-white hover:bg-green-500/90">
+                  <Link href="/pets">Buscar Pets</Link>
+                </Button>
+
                 <Button variant="ghost" asChild className="w-full" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                   <Link href="/auth/login">Entrar</Link>
                 </Button>

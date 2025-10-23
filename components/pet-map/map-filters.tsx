@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { SliderInput } from '@/components/ui/slider-input';
 import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { Filter, X, MapPin, Sparkles } from 'lucide-react';
+import { Filter, X, MapPin, Sparkles, ChevronUp, ChevronDown } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 interface MapFiltersProps {
@@ -40,8 +40,8 @@ export function MapFilters({
     <div className="space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-orange-alert to-pink-500 shadow-lg">
-            <Sparkles className="h-5 w-5 text-white" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-alert to-pink-500 shadow-lg">
+            <Filter className="h-5 w-5 text-white" />
           </div>
           <div>
             <h2 className="text-xl font-bold">Filtros</h2>
@@ -52,10 +52,10 @@ export function MapFilters({
           <Button
             variant="ghost"
             size="sm"
-            className="text-muted-foreground hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground border-1"
             onClick={onClearFilters}
           >
-            <X className="mr-2 h-4 w-4" />
+            <X className="h-4 w-4" />
             Limpar
           </Button>
         )}
@@ -64,7 +64,6 @@ export function MapFilters({
       {/* Location */}
       <div className="space-y-3 rounded-xl bg-muted/30 p-4">
         <div className="flex items-center gap-2">
-          <MapPin className="h-4 w-4 text-orange-alert" />
           <label className="text-sm font-semibold">Localização</label>
         </div>
         <Button
@@ -77,8 +76,8 @@ export function MapFilters({
               : 'hover:border-orange-alert/50'
           }`}
         >
-          <MapPin className="mr-2 h-4 w-4" />
-          {userLocation ? '📍 Localização ativa' : 'Ativar localização'}
+          <MapPin className="h-4 w-4" />
+          {userLocation ? 'Localização ativa' : 'Ativar localização'}
         </Button>
         {userLocation && (
           <>
@@ -98,7 +97,7 @@ export function MapFilters({
             }
             variant={status.includes('LOST') ? 'default' : 'outline'}
             size="lg"
-            className={`flex-col gap-1 ${
+            className={`flex-col gap-1 p-7 ${
               status.includes('LOST')
                 ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
                 : 'hover:border-orange-500/50'
@@ -113,7 +112,7 @@ export function MapFilters({
             }
             variant={status.includes('FOUND') ? 'default' : 'outline'}
             size="lg"
-            className={`flex-col gap-1 ${
+            className={`flex-col gap-1 p-7 ${
               status.includes('FOUND')
                 ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30'
                 : 'hover:border-blue-500/50'
@@ -128,7 +127,7 @@ export function MapFilters({
             }
             variant={status.includes('ADOPTION') ? 'default' : 'outline'}
             size="lg"
-            className={`col-span-2 flex-col gap-1 ${
+            className={`col-span-2 flex-col gap-1 p-7 ${
               status.includes('ADOPTION')
                 ? 'bg-green-500 text-white shadow-lg shadow-green-500/30'
                 : 'hover:border-green-500/50'
@@ -190,18 +189,17 @@ export function MapFilters({
     return (
       <Sheet>
         <SheetTrigger asChild>
-          <Button
-            size="lg"
-            className="h-14 w-14 rounded-full bg-gradient-to-br from-orange-alert to-pink-500 text-white shadow-xl hover:shadow-2xl"
-          >
-            <Filter className="h-6 w-6" />
+          <Button variant="ghost" size="sm" className="gap-2">
+            Mostrar <ChevronUp className="h-4 w-4" />
           </Button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
+        <SheetContent side="bottom" className="h-[85vh]">
           <SheetHeader>
             <SheetTitle>Filtros Inteligentes</SheetTitle>
           </SheetHeader>
-          <FilterContent />
+          <div className="overflow-y-auto h-[calc(85vh-80px)]">
+            <FilterContent />
+          </div>
         </SheetContent>
       </Sheet>
     );

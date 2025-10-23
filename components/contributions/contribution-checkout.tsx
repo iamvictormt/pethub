@@ -52,7 +52,7 @@ export default function ContributionCheckout({ amountInCents }: { amountInCents:
         options={{
           fetchClientSecret,
           onComplete: () => {
-            console.log("[v0] Checkout completed")
+            console.log("Checkout completed")
           },
         }}
       >
