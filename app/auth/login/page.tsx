@@ -38,18 +38,21 @@ export default function LoginPage() {
           toast({
             title: 'Email não confirmado',
             description: 'Por favor, verifique seu email e confirme sua conta antes de entrar.',
+            variant: 'destructive',
           });
           return;
         } else if (error.message === 'Invalid login credentials') {
           toast({
             title: 'Credenciais inválidas',
             description: 'O email ou a senha estão incorretos. Tente novamente.',
+            variant: 'destructive',
           });
           return;
         } else {
           toast({
             title: 'Erro ao entrar',
             description: error.message || 'Ocorreu um erro ao tentar entrar. Tente novamente mais tarde.',
+            variant: 'destructive',
           });
           return;
         }

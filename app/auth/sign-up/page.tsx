@@ -67,6 +67,19 @@ export default function SignUpPage() {
     }
 
     try {
+      // 1. Verificar se o email já existe ANTES de tentar criar
+      const { data: existingUser } = await supabase.from('profiles').select('id').eq('email', email).single();
+
+      if (existingUser) {
+        toast({
+          title: 'Erro ao criar conta!',
+          description: 'Este email já está cadastrado. Por favor, faça login ou use outro email.',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
       const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin}/auth/confirm`;
 
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -84,6 +97,11 @@ export default function SignUpPage() {
 
       if (authError) throw authError;
 
+      // Verificar se o usuário foi realmente criado
+      if (!authData.user) {
+        throw new Error('Não foi possível criar a conta. O email pode já estar em uso.');
+      }
+
       let avatarUrl = null;
       if (avatarFile && authData.user) {
         setIsUploadingAvatar(true);
@@ -100,11 +118,16 @@ export default function SignUpPage() {
           } = supabase.storage.from('profile-avatars').getPublicUrl(fileName);
           avatarUrl = publicUrl;
 
-          // Update profile with avatar URL
           await supabase.from('profiles').update({ avatar_url: avatarUrl }).eq('id', authData.user.id);
         }
         setIsUploadingAvatar(false);
       }
+
+      // 2. Toast de sucesso APENAS aqui, dentro do try
+      toast({
+        title: 'Conta criada com sucesso!',
+        description: 'Por favor, verifique seu email para confirmar sua conta.',
+      });
 
       router.push('/auth/sign-up-success');
     } catch (error: unknown) {
@@ -112,40 +135,43 @@ export default function SignUpPage() {
         if (
           error.message.includes('already registered') ||
           error.message.includes('User already registered') ||
-          error.message.includes('duplicate')
+          error.message.includes('duplicate') ||
+          error.message.includes('já estar em uso')
         ) {
           toast({
             title: 'Erro ao criar conta!',
             description: 'Este email já está cadastrado. Por favor, faça login ou use outro email.',
+            variant: 'destructive',
           });
         } else if (error.message.includes('Invalid email')) {
           toast({
             title: 'Erro ao criar conta!',
             description: 'Email inválido. Por favor, verifique o endereço de email.',
+            variant: 'destructive',
           });
         } else if (error.message.includes('Password')) {
           toast({
             title: 'Erro ao criar conta!',
             description: 'A senha deve ter pelo menos 6 caracteres.',
+            variant: 'destructive',
           });
         } else {
           toast({
             title: 'Erro ao criar conta!',
             description: error.message,
+            variant: 'destructive',
           });
         }
       } else {
         toast({
           title: 'Erro ao criar conta!',
           description: 'Ocorreu um erro ao criar a conta. Por favor, tente novamente.',
+          variant: 'destructive',
         });
       }
     } finally {
+      // 3. No finally, apenas resetar o loading
       setIsLoading(false);
-      toast({
-        title: 'Conta criada com sucesso!',
-        description: 'Por favor, verifique seu email para confirmar sua conta.',
-      });
     }
   };
 
@@ -222,7 +248,7 @@ export default function SignUpPage() {
                 />
               </div>
 
-              <RadioGroup
+              {/* <RadioGroup
                 label="Tipo de conta"
                 options={[
                   { id: 'USER', label: 'Tutor de Pet' },
@@ -230,7 +256,7 @@ export default function SignUpPage() {
                 ]}
                 value={role}
                 onChange={setRole}
-              />
+              /> */}
 
               <div className="grid gap-4 md:grid-cols-2">
                 <TextInput

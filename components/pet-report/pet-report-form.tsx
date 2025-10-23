@@ -119,6 +119,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
       toast({
         title: 'Erro ao reportar pet!',
         description: '' + (err instanceof Error ? err.message : 'Ocorreu um erro ao reportar o pet'),
+        variant: 'destructive',
       });
     } finally {
       toast({

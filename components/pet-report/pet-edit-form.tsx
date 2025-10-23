@@ -122,6 +122,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
       toast({
         title: 'Erro ao salvar pet!',
         description: '' + (err instanceof Error ? err.message : 'Ocorreu um erro ao salvar o pet'),
+        variant: 'destructive',
       });
     } finally {
       toast({
