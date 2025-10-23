@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, MapPin, Trash2, CheckCircle2, Eye, Pencil } from 'lucide-react';
+import { Plus, MapPin, Trash2, CheckCircle2, Eye, Pencil, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createBrowserClient } from '@supabase/ssr';
@@ -29,7 +29,7 @@ const statusConfig = {
   LOST: { label: 'Perdido', color: 'bg-orange-500', emoji: '🔍' },
   FOUND: { label: 'Encontrado', color: 'bg-blue-500', emoji: '👀' },
   ADOPTION: { label: 'Adoção', color: 'bg-green-500', emoji: '🏠' },
-  REUNITED: { label: 'Devolvido', color: 'bg-purple-500', emoji: '❤️' },
+  REUNITED: { label: 'Reunido', color: 'bg-purple-500', emoji: '❤️' },
 };
 
 const petTypeEmoji = {
@@ -43,6 +43,7 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
   const [pets, setPets] = useState(initialPets);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [reunitingId, setReunitingId] = useState<string | null>(null);
+  const [reuniteConfirmId, setReuniteConfirmId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -54,14 +55,17 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
   const adoptionPets = pets.filter((pet) => pet.status === 'ADOPTION').length;
   const reunitedPets = pets.filter((pet) => pet.status === 'REUNITED').length;
 
-  const markAsReunited = async (petId: string) => {
-    setReunitingId(petId);
-    const { error } = await supabase.from('pets').update({ status: 'REUNITED' }).eq('id', petId);
+  const markAsReunited = async () => {
+    if (!reuniteConfirmId) return;
+
+    setReunitingId(reuniteConfirmId);
+    const { error } = await supabase.from('pets').update({ status: 'REUNITED' }).eq('id', reuniteConfirmId);
 
     if (!error) {
-      setPets(pets.map((pet) => (pet.id === petId ? { ...pet, status: 'REUNITED' as const } : pet)));
+      setPets(pets.map((pet) => (pet.id === reuniteConfirmId ? { ...pet, status: 'REUNITED' as const } : pet)));
     }
     setReunitingId(null);
+    setReuniteConfirmId(null);
   };
 
   const deletePet = async () => {
@@ -122,7 +126,7 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Devolvidos</p>
+              <p className="text-sm text-muted-foreground">Reunidos</p>
               <p className="text-3xl font-bold mt-1 text-purple-500">{reunitedPets}</p>
             </div>
             <div className="text-3xl">{statusConfig.REUNITED.emoji}</div>
@@ -150,21 +154,33 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {pets.map((pet) => (
-            <Card key={pet.id} className="overflow-hidden group hover:shadow-lg transition-shadow">
-              <div className="relative aspect-square bg-muted">
+            <Card
+              key={pet.id}
+              className="group overflow-hidden hover:shadow-2xl transition-all duration-300 border-0 bg-gradient-to-br from-background to-muted/20 py-0"
+            >
+              <div className="relative aspect-[3/4] overflow-hidden">
                 <Image
-                  src={pet.photo_url || '/placeholder.svg?height=400&width=400'}
+                  src={pet.photo_url || '/placeholder.svg?height=600&width=450'}
                   alt={pet.name}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-500 group-hover:scale-110"
                 />
-                <div className="absolute top-2 right-2">
-                  <Badge className={`${statusConfig[pet.status].color} text-white border-0`}>
+
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+
+                {/* Status Badge - Top Right */}
+                <div className="absolute top-4 right-4 z-10">
+                  <Badge
+                    className={`${statusConfig[pet.status].color} text-white border-0 shadow-lg text-sm px-3 py-1.5`}
+                  >
                     {statusConfig[pet.status].emoji} {statusConfig[pet.status].label}
                   </Badge>
                 </div>
-                <div className="absolute top-2 left-2">
-                  <Badge variant="secondary" className="bg-white/90 backdrop-blur text-foreground border-0">
+
+                {/* Type Badge - Top Left */}
+                <div className="absolute top-4 left-4 z-10">
+                  <Badge className="bg-white/95 backdrop-blur-sm text-foreground border-0 shadow-lg text-sm px-3 py-1.5">
                     {petTypeEmoji[pet.type]}{' '}
                     {pet.type === 'DOG'
                       ? 'Cachorro'
@@ -175,82 +191,124 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
                       : 'Outro'}
                   </Badge>
                 </div>
-              </div>
 
-              <div className="p-4">
-                <h3 className="font-semibold text-lg mb-2">{pet.name}</h3>
-                {pet.breed && <p className="text-sm text-muted-foreground mb-2">Raça: {pet.breed}</p>}
-                {pet.description && (
-                  <p className="text-sm text-muted-foreground mb-3 line-clamp-2">{pet.description}</p>
-                )}
+                {/* Content Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
+                  <h3 className="text-2xl font-bold mb-2 text-balance">{pet.name}</h3>
 
-                {pet.location_description && (
-                  <div className="flex items-start gap-2 text-sm text-muted-foreground mb-4">
-                    <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                    <span className="line-clamp-1">{pet.location_description}</span>
+                  {pet.breed && <p className="text-sm text-white/90 mb-2 font-medium">{pet.breed}</p>}
+
+                  {pet.description && (
+                    <p className="text-sm text-white/80 mb-3 line-clamp-2 leading-relaxed">{pet.description}</p>
+                  )}
+
+                  {pet.location_description && (
+                    <div className="flex items-start gap-2 text-sm text-white/90 mb-4">
+                      <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <span className="line-clamp-1">{pet.location_description}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center gap-2 text-xs text-white/70 mb-4">
+                    <Calendar className="h-3.5 w-3.5" />
+                    <span>Reportado em {new Date(pet.created_at).toLocaleDateString('pt-BR')}</span>
                   </div>
-                )}
 
-                <div className="flex flex-wrap gap-2">
-                  <Button size="sm" variant="outline" asChild>
-                    <Link href={`/pet/${pet.id}`}>
-                      <Eye className="mr-2 h-4 w-4" />
-                      Ver Detalhes
-                    </Link>
-                  </Button>
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="bg-white/95 hover:bg-white text-foreground backdrop-blur-sm shadow-lg"
+                      asChild
+                    >
+                      <Link href={`/pet/${pet.id}`}>
+                        <Eye className="mr-2 h-4 w-4" />
+                        Ver
+                      </Link>
+                    </Button>
 
-                  {pet.status !== 'REUNITED' && (
-                    <Button size="sm" variant="outline" asChild>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      className="bg-white/95 hover:bg-white text-foreground backdrop-blur-sm shadow-lg"
+                      asChild
+                    >
                       <Link href={`/editar-pet/${pet.id}`}>
                         <Pencil className="mr-2 h-4 w-4" />
                         Editar
                       </Link>
                     </Button>
-                  )}
 
-                  {(pet.status === 'LOST' || pet.status === 'FOUND') && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-purple-600 hover:text-purple-700 bg-transparent"
-                      onClick={() => markAsReunited(pet.id)}
-                      disabled={reunitingId === pet.id}
-                    >
-                      {reunitingId === pet.id ? (
-                        <div className="flex items-center gap-2">
-                          <div className="scale-50">
-                            <LoadingSpinner size="sm" />
+                    {(pet.status === 'LOST' || pet.status === 'FOUND') && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="bg-purple-500/95 hover:bg-purple-600 text-white backdrop-blur-sm shadow-lg"
+                        onClick={() => setReuniteConfirmId(pet.id)}
+                        disabled={reunitingId === pet.id}
+                      >
+                        {reunitingId === pet.id ? (
+                          <div className="flex items-center gap-2">
+                            <div className="scale-50">
+                              <LoadingSpinner size="sm" />
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="mr-2 h-4 w-4" />
-                          Marcar como Devolvido
-                        </>
-                      )}
-                    </Button>
-                  )}
+                        ) : (
+                          <>
+                            <CheckCircle2 className="mr-2 h-4 w-4" />
+                            Reunido
+                          </>
+                        )}
+                      </Button>
+                    )}
 
-                  {pet.status !== 'REUNITED' && (
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="text-destructive hover:text-destructive bg-transparent"
+                      variant="secondary"
+                      className="bg-red-500/95 hover:bg-red-600 text-white backdrop-blur-sm shadow-lg"
                       onClick={() => setDeleteId(pet.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
-                  )}
-                </div>
-
-                <div className="mt-3 pt-3 text-xs text-muted-foreground">
-                  Reportado em {new Date(pet.created_at).toLocaleDateString('pt-BR')}
+                  </div>
                 </div>
               </div>
             </Card>
           ))}
         </div>
       )}
+
+      <AlertDialog open={!!reuniteConfirmId} onOpenChange={() => setReuniteConfirmId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Marcar como reunido?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Isso indicará que o pet foi reunido com seu dono. Esta ação pode ser revertida editando o pet
+              posteriormente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={!!reunitingId}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={markAsReunited}
+              disabled={!!reunitingId}
+              className="bg-purple-500 hover:bg-purple-600"
+            >
+              {reunitingId ? (
+                <div className="flex items-center gap-2">
+                  <div className="scale-75">
+                    <LoadingSpinner size="sm" />
+                  </div>
+                  <span>Marcando...</span>
+                </div>
+              ) : (
+                'Marcar como Reunido'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>

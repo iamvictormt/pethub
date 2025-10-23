@@ -1,9 +1,11 @@
 'use client';
 
+import type React from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SliderInput } from '@/components/ui/slider-input';
 import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { MapPin, X, Sparkles } from 'lucide-react';
+import { MapPin, X, Search } from 'lucide-react';
 
 interface InlineFiltersProps {
   status: string[];
@@ -17,6 +19,7 @@ interface InlineFiltersProps {
   userLocation: { lat: number; lng: number } | null;
   onRequestLocation: () => void;
   onClearFilters: () => void;
+  onSearch: (query: string) => void;
 }
 
 export function InlineFilters({
@@ -31,8 +34,22 @@ export function InlineFilters({
   userLocation,
   onRequestLocation,
   onClearFilters,
+  onSearch,
 }: InlineFiltersProps) {
-  const hasActiveFilters = status.length > 0 || petTypes.length > 0 || userLocation !== null;
+  const [localSearchQuery, setLocalSearchQuery] = useState('');
+
+  const hasActiveFilters =
+    status.length > 0 || petTypes.length > 0 || userLocation !== null || localSearchQuery.length > 0;
+
+  const handleSearch = () => {
+    onSearch(localSearchQuery);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br from-background via-background to-muted/20 p-8 shadow-lg backdrop-blur-sm">
@@ -53,13 +70,41 @@ export function InlineFilters({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onClearFilters}
+              onClick={() => {
+                setLocalSearchQuery('');
+                onClearFilters();
+              }}
               className="text-muted-foreground transition-colors hover:text-foreground"
             >
               <X className="mr-2 h-4 w-4" />
               Limpar tudo
             </Button>
           )}
+        </div>
+
+        <div className="space-y-4 rounded-xl bg-card/50 p-6 shadow-sm backdrop-blur-sm transition-all hover:shadow-md">
+          <div className="flex items-center gap-2">
+            <label className="font-semibold text-foreground">Buscar Pet</label>
+          </div>
+          <p className="text-sm text-muted-foreground">Pesquise por nome, descrição, cor ou raça</p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={localSearchQuery}
+              onChange={(e) => setLocalSearchQuery(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Digite sua busca..."
+              className="flex-1 rounded-lg border border-input bg-background px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            />
+            <Button
+              onClick={handleSearch}
+              size="lg"
+              className="bg-gradient-to-r from-orange-alert to-pink-500 text-white shadow-lg hover:shadow-xl transition-all"
+            >
+              <Search className="h-5 w-5 mr-2" />
+              Pesquisar
+            </Button>
+          </div>
         </div>
 
         {/* Main Filters Grid */}

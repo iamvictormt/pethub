@@ -1,8 +1,10 @@
 'use client';
 import { Button } from '@/components/ui/button';
+import type React from 'react';
+import { useState } from 'react';
 import { SliderInput } from '@/components/ui/slider-input';
 import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { Filter, X, MapPin, Sparkles, ChevronUp, ChevronDown } from 'lucide-react';
+import { Filter, X, MapPin, ChevronUp, Search } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 interface MapFiltersProps {
@@ -18,6 +20,9 @@ interface MapFiltersProps {
   userLocation: { lat: number; lng: number } | null;
   onRequestLocation: () => void;
   onClearFilters: () => void;
+  searchQuery: string;
+  setSearchQuery: (value: string) => void;
+  onSearch: (query: string) => void;
 }
 
 export function MapFilters({
@@ -33,8 +38,24 @@ export function MapFilters({
   userLocation,
   onRequestLocation,
   onClearFilters,
+  searchQuery,
+  setSearchQuery,
+  onSearch,
 }: MapFiltersProps) {
-  const hasActiveFilters = status.length > 0 || petTypes.length > 0 || userLocation !== null;
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery);
+
+  const hasActiveFilters =
+    status.length > 0 || petTypes.length > 0 || userLocation !== null || localSearchQuery.length > 0;
+
+  const handleSearch = () => {
+    onSearch(localSearchQuery);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const FilterContent = () => (
     <div className="space-y-6 p-6">
@@ -53,12 +74,41 @@ export function MapFilters({
             variant="ghost"
             size="sm"
             className="text-muted-foreground hover:text-foreground border-1"
-            onClick={onClearFilters}
+            onClick={() => {
+              setLocalSearchQuery('');
+              onClearFilters();
+            }}
           >
             <X className="h-4 w-4" />
             Limpar
           </Button>
         )}
+      </div>
+
+      {/* Search */}
+      <div className="space-y-3 rounded-xl bg-muted/30 p-4">
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-semibold">Buscar Pet</label>
+        </div>
+        <p className="text-xs text-muted-foreground">Pesquise por nome, descrição, cor ou raça</p>
+        <div className="flex flex-col gap-2">
+          <input
+            type="text"
+            value={localSearchQuery}
+            onChange={(e) => setLocalSearchQuery(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Digite sua busca..."
+            className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          />
+          <Button
+            onClick={handleSearch}
+            size="lg"
+            className="w-full bg-gradient-to-r from-orange-alert to-pink-500 text-white shadow-lg"
+          >
+            <Search className="h-4 w-4 mr-2" />
+            Pesquisar
+          </Button>
+        </div>
       </div>
 
       {/* Location */}
