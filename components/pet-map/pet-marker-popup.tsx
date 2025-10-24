@@ -10,9 +10,9 @@ interface PetMarkerPopupProps {
 
 export function PetMarkerPopup({ pet, distance }: PetMarkerPopupProps) {
   const statusColor =
-    pet.status === 'LOST' ? 'text-orange-alert' : pet.status === 'ADOPTION' ? 'text-green-500' : 'text-blue-pethub';
+    pet.status === 'LOST' ? 'text-orange-alert' : pet.status === 'ADOPTION' ? 'text-green-500' : 'text-blue-farejei';
   const statusBg =
-    pet.status === 'LOST' ? 'bg-orange-alert/10' : pet.status === 'ADOPTION' ? 'bg-green-500/10' : 'bg-blue-pethub/10';
+    pet.status === 'LOST' ? 'bg-orange-alert/10' : pet.status === 'ADOPTION' ? 'bg-green-500/10' : 'bg-blue-farejei/10';
 
   const petTypeLabels: Record<string, string> = {
     DOG: 'Cachorro',

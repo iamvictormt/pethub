@@ -138,7 +138,7 @@ export function AdForm({ userId }: AdFormProps) {
       <Button
         type="submit"
         size="lg"
-        className="w-full bg-blue-pethub text-blue-pethub-foreground hover:bg-blue-pethub/90"
+        className="w-full bg-blue-farejei text-blue-farejei-foreground hover:bg-blue-farejei/90"
         disabled={isLoading}
       >
         {isLoading ? (

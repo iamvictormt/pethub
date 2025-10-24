@@ -17,7 +17,7 @@ export function AdSupportBanner() {
             <Info className="h-4 w-4 text-blue-500" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium">Apoie o PetHub</p>
+            <p className="text-sm font-medium">Apoie o Farejei</p>
             <p className="text-xs text-muted-foreground">
               Os anúncios ajudam a manter nossa plataforma gratuita para ajudar pets perdidos
             </p>

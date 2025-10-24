@@ -15,7 +15,7 @@ const _poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: 'PetHub - Encontre seu Pet',
+  title: 'Farejei - Encontre seu Pet',
   description: 'Plataforma comunitária para reunir pets perdidos com seus donos',
   generator: 'v0.app',
 };
@@ -30,7 +30,7 @@ export default async function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        <meta name="apple-mobile-web-app-title" content="PetHub" />
+        <meta name="apple-mobile-web-app-title" content="Farejei" />
       </head>
       <body className={`font-sans antialiased ${_poppins.variable}`}>
         <Navbar />

@@ -35,7 +35,7 @@ export default async function ContributorsPage() {
           <div className="mb-8 flex justify-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-orange-alert/20 bg-orange-alert/10 px-4 py-2 text-sm font-medium text-orange-alert backdrop-blur">
               <Cat className="h-4 w-4 text-orange-alert" />
-              Comunidade PetHub
+              Comunidade Farejei
             </div>
           </div>
 
@@ -61,7 +61,7 @@ export default async function ContributorsPage() {
               </div>
 
               <div className="rounded-2xl border bg-background p-6 shadow-sm">
-                <div className="mb-2 text-3xl font-bold text-blue-pethub md:text-4xl">{totalContributors}</div>
+                <div className="mb-2 text-3xl font-bold text-blue-farejei md:text-4xl">{totalContributors}</div>
                 <div className="text-sm font-medium text-muted-foreground">Contribuintes</div>
               </div>
 
@@ -149,7 +149,7 @@ export default async function ContributorsPage() {
           <Heart className="mx-auto mb-6 h-16 w-16" />
           <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">Faça Parte Desta História</h2>
           <p className="mb-8 text-lg text-orange-50 md:text-xl">
-            Sua contribuição ajuda a manter o PetHub gratuito para todos e a reunir mais pets com suas famílias. Juntos,
+            Sua contribuição ajuda a manter o Farejei gratuito para todos e a reunir mais pets com suas famílias. Juntos,
             fazemos a diferença!
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">

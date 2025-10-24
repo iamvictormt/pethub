@@ -33,7 +33,7 @@ export function NativeAdCard({ ad }: NativeAdCardProps) {
               </button>
             </TooltipTrigger>
             <TooltipContent side="bottom" className="max-w-xs">
-              <p className="text-xs">Anúncios ajudam a manter o PetHub gratuito e acessível para todos</p>
+              <p className="text-xs">Anúncios ajudam a manter o Farejei gratuito e acessível para todos</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

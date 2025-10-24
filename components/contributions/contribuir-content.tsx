@@ -31,13 +31,13 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
           <div className="mx-auto max-w-3xl text-center">
             <h1 className="mb-6 text-balance text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl">
               Juntos, salvamos{' '}
-              <span className="bg-gradient-to-r from-orange-alert via-orange-500 to-blue-pethub bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-orange-alert via-orange-500 to-blue-farejei bg-clip-text text-transparent">
                 mais vidas
               </span>
             </h1>
 
             <p className="mb-8 text-pretty text-lg text-muted-foreground md:text-xl">
-              O PetHub é 100% gratuito para quem procura pets perdidos. Sua contribuição mantém nossa plataforma viva e
+              O Farejei é 100% gratuito para quem procura pets perdidos. Sua contribuição mantém nossa plataforma viva e
               ajuda milhares de famílias a se reunirem com seus melhores amigos.
             </p>
 
@@ -68,7 +68,7 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
                 <div className="text-sm text-muted-foreground">Arrecadado</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-blue-pethub">{uniqueContributors}</div>
+                <div className="text-3xl font-bold text-blue-farejei">{uniqueContributors}</div>
                 <div className="text-sm text-muted-foreground">Contribuintes</div>
               </div>
               <div>
@@ -92,8 +92,8 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             <div className="rounded-2xl border bg-background p-6 shadow-sm">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-blue-pethub/10">
-                <Zap className="h-6 w-6 text-blue-pethub" />
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-blue-farejei/10">
+                <Zap className="h-6 w-6 text-blue-farejei" />
               </div>
               <h3 className="mb-2 font-semibold">Infraestrutura</h3>
               <p className="text-sm text-muted-foreground">
@@ -140,38 +140,38 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">Como você pode ajudar</h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Existem várias formas de apoiar o PetHub. Escolha a que faz mais sentido para você.
+              Existem várias formas de apoiar o Farejei. Escolha a que faz mais sentido para você.
             </p>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-2">
             {/* Petshop Partner */}
             <div className="rounded-2xl border bg-background p-8 shadow-sm">
-              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-pethub/10">
-                <Shield className="h-8 w-8 text-blue-pethub" />
+              <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-farejei/10">
+                <Shield className="h-8 w-8 text-blue-farejei" />
               </div>
               <h3 className="mb-3 text-2xl font-bold">Seja um Parceiro Petshop</h3>
               <p className="mb-6 text-muted-foreground">
                 Anuncie seus produtos e serviços para milhares de tutores de pets. Sua presença na plataforma ajuda a
-                manter o PetHub gratuito para todos.
+                manter o Farejei gratuito para todos.
               </p>
               <ul className="mb-6 space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-blue-pethub" />
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-blue-farejei" />
                   <span className="text-sm">Alcance milhares de tutores na sua região</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-blue-pethub" />
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-blue-farejei" />
                   <span className="text-sm">Gerencie seus anúncios facilmente</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-blue-pethub" />
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-blue-farejei" />
                   <span className="text-sm">Apoie uma causa importante</span>
                 </li>
               </ul>
 
               <div className="space-y-3">
-                <Button size="lg" className="w-full bg-blue-pethub hover:bg-blue-pethub/90" disabled>
+                <Button size="lg" className="w-full bg-blue-farejei hover:bg-blue-farejei/90" disabled>
                   Em Breve
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
@@ -227,7 +227,7 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
               ))}
             </div>
             <p className="mb-4 text-lg text-muted-foreground">
-              "Anunciar no PetHub trouxe novos clientes para minha pet shop e ainda ajuda famílias a encontrarem seus
+              "Anunciar no Farejei trouxe novos clientes para minha pet shop e ainda ajuda famílias a encontrarem seus
               pets. É gratificante fazer parte dessa comunidade."
             </p>
             <div className="flex items-center gap-3">

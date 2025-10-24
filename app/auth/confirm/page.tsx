@@ -17,7 +17,7 @@ export default function AuthConfirmPage() {
       router.push('/');
       toast({
         title: 'Conta confirmada!',
-        description: 'Sua conta foi confirmada com sucesso. Bem-vindo ao PetHub!',
+        description: 'Sua conta foi confirmada com sucesso. Bem-vindo ao Farejei!',
       });
     }, 2500);
 
@@ -72,7 +72,7 @@ export default function AuthConfirmPage() {
           <CardContent>
             <p className="text-center text-sm text-muted-foreground">
               {confirmed
-                ? 'Bem-vindo ao PetHub! Sua conta foi confirmada com sucesso.'
+                ? 'Bem-vindo ao Farejei! Sua conta foi confirmada com sucesso.'
                 : 'Estamos validando suas informações...'}
             </p>
           </CardContent>

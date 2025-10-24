@@ -11,7 +11,7 @@ export const CONTRIBUTION_TIERS: ContributionTier[] = [
   {
     id: 'supporter',
     name: 'Apoiador',
-    description: 'Ajude a manter o PetHub funcionando',
+    description: 'Ajude a manter o Farejei funcionando',
     amountInCents: 1000, // R$ 10,00
   },
   {

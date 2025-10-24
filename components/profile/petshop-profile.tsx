@@ -149,9 +149,9 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
             <div className="rounded-xl border border-border bg-card p-4">
               <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Estatísticas</h3>
               <div className="space-y-2">
-                <div className="flex items-center justify-between rounded-lg bg-blue-pethub/10 p-3">
+                <div className="flex items-center justify-between rounded-lg bg-blue-farejei/10 p-3">
                   <span className="text-sm font-medium">Anúncios Ativos</span>
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-pethub text-xs font-bold text-white">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-farejei text-xs font-bold text-white">
                     {activeAds.length}
                   </span>
                 </div>
@@ -174,7 +174,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
             <div className="rounded-xl border border-border bg-card p-4">
               <h3 className="mb-3 text-sm font-semibold text-muted-foreground">Ações Rápidas</h3>
               <div className="space-y-2">
-                <Button asChild className="w-full bg-blue-pethub hover:bg-blue-pethub/90">
+                <Button asChild className="w-full bg-blue-farejei hover:bg-blue-farejei/90">
                   <Link href="/anunciar">
                     <Plus className="mr-2 h-4 w-4" />
                     Novo Anúncio
@@ -214,7 +214,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isUploadingAvatar}
-                        className="absolute -bottom-2 left-1/2 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-2xl bg-blue-pethub text-white shadow-lg hover:bg-blue-pethub/90 disabled:opacity-50 md:bottom-1 md:right-1 md:h-10 md:w-10 md:translate-x-0 md:left-auto opacity-80 cursor-pointer md:bottom-19"
+                        className="absolute -bottom-2 left-1/2 flex h-12 w-12 -translate-x-1/2 items-center justify-center rounded-2xl bg-blue-farejei text-white shadow-lg hover:bg-blue-farejei/90 disabled:opacity-50 md:bottom-1 md:right-1 md:h-10 md:w-10 md:translate-x-0 md:left-auto opacity-80 cursor-pointer md:bottom-19"
                       >
                         {isUploadingAvatar ? (
                           <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent md:h-4 md:w-4" />
@@ -233,7 +233,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <h1 className="text-balance text-xl font-bold md:text-2xl">{profile?.name}</h1>
-                          <span className="rounded-full bg-blue-pethub/10 px-2 py-1 text-xs font-medium text-blue-pethub">
+                          <span className="rounded-full bg-blue-farejei/10 px-2 py-1 text-xs font-medium text-blue-farejei">
                             PETSHOP
                           </span>
                         </div>
@@ -254,7 +254,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                             <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>
                               Cancelar
                             </Button>
-                            <Button size="sm" className="bg-blue-pethub hover:bg-blue-pethub/90" onClick={handleSave}>
+                            <Button size="sm" className="bg-blue-farejei hover:bg-blue-farejei/90" onClick={handleSave}>
                               Salvar
                             </Button>
                           </>
@@ -369,7 +369,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
             <div className="rounded-xl border border-border bg-card p-6">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-lg font-semibold">Meus Anúncios ({advertisements.length})</h2>
-                <Button asChild size="sm" className="bg-blue-pethub hover:bg-blue-pethub/90">
+                <Button asChild size="sm" className="bg-blue-farejei hover:bg-blue-farejei/90">
                   <Link href="/anunciar">
                     <Plus className="mr-2 h-4 w-4" />
                     Criar Anúncio
@@ -417,7 +417,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                             href={ad.link_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-pethub hover:underline"
+                            className="text-blue-farejei hover:underline"
                           >
                             <ExternalLink className="h-4 w-4" />
                           </a>
@@ -434,7 +434,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
                   <p className="mb-4 text-sm text-muted-foreground">
                     Crie seu primeiro anúncio para promover seus produtos e serviços
                   </p>
-                  <Button asChild className="bg-blue-pethub hover:bg-blue-pethub/90">
+                  <Button asChild className="bg-blue-farejei hover:bg-blue-farejei/90">
                     <Link href="/anunciar">
                       <Plus className="mr-2 h-4 w-4" />
                       Criar Primeiro Anúncio

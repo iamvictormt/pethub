@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -34,14 +34,14 @@
   --dark: oklch(0.15 0 0);
   --dark-foreground: oklch(1 0 0);
 
-  /* Adding PetHub specific colors */
+  /* Adding Farejei specific colors */
   /* Orange Alert - #F97316 for lost pets */
   --orange-alert: oklch(0.68 0.18 35);
   --orange-alert-foreground: oklch(1 0 0);
 
-  /* Blue PetHub - #3B82F6 for found pets */
-  --blue-pethub: oklch(0.6 0.2 250);
-  --blue-pethub-foreground: oklch(1 0 0);
+  /* Blue Farejei - #3B82F6 for found pets */
+  --blue-farejei: oklch(0.6 0.2 250);
+  --blue-farejei-foreground: oklch(1 0 0);
 
   /* Green Found - #10B981 for success actions */
   --green-found: oklch(0.65 0.18 160);
@@ -86,11 +86,11 @@
   --dark: oklch(0.15 0 0);
   --dark-foreground: oklch(1 0 0);
 
-  /* Dark mode PetHub colors */
+  /* Dark mode Farejei colors */
   --orange-alert: oklch(0.68 0.18 35);
   --orange-alert-foreground: oklch(1 0 0);
-  --blue-pethub: oklch(0.6 0.2 250);
-  --blue-pethub-foreground: oklch(1 0 0);
+  --blue-farejei: oklch(0.6 0.2 250);
+  --blue-farejei-foreground: oklch(1 0 0);
   --green-found: oklch(0.65 0.18 160);
   --green-found-foreground: oklch(1 0 0);
 
@@ -111,8 +111,8 @@
 
 @theme inline {
   /* Updated to use Poppins font */
-  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback';
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -132,11 +132,11 @@
   --color-dark: var(--dark);
   --color-dark-foreground: var(--dark-foreground);
 
-  /* Adding PetHub color utilities */
+  /* Adding Farejei color utilities */
   --color-orange-alert: var(--orange-alert);
   --color-orange-alert-foreground: var(--orange-alert-foreground);
-  --color-blue-pethub: var(--blue-pethub);
-  --color-blue-pethub-foreground: var(--blue-pethub-foreground);
+  --color-blue-farejei: var(--blue-farejei);
+  --color-blue-farejei-foreground: var(--blue-farejei-foreground);
   --color-green-found: var(--green-found);
   --color-green-found-foreground: var(--green-found-foreground);
 

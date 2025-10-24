@@ -78,13 +78,10 @@ export function Navbar() {
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-2">
           <img
-            src="/logo-pethub.png"
-            alt="PetHub Logo"
-            className="h-12 w-12 transition-transform duration-300 ease-in-out group-hover:-rotate-12"
+            src="/farejei.svg"
+            alt="Farejei Logo"
+            className="h-full w-36 transition-transform duration-300 ease-in-out group-hover:scale-105"
           />
-          <span className="text-xl font-bold tracking-tight transition-opacity duration-300 group-hover:opacity-80">
-            PetHub
-          </span>
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -115,7 +112,7 @@ export function Navbar() {
           {user ? (
             <>
               {isPetshop ? (
-                <Button asChild size="sm" className="bg-blue-pethub hover:bg-blue-pethub/90">
+                <Button asChild size="sm" className="bg-blue-farejei hover:bg-blue-farejei/90">
                   <Link href="/anunciar">
                     <Store className="mr-2 h-4 w-4" />
                     Anunciar
@@ -232,7 +229,7 @@ export function Navbar() {
                 {isPetshop ? (
                   <Button
                     asChild
-                    className="w-full justify-start bg-blue-pethub hover:bg-blue-pethub/90"
+                    className="w-full justify-start bg-blue-farejei hover:bg-blue-farejei/90"
                     onClick={() => setIsMenuOpen(false)}
                   >
                     <Link href="/anunciar">

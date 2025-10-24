@@ -181,7 +181,7 @@ export default function SignUpPage() {
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-center text-2xl">Crie sua conta</CardTitle>
-            <CardDescription className="text-center">Junte-se à comunidade PetHub</CardDescription>
+            <CardDescription className="text-center">Junte-se à comunidade Farejei</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSignUp} className="space-y-6">

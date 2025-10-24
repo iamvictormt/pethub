@@ -17,7 +17,7 @@ export default function SignUpSuccessPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-center text-sm text-muted-foreground">
-              Clique no link que enviamos para confirmar sua conta e começar a usar o PetHub.
+              Clique no link que enviamos para confirmar sua conta e começar a usar o Farejei.
             </p>
             <Button asChild className="w-full">
               <Link href="/">Voltar para o início</Link>

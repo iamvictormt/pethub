@@ -23,7 +23,7 @@ export default async function AnunciarPage() {
     <div className="container mx-auto max-w-3xl px-4 py-8">
       <div className="mb-8 space-y-2">
         <h1 className="text-3xl font-bold text-balance">Criar Anúncio</h1>
-        <p className="text-muted-foreground text-pretty">Promova seus produtos e serviços para a comunidade PetHub</p>
+        <p className="text-muted-foreground text-pretty">Promova seus produtos e serviços para a comunidade Farejei</p>
       </div>
 
       <AdForm userId={user.id} />

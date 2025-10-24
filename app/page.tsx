@@ -83,7 +83,7 @@ export default async function HomePage() {
                   <div className="text-sm text-muted-foreground">Pets reunidos</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-blue-pethub">{activeUsers}+</div>
+                  <div className="text-3xl font-bold text-blue-farejei">{activeUsers}+</div>
                   <div className="text-sm text-muted-foreground">Usuários ativos</div>
                 </div>
                 <div>
@@ -95,7 +95,7 @@ export default async function HomePage() {
 
             {/* Right Column - Visual */}
             <div className="relative flex items-center justify-center">
-              <div className="relative h-[400px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-orange-alert/20 to-blue-pethub/20 shadow-2xl lg:h-[500px]">
+              <div className="relative h-[400px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-orange-alert/20 to-blue-farejei/20 shadow-2xl lg:h-[500px]">
                 <img
                   src="/placeholder.svg?height=500&width=600"
                   alt="Pet reunido ao dono"
@@ -144,8 +144,8 @@ export default async function HomePage() {
 
             {/* Step 2 */}
             <div className="relative">
-              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-pethub/10 inline-flex">
-                <Search className="h-10 w-10 text-blue-pethub" />
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-farejei/10 inline-flex">
+                <Search className="h-10 w-10 text-blue-farejei" />
               </div>
               <div className="absolute left-10 top-10 -z-10 text-8xl font-bold text-muted/10">2</div>
               <h3 className="mb-3 text-2xl font-bold">Busque</h3>
@@ -185,7 +185,7 @@ export default async function HomePage() {
                 ))}
               </div>
               <p className="mb-4 text-muted-foreground">
-                "Encontrei minha Luna em menos de 6 horas! A comunidade do PetHub é incrível. Obrigada a todos que
+                "Encontrei minha Luna em menos de 6 horas! A comunidade do Farejei é incrível. Obrigada a todos que
                 ajudaram!"
               </p>
               <div className="flex items-center gap-3">
@@ -205,11 +205,11 @@ export default async function HomePage() {
                 ))}
               </div>
               <p className="mb-4 text-muted-foreground">
-                "Achei um cachorro perdido e consegui localizar o dono pelo PetHub. Ver a felicidade deles foi
+                "Achei um cachorro perdido e consegui localizar o dono pelo Farejei. Ver a felicidade deles foi
                 emocionante!"
               </p>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-blue-pethub/10" />
+                <div className="h-10 w-10 rounded-full bg-blue-farejei/10" />
                 <div>
                   <div className="font-semibold">João Santos</div>
                   <div className="text-sm text-muted-foreground">Rio de Janeiro, RJ</div>
@@ -264,8 +264,8 @@ export default async function HomePage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-pethub/10">
-                    <Users className="h-6 w-6 text-blue-pethub" />
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-farejei/10">
+                    <Users className="h-6 w-6 text-blue-farejei" />
                   </div>
                   <div>
                     <h3 className="mb-1 font-semibold">Comunidade Ativa</h3>
@@ -290,10 +290,10 @@ export default async function HomePage() {
             </div>
 
             <div className="relative flex items-center justify-center">
-              <div className="relative h-[400px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-blue-pethub/20 to-orange-alert/20 shadow-2xl lg:h-[500px]">
+              <div className="relative h-[400px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-blue-farejei/20 to-orange-alert/20 shadow-2xl lg:h-[500px]">
                 <img
                   src="/placeholder.svg?height=500&width=600"
-                  alt="Interface do PetHub"
+                  alt="Interface do Farejei"
                   className="h-full w-full object-cover"
                 />
               </div>
@@ -306,7 +306,7 @@ export default async function HomePage() {
       <section className="border-t bg-gradient-to-br from-orange-alert via-orange-alert/90 to-orange-alert/80 px-4 py-16 text-white md:py-24">
         <div className="container mx-auto max-w-4xl text-center">
           <Shield className="mx-auto mb-6 h-16 w-16" />
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">Ajude a manter o PetHub gratuito</h2>
+          <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">Ajude a manter o Farejei gratuito</h2>
           <p className="mb-8 text-lg text-orange-50 md:text-xl">
             Nossa missão é reunir o máximo de pets com suas famílias. Sua contribuição mantém a plataforma funcionando e
             ajuda mais animais a voltarem para casa.
