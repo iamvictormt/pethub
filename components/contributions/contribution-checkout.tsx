@@ -12,9 +12,9 @@ export default function ContributionCheckout({ amountInCents }: { amountInCents:
 
   const fetchClientSecret = useCallback(async () => {
     try {
-      console.log('[v0] Fetching client secret for amount:', amountInCents);
+      console.log('Fetching client secret for amount:', amountInCents);
       const clientSecret = await startContributionCheckout(amountInCents);
-      console.log('[v0] Received client secret:', !!clientSecret);
+      console.log('Received client secret:', !!clientSecret);
 
       if (!clientSecret) {
         throw new Error('No client secret received');
@@ -22,7 +22,7 @@ export default function ContributionCheckout({ amountInCents }: { amountInCents:
 
       return clientSecret;
     } catch (err) {
-      console.error('[v0] Error fetching client secret:', err);
+      console.error('Error fetching client secret:', err);
       setError(err instanceof Error ? err.message : 'Failed to start checkout');
       throw err;
     }
@@ -52,7 +52,7 @@ export default function ContributionCheckout({ amountInCents }: { amountInCents:
         options={{
           fetchClientSecret,
           onComplete: () => {
-            console.log('[v0] Checkout completed, redirecting to success page');
+            console.log('Checkout completed, redirecting to success page');
             window.location.href = `/contribuir/sucesso?amount=${amountInCents}`;
           },
         }}

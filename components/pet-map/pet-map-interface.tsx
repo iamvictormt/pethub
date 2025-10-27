@@ -26,11 +26,11 @@ function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: numbe
 
 export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
   const [appliedSearchQuery, setAppliedSearchQuery] = useState('');
-  const [pendingStatus, setPendingStatus] = useState<string[]>(['LOST', 'FOUND']);
+  const [pendingStatus, setPendingStatus] = useState<string[]>(['LOST', 'FOUND', 'ADOPTION']);
   const [pendingPetTypes, setPendingPetTypes] = useState<string[]>([]);
-  const [pendingDistance, setPendingDistance] = useState(10);
+  const [pendingDistance, setPendingDistance] = useState(100);
   const [pendingSortBy, setPendingSortBy] = useState('recent');
-  const [status, setStatus] = useState<string[]>(['LOST', 'FOUND']);
+  const [status, setStatus] = useState<string[]>(['LOST', 'FOUND', 'ADOPTION']);
   const [petTypes, setPetTypes] = useState<string[]>([]);
   const [distance, setDistance] = useState(10);
   const [sortBy, setSortBy] = useState('recent');
@@ -56,11 +56,11 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
           });
 
           if (position.coords.accuracy > 100) {
-            console.log('[v0] Low accuracy warning:', position.coords.accuracy, 'meters');
+            console.log('Low accuracy warning:', position.coords.accuracy, 'meters');
           }
         },
         (error) => {
-          console.error('[v0] Error getting location:', error);
+          console.error('Error getting location:', error);
           let errorMessage = 'Não foi possível obter sua localização. ';
 
           switch (error.code) {
@@ -100,11 +100,11 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
 
   const clearFilters = () => {
     setAppliedSearchQuery('');
-    setPendingStatus(['LOST', 'FOUND']);
+    setPendingStatus(['LOST', 'FOUND', 'ADOPTION']);
     setPendingPetTypes([]);
     setPendingDistance(10);
     setPendingSortBy('recent');
-    setStatus(['LOST', 'FOUND']);
+    setStatus(['LOST', 'FOUND', 'ADOPTION']);
     setPetTypes([]);
     setDistance(10);
     setSortBy('recent');

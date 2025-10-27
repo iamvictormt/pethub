@@ -7,7 +7,7 @@ export default async function PetsPage() {
   const { data: pets } = await supabase
     .from('pets')
     .select('*')
-    .in('status', ['LOST', 'FOUND'])
+    .in('status', ['LOST', 'FOUND', 'ADOPTION'])
     .order('created_at', { ascending: false });
 
   const { data: ads } = await supabase

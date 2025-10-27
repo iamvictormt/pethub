@@ -218,7 +218,7 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
       </section>
 
       {/* Testimonial */}
-      <section className="border-t bg-background px-4 py-16 md:py-24">
+      {/* <section className="border-t bg-background px-4 py-16 md:py-24">
         <div className="container mx-auto max-w-4xl">
           <div className="rounded-2xl border bg-background p-6 shadow-sm">
             <div className="mb-4 flex gap-1">
@@ -239,7 +239,7 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Final CTA */}
       <section className="border-t bg-gradient-to-br from-orange-alert via-orange-alert/90 to-orange-alert/80 px-4 py-16 text-white md:py-24">

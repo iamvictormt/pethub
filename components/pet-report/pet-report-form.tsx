@@ -7,15 +7,37 @@ import { createClient } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { TextInput } from '@/components/ui/text-input';
-import { RadioGroup } from '@/components/ui/radio-group';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { Upload } from 'lucide-react';
+import { Heart, PawPrint, Search, Upload } from 'lucide-react';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { LocationPicker } from './location-picker';
 import type { PetStatus, PetType } from '@/lib/types/database';
 import { formatPhoneBR } from '@/lib/utils';
 import { validateImageFile } from '@/lib/image-validation';
 import { toast } from '@/hooks/use-toast';
+import { Label } from '@radix-ui/react-dropdown-menu';
+
+export const PET_STATUS_OPTIONS = [
+  {
+    value: 'LOST',
+    label: 'Perdido',
+    description: 'Estou procurando meu pet desaparecido',
+    icon: Search,
+  },
+  {
+    value: 'FOUND',
+    label: 'Encontrado',
+    description: 'Encontrei um pet e quero ajudar a devolvê-lo',
+    icon: PawPrint,
+  },
+  {
+    value: 'ADOPTION',
+    label: 'Adoção',
+    description: 'Este pet está disponível para adoção',
+    icon: Heart,
+  },
+];
 
 interface PetReportFormProps {
   userId: string;
@@ -136,16 +158,31 @@ export function PetReportForm({ userId }: PetReportFormProps) {
       {/* Status Selection */}
       <Card>
         <CardContent className="pt-6">
-          <RadioGroup
-            label="Status do Pet"
-            options={[
-              { id: 'LOST', label: 'Perdido - Estou procurando meu pet' },
-              { id: 'FOUND', label: 'Encontrado - Encontrei um pet' },
-              { id: 'ADOPTION', label: 'Adoção - Disponível para adoção' },
-            ]}
-            value={status}
-            onChange={(value) => setStatus(value as PetStatus)}
-          />
+          <div>
+            <Label className="mb-3 block text-sm font-medium">Status do Pet</Label>
+            <RadioGroup value={status} onValueChange={setStatus} className="space-y-3">
+              {PET_STATUS_OPTIONS.map((option) => {
+                return (
+                  <div
+                    key={option.value}
+                    className={`flex items-start space-x-3 rounded-lg border p-3 transition-colors cursor-pointer ${
+                      status === option.value
+                        ? 'border-orange-alert bg-orange-alert/5'
+                        : 'border-border hover:border-orange-alert/50'
+                    }`}
+                  >
+                    <RadioGroupItem value={option.value} id={option.value} className="mt-1" />
+                    <label htmlFor={option.value} className="flex-1 cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{option.label}</span>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">{option.description}</p>
+                    </label>
+                  </div>
+                );
+              })}
+            </RadioGroup>
+          </div>
         </CardContent>
       </Card>
 

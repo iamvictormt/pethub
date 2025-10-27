@@ -21,7 +21,7 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
 
   useEffect(() => {
     if (userLocation) {
-      console.log("[v0] Centering map on user location:", userLocation)
+      console.log("Centering map on user location:", userLocation)
       setMapCenter({ lat: userLocation.lat, lng: userLocation.lng })
       setZoom(14)
     }
@@ -208,6 +208,7 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
             style={{
               left: `calc(50% + ${pos.x}px)`,
               top: `calc(50% + ${pos.y}px)`,
+              zIndex: isSelected ? 20 : 10,
             }}
           >
             {/* Pin Icon */}

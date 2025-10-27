@@ -80,7 +80,7 @@ export default function ContributionDialog({ open, onOpenChange }: ContributionD
       return;
     }
 
-    console.log('[v0] Amount in cents:', cents);
+    console.log('Amount in cents:', cents);
     setAmountInCents(cents);
   };
 

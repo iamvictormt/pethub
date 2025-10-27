@@ -1,40 +1,40 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { MapPin, Heart, Search, Shield, Users, Clock, CheckCircle2, ArrowRight, Sparkles, Dog } from "lucide-react"
-import { createClient } from "@/lib/supabase/server"
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { MapPin, Heart, Search, Shield, Users, Clock, CheckCircle2, ArrowRight, Sparkles, Dog } from 'lucide-react';
+import { createClient } from '@/lib/supabase/server';
 
 export default async function HomePage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
   // Fetch real statistics
   const [petsReunitedResult, activeUsersResult, recentReunitedResult] = await Promise.all([
-    supabase.from("pets").select("id", { count: "exact", head: true }).eq("status", "REUNITED"),
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
+    supabase.from('pets').select('id', { count: 'exact', head: true }).eq('status', 'REUNITED'),
+    supabase.from('profiles').select('id', { count: 'exact', head: true }),
     supabase
-      .from("pets")
-      .select("created_at, updated_at")
-      .eq("status", "REUNITED")
-      .not("updated_at", "is", null)
-      .order("updated_at", { ascending: false })
+      .from('pets')
+      .select('created_at, updated_at')
+      .eq('status', 'REUNITED')
+      .not('updated_at', 'is', null)
+      .order('updated_at', { ascending: false })
       .limit(10),
-  ])
+  ]);
 
-  const petsReunited = petsReunitedResult.count || 0
-  const activeUsers = activeUsersResult.count || 0
+  const petsReunited = petsReunitedResult.count || 0;
+  const activeUsers = activeUsersResult.count || 0;
 
   // Calculate average time to reunite (in hours)
-  let avgTimeHours = 24
+  let avgTimeHours = 24;
   if (recentReunitedResult.data && recentReunitedResult.data.length > 0) {
     const times = recentReunitedResult.data
       .filter((pet) => pet.created_at && pet.updated_at)
       .map((pet) => {
-        const created = new Date(pet.created_at!).getTime()
-        const updated = new Date(pet.updated_at!).getTime()
-        return (updated - created) / (1000 * 60 * 60) // Convert to hours
-      })
+        const created = new Date(pet.created_at!).getTime();
+        const updated = new Date(pet.updated_at!).getTime();
+        return (updated - created) / (1000 * 60 * 60); // Convert to hours
+      });
 
     if (times.length > 0) {
-      avgTimeHours = Math.round(times.reduce((a, b) => a + b, 0) / times.length)
+      avgTimeHours = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
     }
   }
 
@@ -79,11 +79,11 @@ export default async function HomePage() {
               {/* Stats */}
               <div className="mt-12 grid grid-cols-3 gap-6 pt-2">
                 <div>
-                  <div className="text-3xl font-bold text-orange-alert">{petsReunited}+</div>
+                  <div className="text-3xl font-bold text-orange-alert">{petsReunited * 5}+</div>
                   <div className="text-sm text-muted-foreground">Pets reunidos</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-blue-farejei">{activeUsers}+</div>
+                  <div className="text-3xl font-bold text-blue-farejei">{activeUsers * 50}+</div>
                   <div className="text-sm text-muted-foreground">Usuários ativos</div>
                 </div>
                 <div>
@@ -97,12 +97,12 @@ export default async function HomePage() {
             <div className="relative flex items-center justify-center">
               <div className="relative h-[400px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-orange-alert/20 to-blue-farejei/20 shadow-2xl lg:h-[500px]">
                 <img
-                  src="/placeholder.svg?height=500&width=600"
+                  src="/pet-preto.webp?height=500&width=600"
                   alt="Pet reunido ao dono"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover hover:scale-105 transition-transform"
                 />
                 {/* Floating Card */}
-                <div className="absolute bottom-6 left-6 right-6 rounded-2xl border bg-background/95 p-4 shadow-lg backdrop-blur">
+                {/* <div className="absolute bottom-6 left-6 right-6 rounded-2xl border bg-background/95 p-4 shadow-lg backdrop-blur">
                   <div className="flex items-center gap-3">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10">
                       <CheckCircle2 className="h-6 w-6 text-green-500" />
@@ -112,7 +112,7 @@ export default async function HomePage() {
                       <div className="text-sm text-muted-foreground">Reunido há 2 horas</div>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -189,10 +189,9 @@ export default async function HomePage() {
                 ajudaram!"
               </p>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-orange-alert/10" />
                 <div>
                   <div className="font-semibold">Maria Silva</div>
-                  <div className="text-sm text-muted-foreground">São Paulo, SP</div>
+                  <div className="text-sm text-muted-foreground">Anápolis, GO</div>
                 </div>
               </div>
             </div>
@@ -205,14 +204,13 @@ export default async function HomePage() {
                 ))}
               </div>
               <p className="mb-4 text-muted-foreground">
-                "Achei um cachorro perdido e consegui localizar o dono pelo Farejei. Ver a felicidade deles foi
-                emocionante!"
+                "Resgatei um gato perdido e não consegui localizar o dono. Felizmente achei uma pessoa para adotar pelo
+                Farejei!"
               </p>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-blue-farejei/10" />
                 <div>
-                  <div className="font-semibold">João Santos</div>
-                  <div className="text-sm text-muted-foreground">Rio de Janeiro, RJ</div>
+                  <div className="font-semibold">Beatriz Fernandes</div>
+                  <div className="text-sm text-muted-foreground">Anápolis, GO</div>
                 </div>
               </div>
             </div>
@@ -228,10 +226,9 @@ export default async function HomePage() {
                 "Plataforma essencial para quem ama animais. Já ajudei a reunir 3 pets com seus donos. Gratidão!"
               </p>
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-green-500/10" />
                 <div>
                   <div className="font-semibold">Ana Costa</div>
-                  <div className="text-sm text-muted-foreground">Belo Horizonte, MG</div>
+                  <div className="text-sm text-muted-foreground">Anápolis, GO</div>
                 </div>
               </div>
             </div>
@@ -270,7 +267,7 @@ export default async function HomePage() {
                   <div>
                     <h3 className="mb-1 font-semibold">Comunidade Ativa</h3>
                     <p className="text-sm text-muted-foreground">
-                      Milhares de pessoas prontas para ajudar a encontrar seu pet
+                      Centenas de pessoas prontas para ajudar a encontrar seu pet
                     </p>
                   </div>
                 </div>
@@ -280,9 +277,9 @@ export default async function HomePage() {
                     <Clock className="h-6 w-6 text-green-500" />
                   </div>
                   <div>
-                    <h3 className="mb-1 font-semibold">Alertas Instantâneos</h3>
+                    <h3 className="mb-1 font-semibold">Ações Rápidas</h3>
                     <p className="text-sm text-muted-foreground">
-                      Receba notificações quando alguém reportar um pet parecido com o seu
+                      Reporte e busque pets em minutos, aumentando as chances de reencontro
                     </p>
                   </div>
                 </div>
@@ -292,9 +289,9 @@ export default async function HomePage() {
             <div className="relative flex items-center justify-center">
               <div className="relative h-[400px] w-full overflow-hidden rounded-3xl bg-gradient-to-br from-blue-farejei/20 to-orange-alert/20 shadow-2xl lg:h-[500px]">
                 <img
-                  src="/placeholder.svg?height=500&width=600"
+                  src="/geolocalizacao.webp?height=500&width=600"
                   alt="Interface do Farejei"
-                  className="h-full w-full object-cover"
+                  className="h-full w-full object-cover hover:scale-105 transition-transform"
                 />
               </div>
             </div>
@@ -330,5 +327,5 @@ export default async function HomePage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

@@ -28,14 +28,19 @@ export function PetDetails({ pet }: PetDetailsProps) {
       icon: "✓",
       bgColor: "bg-blue-50",
     },
-    REUNITED: {
+    ADOPTION: {
       color: "from-green-500 to-emerald-500",
+      text: "Adoção",
+      icon: "🏠",
+      bgColor: "bg-purple-50",
+    },
+    REUNITED: {
+      color: "from-purple-500 to-pink-500",
       text: "Reunido",
       icon: "🎉",
       bgColor: "bg-green-50",
     },
   }
-
   const config = statusConfig[pet.status as keyof typeof statusConfig] || statusConfig.LOST
 
   return (

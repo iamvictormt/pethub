@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET!);
   } catch (err) {
-    console.error('[v0] Webhook signature verification failed:', err);
+    console.error('Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
 
-    console.log('[v0] Processing checkout.session.completed:', session.id);
+    console.log('Processing checkout.session.completed:', session.id);
 
     const { data, error } = await supabaseAdmin
       .from('contributions')
@@ -44,16 +44,16 @@ export async function POST(req: NextRequest) {
       .select();
 
     if (error) {
-      console.error('[v0] Failed to update contribution:', error);
+      console.error('Failed to update contribution:', error);
       return NextResponse.json({ error: 'Database update failed' }, { status: 500 });
     }
 
     if (!data || data.length === 0) {
-      console.error('[v0] No contribution found for session:', session.id);
+      console.error('No contribution found for session:', session.id);
       return NextResponse.json({ error: 'Contribution not found' }, { status: 404 });
     }
 
-    console.log('[v0] Contribution completed successfully:', data[0]);
+    console.log('Contribution completed successfully:', data[0]);
   }
 
   return NextResponse.json({ received: true });

@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,73 +13,88 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import { Share2, Flag, CheckCircle, Trash2, Edit } from "lucide-react"
-import type { Pet } from "@/lib/types/database"
-import { createClient } from "@/lib/supabase/client"
+} from '@/components/ui/alert-dialog';
+import { Share2, Flag, CheckCircle, Trash2, Edit } from 'lucide-react';
+import type { Pet } from '@/lib/types/database';
+import { createClient } from '@/lib/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 interface PetActionsProps {
-  pet: Pet
-  isOwner: boolean
-  userId?: string
+  pet: Pet;
+  isOwner: boolean;
+  userId?: string;
 }
 
 export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
-  const router = useRouter()
-  const supabase = createClient()
-  const [isLoading, setIsLoading] = useState(false)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const [showReunitedDialog, setShowReunitedDialog] = useState(false)
+  const router = useRouter();
+  const supabase = createClient();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showReunitedDialog, setShowReunitedDialog] = useState(false);
 
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${pet.name} - ${pet.status === "LOST" ? "Pet Perdido" : "Pet Encontrado"}`,
-          text: `Ajude a ${pet.status === "LOST" ? "encontrar" : "devolver"} ${pet.name}!`,
+          title: `${pet.name} - ${pet.status === 'LOST' ? 'Pet Perdido' : 'Pet Encontrado'}`,
+          text: `Ajude a ${pet.status === 'LOST' ? 'encontrar' : 'devolver'} ${pet.name}!`,
           url: window.location.href,
-        })
+        });
       } catch (err) {
-        console.error("Error sharing:", err)
+        console.error('Error sharing:', err);
       }
     } else {
-      navigator.clipboard.writeText(window.location.href)
-      alert("Link copiado para a área de transferência!")
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copiado para a área de transferência!');
     }
-  }
+  };
 
   const handleMarkAsReunited = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const { error } = await supabase.from("pets").update({ status: "REUNITED" }).eq("id", pet.id)
+      const { error } = await supabase.from('pets').update({ status: 'REUNITED' }).eq('id', pet.id);
 
-      if (error) throw error
+      if (error) throw error;
 
-      router.refresh()
-      setShowReunitedDialog(false)
+      setShowReunitedDialog(false);
+      toast({
+        title: 'Pet Marcado como Reunido',
+        description: `${pet.name} foi marcado como reunido com sucesso.`,
+      });
     } catch (err) {
-      alert("Erro ao atualizar status do pet")
+      toast({
+        title: 'Erro ao Atualizar',
+        description: 'Houve um problema ao atualizar o status do pet. Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const { error } = await supabase.from("pets").delete().eq("id", pet.id)
+      const { error } = await supabase.from('pets').delete().eq('id', pet.id);
 
-      if (error) throw error
+      if (error) throw error;
 
-      router.push("/")
-      router.refresh()
-      setShowDeleteDialog(false)
+      toast({
+        title: 'Reporte Excluído',
+        description: 'O reporte do pet foi excluído com sucesso.',
+      });
+      router.push('/meus-pets');
+      setShowDeleteDialog(false);
     } catch (err) {
-      alert("Erro ao excluir reporte")
+      toast({
+        title: 'Erro ao Excluir',
+        description: 'Houve um problema ao excluir o reporte do pet. Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -100,7 +115,7 @@ export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
               </Button>
             )}
 
-            {isOwner && pet.status !== "REUNITED" && (
+            {isOwner && pet.status !== 'REUNITED' && (
               <Button
                 onClick={() => setShowReunitedDialog(true)}
                 disabled={isLoading}
@@ -158,8 +173,8 @@ export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Marcar como Reunido?</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja marcar {pet.name} como reunido? Esta ação irá atualizar o status do pet e
-              notificar que ele foi reencontrado com seu tutor.
+              Tem certeza que deseja marcar {pet.name} como reunido? Esta ação irá atualizar o status do pet e notificar
+              que ele foi reencontrado com seu tutor.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -169,7 +184,7 @@ export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
               disabled={isLoading}
               className="bg-purple-500/95 hover:bg-purple-600"
             >
-              {isLoading ? "Atualizando..." : "Confirmar"}
+              {isLoading ? 'Atualizando...' : 'Confirmar'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -191,11 +206,11 @@ export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
               disabled={isLoading}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isLoading ? "Excluindo..." : "Excluir"}
+              {isLoading ? 'Excluindo...' : 'Excluir'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
     </>
-  )
+  );
 }

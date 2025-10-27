@@ -7,7 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 const MINIMUM_AMOUNT = 500; // R$ 5.00 in cents
 
 export async function startContributionCheckout(amountInCents: number) {
-  console.log('[v0] Starting checkout for amount:', amountInCents);
+  console.log('Starting checkout for amount:', amountInCents);
 
   // Validate minimum amount
   if (amountInCents < MINIMUM_AMOUNT) {
@@ -19,7 +19,7 @@ export async function startContributionCheckout(amountInCents: number) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log('[v0] User:', user?.email || 'anonymous');
+  console.log('User:', user?.email || 'anonymous');
 
   try {
     // Create Checkout Session with PIX and card support
@@ -48,11 +48,11 @@ export async function startContributionCheckout(amountInCents: number) {
       customer_email: user?.email,
     });
 
-    console.log('[v0] Stripe session created:', session.id);
-    console.log('[v0] Client secret exists:', !!session.client_secret);
+    console.log('Stripe session created:', session.id);
+    console.log('Client secret exists:', !!session.client_secret);
 
     if (!session.client_secret) {
-      console.error('[v0] No client_secret in session:', session);
+      console.error('No client_secret in session:', session);
       throw new Error('Failed to get client secret from Stripe');
     }
 
@@ -79,17 +79,17 @@ export async function startContributionCheckout(amountInCents: number) {
       });
 
       if (error) {
-        console.error('[v0] Failed to create contribution record:', error);
+        console.error('Failed to create contribution record:', error);
         throw new Error('Failed to create contribution record');
       } else {
-        console.log('[v0] Created pending contribution:', session.id);
+        console.log('Created pending contribution:', session.id);
       }
     }
 
-    console.log('[v0] Returning client secret');
+    console.log('Returning client secret');
     return session.client_secret;
   } catch (error) {
-    console.error('[v0] Error in startContributionCheckout:', error);
+    console.error('Error in startContributionCheckout:', error);
     throw error;
   }
 }

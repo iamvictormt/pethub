@@ -114,7 +114,7 @@ export function PetListView({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${petName || 'Pet'} - PetFinder`,
+          title: `${petName || 'Pet'} - Farejei`,
           text: `Ajude a encontrar ${petName || 'este pet'}!`,
           url: url,
         });

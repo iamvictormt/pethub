@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { toast } from '@/hooks/use-toast';
 
 interface MyPetsContentProps {
   pets: Pet[];
@@ -76,6 +77,16 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
 
     if (!error) {
       setPets(pets.filter((pet) => pet.id !== deleteId));
+      toast({
+        title: 'Reporte Excluído',
+        description: 'O reporte do pet foi excluído com sucesso.',
+      });
+    } else {
+      toast({
+        title: 'Erro ao Excluir',
+        description: 'Houve um problema ao excluir o reporte do pet. Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
     }
     setIsDeleting(false);
     setDeleteId(null);
@@ -194,7 +205,9 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
 
                 {/* Content Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
-                  <h3 className="text-2xl font-bold mb-2 text-balance">{pet.name}</h3>
+                  <Link href={`/pet/${pet.id}`} className="inline">
+                    <h3 className="text-2xl font-bold mb-2 text-balance inline cursor-pointer">{pet.name}</h3>
+                  </Link>
 
                   {pet.breed && <p className="text-sm text-white/90 mb-2 font-medium">{pet.breed}</p>}
 
@@ -216,18 +229,6 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
 
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-2">
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="bg-white/95 hover:bg-white text-foreground backdrop-blur-sm shadow-lg"
-                      asChild
-                    >
-                      <Link href={`/pet/${pet.id}`}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        Ver
-                      </Link>
-                    </Button>
-
                     <Button
                       size="sm"
                       variant="secondary"

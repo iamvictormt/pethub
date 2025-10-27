@@ -108,7 +108,7 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
   const handleSave = async () => {
     if (!profile) return;
 
-    console.log('[v0] Saving petshop profile:', { name, phone, state, city, bio });
+    console.log('Saving petshop profile:', { name, phone, state, city, bio });
 
     const { error } = await supabase
       .from('profiles')
@@ -122,12 +122,12 @@ export function PetshopProfile({ profile, advertisements }: PetshopProfileProps)
       .eq('id', profile.id);
 
     if (error) {
-      console.error('[v0] Error saving petshop profile:', error);
+      console.error('Error saving petshop profile:', error);
       alert('Erro ao salvar perfil: ' + error.message);
       return;
     }
 
-    console.log('[v0] Petshop profile saved successfully');
+    console.log('Petshop profile saved successfully');
     setIsEditing(false);
     router.refresh();
   };

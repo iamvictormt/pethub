@@ -126,10 +126,10 @@ export default function SignUpPage() {
       // 2. Toast de sucesso APENAS aqui, dentro do try
       toast({
         title: 'Conta criada com sucesso!',
-        description: 'Por favor, verifique seu email para confirmar sua conta.',
+        description: 'Faça login para continuar.',
       });
 
-      router.push('/auth/sign-up-success');
+      router.push('/auth/login');
     } catch (error: unknown) {
       if (error instanceof Error) {
         if (

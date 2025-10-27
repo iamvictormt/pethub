@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SliderInput } from '@/components/ui/slider-input';
 import { SelectDropdown } from '@/components/ui/select-dropdown';
@@ -50,6 +50,10 @@ export function InlineFilters({
       handleSearch();
     }
   };
+
+  useEffect(() => {
+    handleSearch();
+  }, [status, petTypes, distance, sortBy, userLocation]);
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br from-background via-background to-muted/20 p-8 shadow-lg backdrop-blur-sm">
