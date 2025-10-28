@@ -144,10 +144,6 @@ export function Navbar() {
                       </Link>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={() => setIsFeedbackOpen(true)}>
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Feedback
-                    </DropdownMenuItem>
                     {isPetshop ? (
                       <DropdownMenuItem asChild>
                         <Link href="/meus-anuncios" className="cursor-pointer">
@@ -163,6 +159,10 @@ export function Navbar() {
                         </Link>
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem onClick={() => setIsFeedbackOpen(true)}>
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Feedback
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleSignOut}
@@ -235,16 +235,7 @@ export function Navbar() {
               {/* Mobile User Actions */}
               {user ? (
                 <>
-                  <button
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      setIsFeedbackOpen(true);
-                    }}
-                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <MessageSquare className="h-4 w-4" />
-                    Enviar Feedback
-                  </button>
+
                   {isPetshop ? (
                     <Button
                       asChild
@@ -297,6 +288,17 @@ export function Navbar() {
                       Meus Pets
                     </Link>
                   )}
+
+                                    <button
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      setIsFeedbackOpen(true);
+                    }}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                  >
+                    <MessageSquare className="h-4 w-4" />
+                    Enviar Feedback
+                  </button>
 
                   <button
                     onClick={async () => {

@@ -10,7 +10,6 @@ import { TextInput } from '@/components/ui/text-input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { SelectDropdown } from '@/components/ui/select-dropdown';
 import { Heart, PawPrint, Search, Upload } from 'lucide-react';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { LocationPicker } from './location-picker';
 import type { PetStatus, PetType } from '@/lib/types/database';
 import { formatPhoneBR } from '@/lib/utils';
@@ -92,9 +91,25 @@ export function PetReportForm({ userId }: PetReportFormProps) {
     setError(null);
 
     try {
+      if (!photoFile) {
+        toast({
+          title: 'Foto obrigatória',
+          description: 'Por favor, faça upload de uma foto do pet',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Validate required fields
-      if (!name || !contactName || !contactPhone || !latitude || !longitude) {
-        throw new Error('Por favor, preencha todos os campos obrigatórios');
+      if (!contactName || !contactPhone || !latitude || !longitude) {
+        toast({
+          title: 'Campos obrigatórios',
+          description: 'Por favor, preencha todos os campos obrigatórios',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
       }
 
       let photoUrl = null;
@@ -137,6 +152,11 @@ export function PetReportForm({ userId }: PetReportFormProps) {
       });
 
       if (insertError) throw insertError;
+      toast({
+        title: 'Pet reportado com sucesso!',
+        description: 'Obrigado por ajudar a reunir pets perdidos com seus donos.',
+      });
+      router.push('/meus-pets');
     } catch (err) {
       toast({
         title: 'Erro ao reportar pet!',
@@ -144,11 +164,6 @@ export function PetReportForm({ userId }: PetReportFormProps) {
         variant: 'destructive',
       });
     } finally {
-      toast({
-        title: 'Pet reportado com sucesso!',
-        description: 'Obrigado por ajudar a reunir pets perdidos com seus donos.',
-      });
-      router.push('/meus-pets');
       setIsLoading(false);
     }
   };
@@ -235,7 +250,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
               placeholder="Ex: 3"
               value={age}
               onChange={(e) => {
-                let value = e.target.value.replace(/\D/g, '');
+                const value = e.target.value.replace(/\D/g, '');
 
                 let numberValue = Number(value);
 
@@ -273,7 +288,9 @@ export function PetReportForm({ userId }: PetReportFormProps) {
 
           {/* Photo Upload */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Foto do Pet</label>
+            <label className="text-sm font-medium">
+              Foto do Pet
+            </label>
             <div className="flex flex-col gap-4">
               {photoPreview && (
                 <div className="relative h-[50vh] w-full overflow-hidden rounded-xl">

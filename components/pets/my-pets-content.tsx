@@ -206,7 +206,9 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
                 {/* Content Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
                   <Link href={`/pet/${pet.id}`} className="inline">
-                    <h3 className="text-2xl font-bold mb-2 text-balance inline cursor-pointer">{pet.name}</h3>
+                    <h3 className="text-2xl font-bold mb-2 text-balance inline cursor-pointer">
+                      {pet.name || 'Sem Nome'}
+                    </h3>
                   </Link>
 
                   {pet.breed && <p className="text-sm text-white/90 mb-2 font-medium">{pet.breed}</p>}

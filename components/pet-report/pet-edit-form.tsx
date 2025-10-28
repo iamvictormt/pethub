@@ -9,8 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { TextInput } from '@/components/ui/text-input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { Upload, MapPin, ArrowLeft } from 'lucide-react';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Upload, ArrowLeft } from 'lucide-react';
 import { LocationPicker } from './location-picker';
 import type { Pet, PetStatus, PetType } from '@/lib/types/database';
 import Link from 'next/link';
@@ -72,9 +71,25 @@ export function PetEditForm({ pet }: PetEditFormProps) {
     setError(null);
 
     try {
+      if (!photoFile && !photoPreview) {
+        toast({
+          title: 'Foto obrigatória',
+          description: 'Por favor, faça upload de uma foto do pet',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Validate required fields
-      if (!name || !contactName || !contactPhone || !latitude || !longitude) {
-        throw new Error('Por favor, preencha todos os campos obrigatórios');
+      if (!contactName || !contactPhone || !latitude || !longitude) {
+        toast({
+          title: 'Campos obrigatórios',
+          description: 'Por favor, preencha todos os campos obrigatórios',
+          variant: 'destructive',
+        });
+        setIsLoading(false);
+        return;
       }
 
       let photoUrl = pet.photo_url;
@@ -118,19 +133,20 @@ export function PetEditForm({ pet }: PetEditFormProps) {
 
       if (updateError) throw updateError;
 
+      toast({
+        title: 'Pet salvo com sucesso!',
+        description: 'As informações do pet foram atualizadas.',
+      });
+
       router.push('/meus-pets');
       router.refresh();
     } catch (err) {
       toast({
         title: 'Erro ao salvar pet!',
-        description: '' + (err instanceof Error ? err.message : 'Ocorreu um erro ao salvar o pet'),
+        description: err instanceof Error ? err.message : 'Ocorreu um erro ao salvar o pet.',
         variant: 'destructive',
       });
     } finally {
-      toast({
-        title: 'Pet salvo com sucesso!',
-        description: 'As informações do pet foram atualizadas.',
-      });
       setIsLoading(false);
     }
   };
@@ -140,29 +156,29 @@ export function PetEditForm({ pet }: PetEditFormProps) {
       {/* Status Selection */}
       <Card>
         <CardContent className="pt-6">
-            <Label className="mb-3 block text-sm font-medium">Status do Pet</Label>
-            <RadioGroup value={status} onValueChange={setStatus} className="space-y-3">
-              {PET_STATUS_OPTIONS.map((option) => {
-                return (
-                  <div
-                    key={option.value}
-                    className={`flex items-start space-x-3 rounded-lg border p-3 transition-colors cursor-pointer ${
-                      status === option.value
-                        ? 'border-orange-alert bg-orange-alert/5'
-                        : 'border-border hover:border-orange-alert/50'
-                    }`}
-                  >
-                    <RadioGroupItem value={option.value} id={option.value} className="mt-1" />
-                    <label htmlFor={option.value} className="flex-1 cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{option.label}</span>
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">{option.description}</p>
-                    </label>
-                  </div>
-                );
-              })}
-            </RadioGroup>
+          <Label className="mb-3 block text-sm font-medium">Status do Pet</Label>
+          <RadioGroup value={status} onValueChange={setStatus} className="space-y-3">
+            {PET_STATUS_OPTIONS.map((option) => {
+              return (
+                <div
+                  key={option.value}
+                  className={`flex items-start space-x-3 rounded-lg border p-3 transition-colors cursor-pointer ${
+                    status === option.value
+                      ? 'border-orange-alert bg-orange-alert/5'
+                      : 'border-border hover:border-orange-alert/50'
+                  }`}
+                >
+                  <RadioGroupItem value={option.value} id={option.value} className="mt-1" />
+                  <label htmlFor={option.value} className="flex-1 cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{option.label}</span>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">{option.description}</p>
+                  </label>
+                </div>
+              );
+            })}
+          </RadioGroup>
         </CardContent>
       </Card>
 
@@ -215,7 +231,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
               placeholder="Ex: 3"
               value={age}
               onChange={(e) => {
-                let value = e.target.value.replace(/\D/g, '');
+                const value = e.target.value.replace(/\D/g, '');
 
                 let numberValue = Number(value);
 
@@ -253,7 +269,9 @@ export function PetEditForm({ pet }: PetEditFormProps) {
 
           {/* Photo Upload */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">Foto do Pet</label>
+            <label className="text-sm font-medium">
+              Foto do Pet
+            </label>
             <div className="flex flex-col gap-4">
               {photoPreview && (
                 <div className="relative h-[50vh] w-full overflow-hidden rounded-xl">

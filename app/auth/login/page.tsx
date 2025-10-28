@@ -31,7 +31,6 @@ export default function LoginPage() {
       });
       if (error) throw error;
       router.push('/');
-      router.refresh();
     } catch (error: unknown) {
       if (error instanceof Error) {
         if (error.message === 'Email not confirmed') {
@@ -58,6 +57,10 @@ export default function LoginPage() {
         }
       }
     } finally {
+      toast({
+        title: 'Login realizado com sucesso',
+        description: 'Bem-vindo!',
+      });
       setIsLoading(false);
     }
   };
