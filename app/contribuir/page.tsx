@@ -1,8 +1,13 @@
 import ContribuirContent from "@/components/contributions/contribuir-content"
 import { createClient } from "@/lib/supabase/server"
+import { redirect } from "next/navigation"
 
 export default async function ContribuirPage() {
   const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   const [totalAmountResult, contributorsResult] = await Promise.all([
     supabase.from("contributions").select("amount_in_cents").eq("status", "completed"),
@@ -13,5 +18,5 @@ export default async function ContribuirPage() {
   const totalAmount = totalAmountCents / 100 // Convert cents to reais
   const uniqueContributors = new Set(contributorsResult.data?.map((c) => c.user_id) || []).size
 
-  return <ContribuirContent totalAmount={totalAmount} uniqueContributors={uniqueContributors} />
+  return <ContribuirContent totalAmount={totalAmount} uniqueContributors={uniqueContributors} isLogged={user != null} />
 }

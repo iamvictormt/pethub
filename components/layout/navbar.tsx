@@ -62,9 +62,19 @@ export function Navbar() {
   }, [supabase]);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
-    router.refresh();
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout error:', error);
+      }
+      setUser(null);
+      setProfile(null);
+      setIsMenuOpen(false);
+      router.push('/');
+      window.location.reload();
+    } catch (error) {
+      console.error('Unexpected logout error:', error);
+    }
   };
 
   const isPetshop = profile?.role === 'PETSHOP';
@@ -235,7 +245,6 @@ export function Navbar() {
               {/* Mobile User Actions */}
               {user ? (
                 <>
-
                   {isPetshop ? (
                     <Button
                       asChild
@@ -289,7 +298,7 @@ export function Navbar() {
                     </Link>
                   )}
 
-                                    <button
+                  <button
                     onClick={() => {
                       setIsMenuOpen(false);
                       setIsFeedbackOpen(true);

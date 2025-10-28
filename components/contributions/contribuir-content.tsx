@@ -5,14 +5,31 @@ import { Button } from '@/components/ui/button';
 import { Heart, Coffee, Users, Shield, TrendingUp, Zap, CheckCircle2, ArrowRight, Award } from 'lucide-react';
 import Link from 'next/link';
 import ContributionDialog from '@/components/contributions/contribution-dialog';
+import { toast } from '@/hooks/use-toast';
+import { redirect } from 'next/navigation';
 
 interface ContribuirContentProps {
   totalAmount: number;
   uniqueContributors: number;
+  isLogged: boolean;
 }
 
-export default function ContribuirContent({ totalAmount, uniqueContributors }: ContribuirContentProps) {
+export default function ContribuirContent({ totalAmount, uniqueContributors, isLogged }: ContribuirContentProps) {
   const [showContributionDialog, setShowContributionDialog] = useState(false);
+
+  const onClickDonate = () => {
+    if (!isLogged) {
+      toast({
+        title: 'Faça login para continuar',
+        description: 'Você precisa estar logado para fazer uma doação — redirecionando para o login...',
+      });
+      setTimeout(() => {
+        redirect('/auth/login');
+      }, 1000);
+    } else {
+      setShowContributionDialog(true);
+    }
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -45,7 +62,7 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               <Button
                 size="lg"
-                onClick={() => setShowContributionDialog(true)}
+                onClick={() => onClickDonate()}
                 className="group bg-orange-alert hover:bg-orange-alert/90"
               >
                 Fazer uma Doação
