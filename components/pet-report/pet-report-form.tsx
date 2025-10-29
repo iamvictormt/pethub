@@ -19,6 +19,7 @@ import { Label } from '@radix-ui/react-dropdown-menu';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatRewardAmount } from '@/utils/formatCurrency';
 import { parseCurrencyToNumber } from '@/utils/parseCurrency';
+import { DateInput } from '../ui/date-input';
 
 export const PET_STATUS_OPTIONS = [
   {
@@ -285,10 +286,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
             />
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Visto pela última vez</label>
-              <input
-                type="date"
-                className="h-12 w-full rounded-2xl border border-input bg-background px-4 py-3 text-base transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+              <DateInput
+                label="Visto pela última vez"
                 value={lastSeenDate}
                 onChange={(e) => setLastSeenDate(e.target.value)}
                 required
