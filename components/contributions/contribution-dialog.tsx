@@ -5,8 +5,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Heart, DollarSign, AlertCircle, ArrowLeft, Coins } from 'lucide-react';
-import ContributionCheckout from './contribution-checkout';
+import { Heart, DollarSign, AlertCircle, Coins } from 'lucide-react';
+import PixCheckout from './pix-checkout';
 
 const MINIMUM_AMOUNT = 500; // R$ 5.00 in cents
 const SUGGESTED_AMOUNTS = [1000, 2500, 5000, 10000]; // R$ 10, 25, 50, 100
@@ -18,11 +18,15 @@ interface ContributionDialogProps {
 
 export default function ContributionDialog({ open, onOpenChange }: ContributionDialogProps) {
   const [customAmount, setCustomAmount] = useState<string>('');
+  const [contributorName, setContributorName] = useState<string>('');
+  const [contributorEmail, setContributorEmail] = useState<string>('');
   const [amountInCents, setAmountInCents] = useState<number | null>(null);
   const [error, setError] = useState<string>('');
 
   const handleClose = () => {
     setCustomAmount('');
+    setContributorName('');
+    setContributorEmail('');
     setAmountInCents(null);
     setError('');
     onOpenChange(false);
@@ -49,7 +53,7 @@ export default function ContributionDialog({ open, onOpenChange }: ContributionD
 
     setCustomAmount(formatted);
 
-    // Validação simples (exemplo)
+    // Validação simples
     if (floatValue < 5) {
       setError('O valor mínimo é R$ 5,00');
     } else {
@@ -80,7 +84,7 @@ export default function ContributionDialog({ open, onOpenChange }: ContributionD
       return;
     }
 
-    console.log('Amount in cents:', cents);
+    console.log('[v0] Amount in cents:', cents);
     setAmountInCents(cents);
   };
 
@@ -146,6 +150,38 @@ export default function ContributionDialog({ open, onOpenChange }: ContributionD
                 )}
               </div>
 
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="contributor-name" className="mb-2 block text-sm font-medium">
+                    Seu nome (opcional)
+                  </Label>
+                  <Input
+                    id="contributor-name"
+                    type="text"
+                    placeholder="Como você gostaria de aparecer na lista de contribuintes"
+                    value={contributorName}
+                    onChange={(e) => setContributorName(e.target.value)}
+                    className="h-12"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="contributor-email" className="mb-2 block text-sm font-medium">
+                    Seu e-mail (opcional)
+                  </Label>
+                  <Input
+                    id="contributor-email"
+                    type="email"
+                    placeholder="Para receber atualizações sobre o projeto"
+                    value={contributorEmail}
+                    onChange={(e) => setContributorEmail(e.target.value)}
+                    className="h-12"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Não é necessário estar logado para contribuir. Se preferir, pode doar anonimamente.
+                </p>
+              </div>
+
               {/* Info Box */}
               <div className="rounded-lg border bg-muted/50 p-3 sm:p-4">
                 <div className="mb-2 flex items-center gap-2">
@@ -159,12 +195,11 @@ export default function ContributionDialog({ open, onOpenChange }: ContributionD
                 </ul>
               </div>
 
-              {/* Payment Methods */}
-              <div className="rounded-lg bg-blue-50 p-3 text-xs sm:p-4 sm:text-sm">
-                <p className="mb-1 font-medium text-blue-900">💳 Formas de pagamento</p>
-                <p className="text-blue-700">
-                  Pagamento via cartão de crédito com processamento instantâneo. Sua compra é protegida e processada com
-                  segurança pelo Stripe.
+              <div className="rounded-lg bg-green-50 p-3 text-xs sm:p-4 sm:text-sm">
+                <p className="mb-1 font-medium text-green-900">💚 Forma de pagamento</p>
+                <p className="text-green-700">
+                  Pagamento via PIX - instantâneo e seguro. Após confirmar, você receberá um QR Code para escanear com o
+                  app do seu banco.
                 </p>
               </div>
             </div>
@@ -181,26 +216,29 @@ export default function ContributionDialog({ open, onOpenChange }: ContributionD
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold sm:text-2xl">Finalize sua contribuição</DialogTitle>
+              <DialogTitle className="text-xl font-bold sm:text-2xl">Finalize sua contribuição via PIX</DialogTitle>
               <DialogDescription className="text-sm">
-                Valor: <span className="font-semibold text-orange-alert">{formatCurrency(amountInCents)}</span> -
-                Complete o pagamento de forma segura através do Stripe.
+                Valor: <span className="font-semibold text-orange-alert">{formatCurrency(amountInCents)}</span>
               </DialogDescription>
             </DialogHeader>
 
             <div className="py-3 sm:py-4">
-              <ContributionCheckout amountInCents={amountInCents} />
+              <PixCheckout
+                amountInCents={amountInCents}
+                contributorName={contributorName || undefined}
+                contributorEmail={contributorEmail || undefined}
+              />
             </div>
 
             <Button
               variant="outline"
               onClick={() => {
+                console.log('[v0] Going back to amount selection');
                 setAmountInCents(null);
               }}
               className="h-12 w-full sm:h-auto"
             >
-              <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
-              Voltar para seleção de valor
+              ← Voltar para seleção de valor
             </Button>
           </>
         )}

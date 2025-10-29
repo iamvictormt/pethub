@@ -1,57 +1,58 @@
-'use client';
+"use client"
 
-import { useEffect, useState, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Heart, Sparkles, ArrowRight, Users } from 'lucide-react';
-import Link from 'next/link';
-import confetti from 'canvas-confetti';
+import { useEffect, useState, Suspense } from "react"
+import { useSearchParams, useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Heart, Sparkles, ArrowRight, Users } from "lucide-react"
+import Link from "next/link"
+import confetti from "canvas-confetti"
 
 function SuccessContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const [isAnimating, setIsAnimating] = useState(true);
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const [isAnimating, setIsAnimating] = useState(true)
 
-  const amount = searchParams.get('amount');
-  const formattedAmount = amount ? `R$ ${(Number.parseInt(amount) / 100).toFixed(2).replace('.', ',')}` : 'R$ 0,00';
+  const amount = searchParams.get("amount")
+  const name = searchParams.get("name")
+  const formattedAmount = amount ? `R$ ${(Number.parseInt(amount) / 100).toFixed(2).replace(".", ",")}` : "R$ 0,00"
 
   useEffect(() => {
     // Trigger confetti animation
-    const duration = 3000;
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    const duration = 3000
+    const animationEnd = Date.now() + duration
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 }
 
     function randomInRange(min: number, max: number) {
-      return Math.random() * (max - min) + min;
+      return Math.random() * (max - min) + min
     }
 
     const interval = setInterval(() => {
-      const timeLeft = animationEnd - Date.now();
+      const timeLeft = animationEnd - Date.now()
 
       if (timeLeft <= 0) {
-        setIsAnimating(false);
-        return clearInterval(interval);
+        setIsAnimating(false)
+        return clearInterval(interval)
       }
 
-      const particleCount = 50 * (timeLeft / duration);
+      const particleCount = 50 * (timeLeft / duration)
 
       confetti({
         ...defaults,
         particleCount,
         origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-        colors: ['#f97316', '#fb923c', '#fdba74'],
-      });
+        colors: ["#f97316", "#fb923c", "#fdba74"],
+      })
       confetti({
         ...defaults,
         particleCount,
         origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-        colors: ['#3b82f6', '#60a5fa', '#93c5fd'],
-      });
-    }, 250);
+        colors: ["#3b82f6", "#60a5fa", "#93c5fd"],
+      })
+    }, 250)
 
-    return () => clearInterval(interval);
-  }, []);
+    return () => clearInterval(interval)
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-background to-blue-50">
@@ -69,7 +70,7 @@ function SuccessContent() {
                 {/* Title */}
                 <div className="space-y-2">
                   <h1 className="text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
-                    Obrigado pela sua generosidade!
+                    {name && name !== "Anônimo" ? `Obrigado, ${name}!` : "Obrigado pela sua generosidade!"}
                   </h1>
                   <p className="text-lg text-muted-foreground md:text-xl">Sua contribuição faz toda a diferença</p>
                 </div>
@@ -83,6 +84,7 @@ function SuccessContent() {
                 {/* Impact Message */}
                 <div className="space-y-4 rounded-2xl border bg-muted/30 p-6 text-left">
                   <div className="flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-orange-alert" />
                     <h3 className="font-semibold">Seu impacto:</h3>
                   </div>
                   <ul className="space-y-2 text-sm text-muted-foreground md:text-base">
@@ -129,13 +131,14 @@ function SuccessContent() {
           {/* Additional Info */}
           <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              Um recibo foi enviado para o seu email. Obrigado por fazer parte da nossa missão! 🐾
+              Sua contribuição foi confirmada e já aparece na lista de contribuintes. Obrigado por fazer parte da nossa
+              missão! 🐾
             </p>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
 
 export default function ContributionSuccessPage() {
@@ -149,5 +152,5 @@ export default function ContributionSuccessPage() {
     >
       <SuccessContent />
     </Suspense>
-  );
+  )
 }
