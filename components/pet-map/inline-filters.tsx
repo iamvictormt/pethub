@@ -1,27 +1,27 @@
-'use client';
+"use client"
 
-import type React from 'react';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { SliderInput } from '@/components/ui/slider-input';
-import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { MapPin, X, Search, DollarSign } from 'lucide-react';
+import type React from "react"
+import { useEffect, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { SliderInput } from "@/components/ui/slider-input"
+import { SelectDropdown } from "@/components/ui/select-dropdown"
+import { MapPin, X, Search, DollarSign } from "lucide-react"
 
 interface InlineFiltersProps {
-  status: string[];
-  setStatus: (value: string[]) => void;
-  petTypes: string[];
-  setPetTypes: (value: string[]) => void;
-  distance: number;
-  setDistance: (value: number) => void;
-  sortBy: string;
-  setSortBy: (value: string) => void;
-  userLocation: { lat: number; lng: number } | null;
-  onRequestLocation: () => void;
-  onClearFilters: () => void;
-  onSearch: (query: string) => void;
-  hasReward: boolean;
-  setHasReward: (value: boolean) => void;
+  status: string[]
+  setStatus: (value: string[]) => void
+  petTypes: string[]
+  setPetTypes: (value: string[]) => void
+  distance: number
+  setDistance: (value: number) => void
+  sortBy: string
+  setSortBy: (value: string) => void
+  userLocation: { lat: number; lng: number } | null
+  onRequestLocation: () => void
+  onClearFilters: () => void
+  onSearch: (query: string) => void
+  hasReward: boolean
+  setHasReward: (value: boolean) => void
 }
 
 export function InlineFilters({
@@ -40,24 +40,24 @@ export function InlineFilters({
   hasReward,
   setHasReward,
 }: InlineFiltersProps) {
-  const [localSearchQuery, setLocalSearchQuery] = useState('');
+  const [localSearchQuery, setLocalSearchQuery] = useState("")
 
   const hasActiveFilters =
-    status.length > 0 || petTypes.length > 0 || userLocation !== null || localSearchQuery.length > 0 || hasReward;
+    status.length > 0 || petTypes.length > 0 || userLocation !== null || localSearchQuery.length > 0 || hasReward
 
   const handleSearch = () => {
-    onSearch(localSearchQuery);
-  };
+    onSearch(localSearchQuery)
+  }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
+    if (e.key === "Enter") {
+      handleSearch()
     }
-  };
+  }
 
   useEffect(() => {
-    handleSearch();
-  }, [status, petTypes, distance, sortBy, userLocation, hasReward]);
+    handleSearch()
+  }, [status, petTypes, distance, sortBy, userLocation, hasReward])
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br from-background via-background to-muted/20 p-8 shadow-lg backdrop-blur-sm">
@@ -79,8 +79,8 @@ export function InlineFilters({
               variant="ghost"
               size="sm"
               onClick={() => {
-                setLocalSearchQuery('');
-                onClearFilters();
+                setLocalSearchQuery("")
+                onClearFilters()
               }}
               className="text-muted-foreground transition-colors hover:text-foreground"
             >
@@ -124,16 +124,16 @@ export function InlineFilters({
             </div>
             <Button
               onClick={onRequestLocation}
-              variant={userLocation ? 'default' : 'outline'}
+              variant={userLocation ? "default" : "outline"}
               size="lg"
               className={`w-full transition-all ${
                 userLocation
-                  ? 'bg-gradient-to-r from-orange-alert to-pink-500 text-white shadow-lg hover:shadow-xl'
-                  : 'hover:border-orange-alert/50'
+                  ? "bg-gradient-to-r from-orange-alert to-pink-500 text-white shadow-lg hover:shadow-xl"
+                  : "hover:border-orange-alert/50"
               }`}
             >
               <MapPin className="h-5 w-5" />
-              {userLocation ? 'Localização Ativa' : 'Ativar Localização'}
+              {userLocation ? "Localização Ativa" : "Ativar Localização"}
             </Button>
             {userLocation && (
               <div className="rounded-lg bg-muted/50 p-3 text-center">
@@ -154,14 +154,14 @@ export function InlineFilters({
             <div className="grid grid-cols-3 gap-2">
               <Button
                 onClick={() =>
-                  setStatus(status.includes('LOST') ? status.filter((s) => s !== 'LOST') : [...status, 'LOST'])
+                  setStatus(status.includes("LOST") ? status.filter((s) => s !== "LOST") : [...status, "LOST"])
                 }
-                variant={status.includes('LOST') ? 'default' : 'outline'}
+                variant={status.includes("LOST") ? "default" : "outline"}
                 size="lg"
                 className={`flex-col gap-1 transition-all py-8 ${
-                  status.includes('LOST')
-                    ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30 hover:bg-orange-600'
-                    : 'hover:border-orange-500/50 hover:bg-orange-500/10'
+                  status.includes("LOST")
+                    ? "bg-orange-500 text-white shadow-lg shadow-orange-500/30 hover:bg-orange-600"
+                    : "hover:border-orange-500/50 hover:bg-orange-500/10"
                 }`}
               >
                 <span className="text-2xl">😢</span>
@@ -169,31 +169,46 @@ export function InlineFilters({
               </Button>
               <Button
                 onClick={() =>
-                  setStatus(status.includes('FOUND') ? status.filter((s) => s !== 'FOUND') : [...status, 'FOUND'])
+                  setStatus(status.includes("SIGHTED") ? status.filter((s) => s !== "SIGHTED") : [...status, "SIGHTED"])
                 }
-                variant={status.includes('FOUND') ? 'default' : 'outline'}
+                variant={status.includes("SIGHTED") ? "default" : "outline"}
                 size="lg"
                 className={`flex-col gap-1 transition-all py-8 ${
-                  status.includes('FOUND')
-                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600'
-                    : 'hover:border-blue-500/50 hover:bg-blue-500/10'
+                  status.includes("SIGHTED")
+                    ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30 hover:bg-blue-600"
+                    : "hover:border-blue-500/50 hover:bg-blue-500/10"
                 }`}
               >
-                <span className="text-2xl">🎉</span>
-                <span className="text-xs font-semibold">Encontrados</span>
+                <span className="text-2xl">👀</span>
+                <span className="text-xs font-semibold">Avistados</span>
+              </Button>
+              <Button
+                onClick={() =>
+                  setStatus(status.includes("RESCUED") ? status.filter((s) => s !== "RESCUED") : [...status, "RESCUED"])
+                }
+                variant={status.includes("RESCUED") ? "default" : "outline"}
+                size="lg"
+                className={`flex-col gap-1 transition-all py-8 ${
+                  status.includes("RESCUED")
+                    ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/30 hover:bg-cyan-600"
+                    : "hover:border-cyan-500/50 hover:bg-cyan-500/10"
+                }`}
+              >
+                <span className="text-2xl">🏥</span>
+                <span className="text-xs font-semibold">Resgatados</span>
               </Button>
               <Button
                 onClick={() =>
                   setStatus(
-                    status.includes('ADOPTION') ? status.filter((s) => s !== 'ADOPTION') : [...status, 'ADOPTION']
+                    status.includes("ADOPTION") ? status.filter((s) => s !== "ADOPTION") : [...status, "ADOPTION"],
                   )
                 }
-                variant={status.includes('ADOPTION') ? 'default' : 'outline'}
+                variant={status.includes("ADOPTION") ? "default" : "outline"}
                 size="lg"
                 className={`flex-col gap-1 transition-all py-8 ${
-                  status.includes('ADOPTION')
-                    ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 hover:bg-green-600'
-                    : 'hover:border-green-500/50 hover:bg-green-500/10'
+                  status.includes("ADOPTION")
+                    ? "bg-green-500 text-white shadow-lg shadow-green-500/30 hover:bg-green-600"
+                    : "hover:border-green-500/50 hover:bg-green-500/10"
                 }`}
               >
                 <span className="text-2xl">💚</span>
@@ -205,9 +220,9 @@ export function InlineFilters({
               <label className="mb-3 block font-semibold text-foreground">Ordenar Por</label>
               <SelectDropdown
                 options={[
-                  { value: 'recent', label: '⏰ Mais recentes' },
-                  { value: 'distance', label: '📍 Mais próximos' },
-                  { value: 'oldest', label: '📅 Mais antigos' },
+                  { value: "recent", label: "⏰ Mais recentes" },
+                  { value: "distance", label: "📍 Mais próximos" },
+                  { value: "oldest", label: "📅 Mais antigos" },
                 ]}
                 value={sortBy}
                 onChange={setSortBy}
@@ -221,24 +236,24 @@ export function InlineFilters({
           <label className="font-semibold text-foreground">Tipo de Animal</label>
           <div className="flex flex-wrap gap-3">
             {[
-              { id: 'DOG', label: 'Cachorro', emoji: '🐕' },
-              { id: 'CAT', label: 'Gato', emoji: '🐈' },
-              { id: 'BIRD', label: 'Pássaro', emoji: '🦜' },
-              { id: 'OTHER', label: 'Outro', emoji: '🐾' },
+              { id: "DOG", label: "Cachorro", emoji: "🐕" },
+              { id: "CAT", label: "Gato", emoji: "🐈" },
+              { id: "BIRD", label: "Pássaro", emoji: "🦜" },
+              { id: "OTHER", label: "Outro", emoji: "🐾" },
             ].map((type) => (
               <Button
                 key={type.id}
                 onClick={() =>
                   setPetTypes(
-                    petTypes.includes(type.id) ? petTypes.filter((t) => t !== type.id) : [...petTypes, type.id]
+                    petTypes.includes(type.id) ? petTypes.filter((t) => t !== type.id) : [...petTypes, type.id],
                   )
                 }
-                variant={petTypes.includes(type.id) ? 'default' : 'outline'}
+                variant={petTypes.includes(type.id) ? "default" : "outline"}
                 size="lg"
                 className={`gap-2 transition-all ${
                   petTypes.includes(type.id)
-                    ? 'bg-gradient-to-r from-pink-500 to-orange-alert text-white shadow-lg shadow-pink-500/30 hover:shadow-xl'
-                    : 'hover:border-pink-500/50 hover:bg-pink-500/10'
+                    ? "bg-gradient-to-r from-pink-500 to-orange-alert text-white shadow-lg shadow-pink-500/30 hover:shadow-xl"
+                    : "hover:border-pink-500/50 hover:bg-pink-500/10"
                 }`}
               >
                 <span className="text-xl">{type.emoji}</span>
@@ -253,7 +268,7 @@ export function InlineFilters({
           <label className="font-semibold text-foreground">Recompensa</label>
           <Button
             onClick={() => setHasReward(!hasReward)}
-            variant={hasReward ? 'default' : 'outline'}
+            variant={hasReward ? "default" : "outline"}
             size="lg"
             className={`w-full flex-col gap-1 transition-all py-8 ${
               hasReward
@@ -267,5 +282,5 @@ export function InlineFilters({
         </div>
       </div>
     </div>
-  );
+  )
 }

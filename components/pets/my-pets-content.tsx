@@ -20,25 +20,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { toast } from '@/hooks/use-toast';
+import { petTypeEmoji, statusConfig } from '@/utils/configPet';
 
 interface MyPetsContentProps {
   pets: Pet[];
 }
-
-const statusConfig = {
-  LOST: { label: 'Perdido', color: 'bg-orange-500', emoji: '🔍' },
-  FOUND: { label: 'Encontrado', color: 'bg-blue-500', emoji: '👀' },
-  ADOPTION: { label: 'Adoção', color: 'bg-green-500', emoji: '🏠' },
-  REUNITED: { label: 'Reunido', color: 'bg-purple-500', emoji: '❤️' },
-};
-
-const petTypeEmoji = {
-  DOG: '🐕',
-  CAT: '🐈',
-  BIRD: '🐦',
-  OTHER: '🐾',
-};
 
 export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
   const [pets, setPets] = useState(initialPets);
@@ -52,7 +38,8 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
   );
 
   const lostPets = pets.filter((pet) => pet.status === 'LOST').length;
-  const foundPets = pets.filter((pet) => pet.status === 'FOUND').length;
+  const sightedPets = pets.filter((pet) => pet.status === 'SIGHTED').length;
+  const rescuedPets = pets.filter((pet) => pet.status === 'RESCUED').length;
   const adoptionPets = pets.filter((pet) => pet.status === 'ADOPTION').length;
   const reunitedPets = pets.filter((pet) => pet.status === 'REUNITED').length;
 
@@ -77,16 +64,6 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
 
     if (!error) {
       setPets(pets.filter((pet) => pet.id !== deleteId));
-      toast({
-        title: 'Reporte Excluído',
-        description: 'O reporte do pet foi excluído com sucesso.',
-      });
-    } else {
-      toast({
-        title: 'Erro ao Excluir',
-        description: 'Houve um problema ao excluir o reporte do pet. Tente novamente mais tarde.',
-        variant: 'destructive',
-      });
     }
     setIsDeleting(false);
     setDeleteId(null);
@@ -100,10 +77,16 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
           <h1 className="text-3xl font-bold">Meus Pets</h1>
           <p className="text-muted-foreground mt-1">Gerencie os pets que você reportou</p>
         </div>
+        <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600">
+          <Link href="/reportar">
+            <Plus className="mr-2 h-5 w-5" />
+            Reportar Pet
+          </Link>
+        </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -117,10 +100,20 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
         <Card className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Encontrados</p>
-              <p className="text-3xl font-bold mt-1 text-blue-500">{foundPets}</p>
+              <p className="text-sm text-muted-foreground">Avistados</p>
+              <p className="text-3xl font-bold mt-1 text-blue-500">{sightedPets}</p>
             </div>
-            <div className="text-3xl">{statusConfig.FOUND.emoji}</div>
+            <div className="text-3xl">{statusConfig.SIGHTED.emoji}</div>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted-foreground">Resgatados</p>
+              <p className="text-3xl font-bold mt-1 text-cyan-500">{rescuedPets}</p>
+            </div>
+            <div className="text-3xl">{statusConfig.RESCUED.emoji}</div>
           </div>
         </Card>
 
@@ -156,7 +149,7 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
             <p className="text-muted-foreground mb-6">Comece reportando um pet perdido, encontrado ou para adoção</p>
             <Button asChild className="bg-orange-500 hover:bg-orange-600">
               <Link href="/reportar">
-                <Plus className="h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" />
                 Reportar Primeiro Pet
               </Link>
             </Button>
@@ -205,10 +198,8 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
 
                 {/* Content Overlay */}
                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white z-10">
-                  <Link href={`/pet/${pet.id}`} className="inline">
-                    <h3 className="text-2xl font-bold mb-2 text-balance inline cursor-pointer">
-                      {pet.name || 'Sem Nome'}
-                    </h3>
+                  <Link href={`/pet/${pet.id}`}>
+                    <h3 className="text-2xl font-bold mb-2 text-balance">{pet.name}</h3>
                   </Link>
 
                   {pet.breed && <p className="text-sm text-white/90 mb-2 font-medium">{pet.breed}</p>}
@@ -243,7 +234,7 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
                       </Link>
                     </Button>
 
-                    {(pet.status === 'LOST' || pet.status === 'FOUND') && (
+                    {pet.status === 'RESCUED' && (
                       <Button
                         size="sm"
                         variant="secondary"

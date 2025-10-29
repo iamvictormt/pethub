@@ -38,6 +38,9 @@ export function Footer() {
 
           {/* Legal */}
           <div className="flex flex-col items-center gap-2 md:items-end">
+            <Link href="/parceiros" className="text-sm text-muted-foreground transition-colors hover:text-orange-alert">
+              Parceiros
+            </Link>
             <Link href="/termos" className="text-sm text-muted-foreground transition-colors hover:text-orange-alert">
               Termos de Uso
             </Link>

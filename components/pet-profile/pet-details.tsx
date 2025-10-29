@@ -3,6 +3,7 @@ import { MapPin, Calendar, Phone, Mail, User, Eye, Clock, ExternalLink, DollarSi
 import type { Pet } from "@/lib/types/database"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { statusConfig } from "@/utils/configPet"
 
 interface PetDetailsProps {
   pet: Pet & {
@@ -15,32 +16,6 @@ interface PetDetailsProps {
 }
 
 export function PetDetails({ pet }: PetDetailsProps) {
-  const statusConfig = {
-    LOST: {
-      color: "from-orange-500 to-red-500",
-      text: "Perdido",
-      icon: "🔍",
-      bgColor: "bg-orange-50",
-    },
-    FOUND: {
-      color: "from-blue-500 to-cyan-500",
-      text: "Encontrado",
-      icon: "✓",
-      bgColor: "bg-blue-50",
-    },
-    ADOPTION: {
-      color: "from-green-500 to-emerald-500",
-      text: "Adoção",
-      icon: "🏠",
-      bgColor: "bg-purple-50",
-    },
-    REUNITED: {
-      color: "from-purple-500 to-pink-500",
-      text: "Reunido",
-      icon: "🎉",
-      bgColor: "bg-green-50",
-    },
-  }
   const config = statusConfig[pet.status as keyof typeof statusConfig] || statusConfig.LOST
 
   return (
@@ -65,8 +40,8 @@ export function PetDetails({ pet }: PetDetailsProps) {
             <div
               className={`flex items-center gap-2 rounded-full bg-gradient-to-r px-5 py-2.5 text-sm font-bold text-white shadow-2xl backdrop-blur-sm ${config.color}`}
             >
-              <span className="text-lg">{config.icon}</span>
-              {config.text}
+              <span className="text-lg">{config.emoji}</span>
+              {config.label}
             </div>
           </div>
 

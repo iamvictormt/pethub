@@ -1,158 +1,164 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useState, useRef, useEffect } from "react"
-import type { Pet } from "@/lib/types/database"
-import { PetMarkerPopup } from "./pet-marker-popup"
+import { useState, useRef, useEffect } from 'react';
+import type { Pet } from '@/lib/types/database';
+import { PetMarkerPopup } from './pet-marker-popup';
+import { statusConfig } from '@/utils/configPet';
 
 interface PetMapProps {
-  pets: Pet[]
-  userLocation?: { lat: number; lng: number } | null
+  pets: Pet[];
+  userLocation?: { lat: number; lng: number } | null;
 }
 
 export function PetMap({ pets, userLocation }: PetMapProps) {
-  const [selectedPet, setSelectedPet] = useState<Pet | null>(null)
-  const [mapCenter, setMapCenter] = useState({ lat: -23.5505, lng: -46.6333 }) // São Paulo
-  const [zoom, setZoom] = useState(13)
-  const [isDragging, setIsDragging] = useState(false)
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-  const mapRef = useRef<HTMLDivElement>(null)
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [mapCenter, setMapCenter] = useState({ lat: -23.5505, lng: -46.6333 }); // São Paulo
+  const [zoom, setZoom] = useState(13);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [dragged, setDragged] = useState(false);
 
   useEffect(() => {
     if (userLocation) {
-      console.log("Centering map on user location:", userLocation)
-      setMapCenter({ lat: userLocation.lat, lng: userLocation.lng })
-      setZoom(14)
+      setMapCenter({ lat: userLocation.lat, lng: userLocation.lng });
+      setZoom(14);
     }
-  }, [userLocation])
+  }, [userLocation]);
 
   const getTilesToDisplay = () => {
-    const tileSize = 256
-    const scale = Math.pow(2, zoom)
+    const tileSize = 256;
+    const scale = Math.pow(2, zoom);
 
     // Convert center to tile coordinates
-    const centerTileX = ((mapCenter.lng + 180) / 360) * scale
+    const centerTileX = ((mapCenter.lng + 180) / 360) * scale;
     const centerTileY =
       ((1 -
         Math.log(Math.tan((mapCenter.lat * Math.PI) / 180) + 1 / Math.cos((mapCenter.lat * Math.PI) / 180)) / Math.PI) /
         2) *
-      scale
+      scale;
 
-    const tilesX = Math.ceil((mapRef.current?.clientWidth || 800) / tileSize) + 2
-    const tilesY = Math.ceil((mapRef.current?.clientHeight || 600) / tileSize) + 2
+    const tilesX = Math.ceil((mapRef.current?.clientWidth || 800) / tileSize) + 2;
+    const tilesY = Math.ceil((mapRef.current?.clientHeight || 600) / tileSize) + 2;
 
-    const tiles = []
-    const startX = Math.floor(centerTileX - tilesX / 2)
-    const startY = Math.floor(centerTileY - tilesY / 2)
+    const tiles = [];
+    const startX = Math.floor(centerTileX - tilesX / 2);
+    const startY = Math.floor(centerTileY - tilesY / 2);
 
     for (let x = startX; x < startX + tilesX; x++) {
       for (let y = startY; y < startY + tilesY; y++) {
         if (x >= 0 && y >= 0 && x < scale && y < scale) {
-          tiles.push({ x, y, z: zoom })
+          tiles.push({ x, y, z: zoom });
         }
       }
     }
 
-    return { tiles, centerTileX, centerTileY }
-  }
+    return { tiles, centerTileX, centerTileY };
+  };
 
   const latLngToPixel = (lat: number, lng: number) => {
-    const tileSize = 256
-    const scale = Math.pow(2, zoom)
-    const worldCoordX = ((lng + 180) / 360) * tileSize * scale
+    const tileSize = 256;
+    const scale = Math.pow(2, zoom);
+    const worldCoordX = ((lng + 180) / 360) * tileSize * scale;
     const worldCoordY =
       ((1 - Math.log(Math.tan((lat * Math.PI) / 180) + 1 / Math.cos((lat * Math.PI) / 180)) / Math.PI) / 2) *
       tileSize *
-      scale
+      scale;
 
-    const centerWorldX = ((mapCenter.lng + 180) / 360) * tileSize * scale
+    const centerWorldX = ((mapCenter.lng + 180) / 360) * tileSize * scale;
     const centerWorldY =
       ((1 -
         Math.log(Math.tan((mapCenter.lat * Math.PI) / 180) + 1 / Math.cos((mapCenter.lat * Math.PI) / 180)) / Math.PI) /
         2) *
       tileSize *
-      scale
+      scale;
 
     return {
       x: worldCoordX - centerWorldX,
       y: worldCoordY - centerWorldY,
-    }
-  }
+    };
+  };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true)
-    setDragStart({ x: e.clientX, y: e.clientY })
-  }
+    setIsDragging(true);
+    setDragged(false); // 👈 reset
+
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return
+    if (!isDragging) return;
 
-    const dx = e.clientX - dragStart.x
-    const dy = e.clientY - dragStart.y
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+      setDragged(true);
+    }
+    const tileSize = 256;
+    const scale = Math.pow(2, zoom);
+    const metersPerPixel = (40075016.686 * Math.cos((mapCenter.lat * Math.PI) / 180)) / (tileSize * scale);
 
-    const tileSize = 256
-    const scale = Math.pow(2, zoom)
-    const metersPerPixel = (40075016.686 * Math.cos((mapCenter.lat * Math.PI) / 180)) / (tileSize * scale)
+    const newLng = mapCenter.lng - (dx * metersPerPixel) / 111320;
+    const newLat = mapCenter.lat + (dy * metersPerPixel) / 110540;
 
-    const newLng = mapCenter.lng - (dx * metersPerPixel) / 111320
-    const newLat = mapCenter.lat + (dy * metersPerPixel) / 110540
-
-    setMapCenter({ lat: newLat, lng: newLng })
-    setDragStart({ x: e.clientX, y: e.clientY })
-  }
+    setMapCenter({ lat: newLat, lng: newLng });
+    setDragStart({ x: e.clientX, y: e.clientY });
+  };
 
   const handleMouseUp = () => {
-    setIsDragging(false)
-  }
+    setIsDragging(false);
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     if (e.touches.length === 1) {
-      setIsDragging(true)
-      setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY })
+      setIsDragging(true);
+      setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
     }
-  }
+  };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || e.touches.length !== 1) return
+    if (!isDragging || e.touches.length !== 1) return;
 
-    e.preventDefault() // Prevent scrolling while dragging
+    const dx = e.touches[0].clientX - dragStart.x;
+    const dy = e.touches[0].clientY - dragStart.y;
 
-    const dx = e.touches[0].clientX - dragStart.x
-    const dy = e.touches[0].clientY - dragStart.y
+    const tileSize = 256;
+    const scale = Math.pow(2, zoom);
+    const metersPerPixel = (40075016.686 * Math.cos((mapCenter.lat * Math.PI) / 180)) / (tileSize * scale);
 
-    const tileSize = 256
-    const scale = Math.pow(2, zoom)
-    const metersPerPixel = (40075016.686 * Math.cos((mapCenter.lat * Math.PI) / 180)) / (tileSize * scale)
+    const newLng = mapCenter.lng - (dx * metersPerPixel) / 111320;
+    const newLat = mapCenter.lat + (dy * metersPerPixel) / 110540;
 
-    const newLng = mapCenter.lng - (dx * metersPerPixel) / 111320
-    const newLat = mapCenter.lat + (dy * metersPerPixel) / 110540
-
-    setMapCenter({ lat: newLat, lng: newLng })
-    setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY })
-  }
+    setMapCenter({ lat: newLat, lng: newLng });
+    setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+  };
 
   const handleTouchEnd = () => {
-    setIsDragging(false)
-  }
+    setIsDragging(false);
+  };
 
   const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
-    const R = 6371 // Earth's radius in km
-    const dLat = ((lat2 - lat1) * Math.PI) / 180
-    const dLng = ((lng2 - lng1) * Math.PI) / 180
+    const R = 6371; // Earth's radius in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    return R * c
-  }
+      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
 
-  const { tiles, centerTileX, centerTileY } = getTilesToDisplay()
+  const { tiles, centerTileX, centerTileY } = getTilesToDisplay();
 
   return (
     <div
       ref={mapRef}
       className="relative h-full w-full overflow-hidden bg-gray-200"
+      onClick={() => {
+        if (!dragged) setSelectedPet(null); // 👈 só fecha se não arrastou
+      }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -161,12 +167,12 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
-      style={{ cursor: isDragging ? "grabbing" : "grab", touchAction: "none" }}
+      style={{ cursor: isDragging ? 'grabbing' : 'grab', touchAction: 'none', userSelect: 'none' }}
     >
       <div className="absolute inset-0">
         {tiles.map(({ x, y, z }) => {
-          const offsetX = (x - centerTileX) * 256
-          const offsetY = (y - centerTileY) * 256
+          const offsetX = (x - centerTileX) * 256;
+          const offsetY = (y - centerTileY) * 256;
 
           return (
             <img
@@ -175,34 +181,34 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
               alt=""
               className="absolute pointer-events-none"
               style={{
-                width: "256px",
-                height: "256px",
+                width: '256px',
+                height: '256px',
                 left: `calc(50% + ${offsetX}px)`,
                 top: `calc(50% + ${offsetY}px)`,
               }}
               draggable={false}
             />
-          )
+          );
         })}
       </div>
 
       {/* Pet Markers */}
       {pets.map((pet) => {
-        const pos = latLngToPixel(pet.latitude, pet.longitude)
-        const isSelected = selectedPet?.id === pet.id
+        const pos = latLngToPixel(pet.latitude, pet.longitude);
+        const isSelected = selectedPet?.id === pet.id;
 
         const distance = userLocation
           ? calculateDistance(userLocation.lat, userLocation.lng, pet.latitude, pet.longitude)
-          : undefined
+          : undefined;
 
-        const markerColor = pet.status === "LOST" ? "#F97316" : pet.status === "ADOPTION" ? "#22C55E" : "#3B82F6"
+        const { markerColor } = statusConfig[pet.status];
 
         return (
           <button
             key={pet.id}
             onClick={(e) => {
-              e.stopPropagation()
-              setSelectedPet(isSelected ? null : pet)
+              e.stopPropagation();
+              setSelectedPet(isSelected ? null : pet);
             }}
             className="absolute -translate-x-1/2 -translate-y-full transition-transform hover:scale-110 z-10 cursor-pointer"
             style={{
@@ -233,7 +239,7 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
               </div>
             )}
           </button>
-        )
+        );
       })}
 
       {/* User Location Marker */}
@@ -275,8 +281,8 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
         {userLocation && (
           <button
             onClick={() => {
-              setMapCenter({ lat: userLocation.lat, lng: userLocation.lng })
-              setZoom(14)
+              setMapCenter({ lat: userLocation.lat, lng: userLocation.lng });
+              setZoom(14);
             }}
             className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-lg hover:bg-gray-50"
             aria-label="Centralizar na minha localização"
@@ -299,7 +305,11 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
           </div>
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-blue-500" />
-            <span>Pet Encontrado</span>
+            <span>Pet Avistado</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded-full bg-cyan-500" />
+            <span>Pet Resgatado</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="h-3 w-3 rounded-full bg-green-500" />
@@ -314,7 +324,7 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
 
       {/* Attribution */}
       <div className="absolute bottom-2 left-2 text-xs text-gray-600 bg-white/80 px-2 py-1 rounded z-10">
-        ©{" "}
+        ©{' '}
         <a
           href="https://www.openstreetmap.org/copyright"
           target="_blank"
@@ -322,9 +332,9 @@ export function PetMap({ pets, userLocation }: PetMapProps) {
           className="underline"
         >
           OpenStreetMap
-        </a>{" "}
+        </a>{' '}
         contributors
       </div>
     </div>
-  )
+  );
 }

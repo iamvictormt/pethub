@@ -5,9 +5,9 @@ import { createClient } from '@/lib/supabase/server';
 
 const SUPPORTERS = [
   {
-    name: 'Seu nome aqui 💛',
-    instagram: '@farejeiapp',
-    photo: '/placeholder.svg?height=80&width=80',
+    name: 'Associação Anjos da Rua GO',
+    instagram: '@anjosdaruago',
+    photo: '/associacao-anjos-da-rua.webp?height=80&width=80',
   },
   {
     name: 'Seu nome aqui 💛',
@@ -304,7 +304,7 @@ export default async function HomePage() {
                   <img
                     src={supporter.photo || '/placeholder.svg'}
                     alt={supporter.name}
-                    className="h-20 w-20 rounded-full object-cover ring-2 ring-orange-alert/20"
+                    className="h-32 w-32 rounded-2xl object-cover ring-2 ring-orange-alert/20"
                   />
                   <div className="text-center">
                     <h3 className="font-semibold">{supporter.name}</h3>
@@ -367,7 +367,7 @@ export default async function HomePage() {
                   <div>
                     <h3 className="mb-1 font-semibold">Ações Rápidas</h3>
                     <p className="text-sm text-muted-foreground">
-                      Reporte e busque pets em minutos, aumentando as chances de reencontro
+                      Reporte e busque pets em minutos
                     </p>
                   </div>
                 </div>

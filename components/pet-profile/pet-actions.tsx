@@ -115,7 +115,7 @@ export function PetActions({ pet, isOwner, userId }: PetActionsProps) {
               </Button>
             )}
 
-            {isOwner && pet.status !== 'REUNITED' && (
+            {isOwner && pet.status === 'RESCUED' && (
               <Button
                 onClick={() => setShowReunitedDialog(true)}
                 disabled={isLoading}

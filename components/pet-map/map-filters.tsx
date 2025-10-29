@@ -157,18 +157,33 @@ export function MapFilters({
             </Button>
             <Button
               onClick={() =>
-                setStatus(status.includes("FOUND") ? status.filter((s) => s !== "FOUND") : [...status, "FOUND"])
+                setStatus(status.includes("SIGHTED") ? status.filter((s) => s !== "SIGHTED") : [...status, "SIGHTED"])
               }
-              variant={status.includes("FOUND") ? "default" : "outline"}
+              variant={status.includes("SIGHTED") ? "default" : "outline"}
               size="lg"
               className={`flex-col gap-1 p-7 ${
-                status.includes("FOUND")
+                status.includes("SIGHTED")
                   ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30"
                   : "hover:border-blue-500/50"
               }`}
             >
-              <span className="text-2xl">🎉</span>
-              <span className="text-xs font-semibold">Encontrados</span>
+              <span className="text-2xl">👀</span>
+              <span className="text-xs font-semibold">Avistados</span>
+            </Button>
+            <Button
+              onClick={() =>
+                setStatus(status.includes("RESCUED") ? status.filter((s) => s !== "RESCUED") : [...status, "RESCUED"])
+              }
+              variant={status.includes("RESCUED") ? "default" : "outline"}
+              size="lg"
+              className={`flex-col gap-1 p-7 ${
+                status.includes("RESCUED")
+                  ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/30"
+                  : "hover:border-cyan-500/50"
+              }`}
+            >
+              <span className="text-2xl">🏥</span>
+              <span className="text-xs font-semibold">Resgatados</span>
             </Button>
             <Button
               onClick={() =>
