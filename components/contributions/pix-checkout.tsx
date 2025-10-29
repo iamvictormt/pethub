@@ -1,182 +1,182 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useEffect, useState } from "react"
-import { createPixContribution, checkPaymentStatus } from "@/app/actions/contributions"
-import { Button } from "@/components/ui/button"
-import { CheckCircle2, Copy, Loader2, QrCode } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
-import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from 'react';
+import { createPixContribution, checkPaymentStatus } from '@/app/actions/contributions';
+import { Button } from '@/components/ui/button';
+import { CheckCircle2, Copy, Loader2, QrCode } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 interface PixCheckoutProps {
-  amountInCents: number
-  contributorName?: string
-  contributorEmail?: string
+  amountInCents: number;
+  contributorName?: string;
+  contributorEmail?: string;
 }
 
 export default function PixCheckout({ amountInCents, contributorName, contributorEmail }: PixCheckoutProps) {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [pixData, setPixData] = useState<{
-    contributionId: string
-    paymentId: string
-    pixPayload: string
-    qrCodeBase64: string
-    amount: number
-  } | null>(null)
-  const [copied, setCopied] = useState(false)
-  const [checking, setChecking] = useState(false)
-  const [paymentStatus, setPaymentStatus] = useState<string>("pending")
-  const [timeRemaining, setTimeRemaining] = useState(30 * 60) // 30 minutes in seconds
-  const [isExpired, setIsExpired] = useState(false)
-  const { toast } = useToast()
-  const router = useRouter()
+    contributionId: string;
+    paymentId: string;
+    pixPayload: string;
+    qrCodeBase64: string;
+    amount: number;
+  } | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<string>('pending');
+  const [timeRemaining, setTimeRemaining] = useState(30 * 60); // 30 minutes in seconds
+  const [isExpired, setIsExpired] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
     async function generatePix() {
       try {
-        console.log("[v0] Generating PIX for amount:", amountInCents)
-        const data = await createPixContribution(amountInCents, contributorName, contributorEmail)
-        console.log("[v0] PIX generated successfully")
-        setPixData(data)
+        console.log('[v0] Generating PIX for amount:', amountInCents);
+        const data = await createPixContribution(amountInCents, contributorName, contributorEmail);
+        console.log('[v0] PIX generated successfully');
+        setPixData(data);
       } catch (err) {
-        console.error("[v0] Error generating PIX:", err)
-        setError(err instanceof Error ? err.message : "Falha ao gerar PIX")
+        console.error('[v0] Error generating PIX:', err);
+        setError(err instanceof Error ? err.message : 'Falha ao gerar PIX');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
 
-    generatePix()
-  }, [amountInCents, contributorName, contributorEmail])
+    generatePix();
+  }, [amountInCents, contributorName, contributorEmail]);
 
   useEffect(() => {
-    if (!pixData || paymentStatus === "completed" || isExpired) return
+    if (!pixData || paymentStatus === 'completed' || isExpired) return;
 
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
-          setIsExpired(true)
-          clearInterval(timer)
+          setIsExpired(true);
+          clearInterval(timer);
           toast({
-            title: "QR Code expirado",
-            description: "O tempo para pagamento expirou. Gere um novo QR Code.",
-            variant: "destructive",
-          })
-          return 0
+            title: 'QR Code expirado',
+            description: 'O tempo para pagamento expirou. Gere um novo QR Code.',
+            variant: 'destructive',
+          });
+          return 0;
         }
-        return prev - 1
-      })
-    }, 1000)
+        return prev - 1;
+      });
+    }, 1000);
 
-    return () => clearInterval(timer)
-  }, [pixData, paymentStatus, isExpired, toast])
+    return () => clearInterval(timer);
+  }, [pixData, paymentStatus, isExpired, toast]);
 
   useEffect(() => {
-    if (!pixData || paymentStatus === "completed" || isExpired) return
+    if (!pixData || paymentStatus === 'completed' || isExpired) return;
 
     const interval = setInterval(async () => {
       try {
-        console.log("[v0] Checking payment status...")
-        const result = await checkPaymentStatus(pixData.contributionId)
+        console.log('[v0] Checking payment status...');
+        const result = await checkPaymentStatus(pixData.contributionId);
 
-        if (result.status === "completed") {
-          setPaymentStatus("completed")
-          clearInterval(interval)
+        if (result.status === 'completed') {
+          setPaymentStatus('completed');
+          clearInterval(interval);
 
           toast({
-            title: "Pagamento confirmado! 🎉",
-            description: "Obrigado pela sua contribuição!",
-          })
+            title: 'Pagamento confirmado! 🎉',
+            description: 'Obrigado pela sua contribuição!',
+          });
 
           setTimeout(() => {
             router.push(
-              `/contribuir/sucesso?amount=${pixData.amount}&name=${encodeURIComponent(contributorName || "Anônimo")}`,
-            )
-          }, 1500)
-        } else if (result.status === "expired") {
-          setIsExpired(true)
-          setPaymentStatus("expired")
-          clearInterval(interval)
+              `/contribuir/sucesso?amount=${pixData.amount}&name=${encodeURIComponent(contributorName || 'Anônimo')}`
+            );
+          }, 1500);
+        } else if (result.status === 'expired') {
+          setIsExpired(true);
+          setPaymentStatus('expired');
+          clearInterval(interval);
 
           toast({
-            title: "QR Code expirado",
-            description: "O tempo para pagamento expirou. Gere um novo QR Code.",
-            variant: "destructive",
-          })
+            title: 'QR Code expirado',
+            description: 'O tempo para pagamento expirou. Gere um novo QR Code.',
+            variant: 'destructive',
+          });
         }
       } catch (err) {
-        console.error("[v0] Error checking payment status:", err)
+        console.error('[v0] Error checking payment status:', err);
       }
-    }, 5000)
+    }, 5000);
 
-    return () => clearInterval(interval)
-  }, [pixData, paymentStatus, isExpired, contributorName, router, toast])
+    return () => clearInterval(interval);
+  }, [pixData, paymentStatus, isExpired, contributorName, router, toast]);
 
   const handleCopyPixCode = async () => {
-    if (!pixData) return
+    if (!pixData) return;
 
     try {
-      await navigator.clipboard.writeText(pixData.pixPayload)
-      setCopied(true)
+      await navigator.clipboard.writeText(pixData.pixPayload);
+      setCopied(true);
       toast({
-        title: "Código PIX copiado!",
-        description: "Cole no app do seu banco para fazer o pagamento",
-      })
-      setTimeout(() => setCopied(false), 3000)
+        title: 'Código PIX copiado!',
+        description: 'Cole no app do seu banco para fazer o pagamento',
+      });
+      setTimeout(() => setCopied(false), 3000);
     } catch (err) {
       toast({
-        title: "Erro ao copiar",
-        description: "Tente copiar manualmente o código abaixo",
-        variant: "destructive",
-      })
+        title: 'Erro ao copiar',
+        description: 'Tente copiar manualmente o código abaixo',
+        variant: 'destructive',
+      });
     }
-  }
+  };
 
   const handleCheckPayment = async () => {
-    if (!pixData) return
+    if (!pixData) return;
 
-    setChecking(true)
+    setChecking(true);
     try {
-      const result = await checkPaymentStatus(pixData.contributionId)
+      const result = await checkPaymentStatus(pixData.contributionId);
 
-      if (result.status === "completed") {
-        setPaymentStatus("completed")
+      if (result.status === 'completed') {
+        setPaymentStatus('completed');
         toast({
-          title: "Pagamento confirmado! 🎉",
-          description: "Obrigado pela sua contribuição!",
-        })
+          title: 'Pagamento confirmado! 🎉',
+          description: 'Obrigado pela sua contribuição!',
+        });
 
         setTimeout(() => {
           router.push(
-            `/contribuir/sucesso?amount=${pixData.amount}&name=${encodeURIComponent(contributorName || "Anônimo")}`,
-          )
-        }, 1500)
+            `/contribuir/sucesso?amount=${pixData.amount}&name=${encodeURIComponent(contributorName || 'Anônimo')}`
+          );
+        }, 1500);
       } else {
         toast({
-          title: "Pagamento ainda não confirmado",
-          description: "Aguarde alguns segundos após fazer o pagamento e tente novamente",
-        })
+          title: 'Pagamento ainda não confirmado',
+          description: 'Aguarde alguns segundos após fazer o pagamento e tente novamente',
+        });
       }
     } catch (err) {
-      console.error("[v0] Error checking payment:", err)
+      console.error('[v0] Error checking payment:', err);
       toast({
-        title: "Erro ao verificar pagamento",
-        description: "Tente novamente em alguns instantes",
-        variant: "destructive",
-      })
+        title: 'Erro ao verificar pagamento',
+        description: 'Tente novamente em alguns instantes',
+        variant: 'destructive',
+      });
     } finally {
-      setChecking(false)
+      setChecking(false);
     }
-  }
+  };
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs.toString().padStart(2, "0")}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   if (loading) {
     return (
@@ -184,21 +184,21 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
         <Loader2 className="h-8 w-8 animate-spin text-orange-alert" />
         <p className="text-sm text-muted-foreground">Gerando QR Code PIX...</p>
       </div>
-    )
+    );
   }
 
   if (error || !pixData) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-8">
-        <p className="text-destructive">Erro: {error || "Falha ao gerar PIX"}</p>
+        <p className="text-destructive">Erro: {error || 'Falha ao gerar PIX'}</p>
         <Button onClick={() => window.location.reload()} className="bg-orange-alert hover:bg-orange-alert/90">
           Tentar Novamente
         </Button>
       </div>
-    )
+    );
   }
 
-  if (isExpired || paymentStatus === "expired") {
+  if (isExpired || paymentStatus === 'expired') {
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-8">
         <div className="rounded-full bg-destructive/10 p-4">
@@ -221,17 +221,17 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
           Gerar Novo QR Code
         </Button>
       </div>
-    )
+    );
   }
 
-  if (paymentStatus === "completed") {
+  if (paymentStatus === 'completed') {
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-8">
         <CheckCircle2 className="h-16 w-16 text-green-600" />
         <p className="text-lg font-semibold">Pagamento confirmado!</p>
         <p className="text-sm text-muted-foreground">Redirecionando...</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -258,7 +258,9 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
             <span>MERCADO PAGO IP LTDA</span>
           </div>
           <p className="mt-3 text-xs text-blue-700">
-           Victor, criador da plataforma Farejei, conta com o seu apoio! Como ainda não temos CNPJ, as contribuições estão sendo recebidas diretamente em sua conta pessoal do Mercado Pago. Cada ajuda faz a diferença para manter nossa plataforma funcionando e ajudando pets e tutores.
+            Victor, criador da plataforma Farejei, conta com o seu apoio! Como ainda não temos CNPJ, as contribuições
+            estão sendo recebidas diretamente em sua conta pessoal do Mercado Pago. Cada ajuda faz a diferença para
+            manter nossa plataforma funcionando e ajudando pets e tutores.
           </p>
         </div>
       </div>
@@ -340,9 +342,9 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
         </p>
       </div>
     </div>
-  )
+  );
 }
 
 function Label({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <label className={className}>{children}</label>
+  return <label className={className}>{children}</label>;
 }

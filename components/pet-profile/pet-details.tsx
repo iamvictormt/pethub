@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { MapPin, Calendar, Phone, Mail, User, Eye, Clock, ExternalLink } from "lucide-react"
+import { MapPin, Calendar, Phone, Mail, User, Eye, Clock, ExternalLink, DollarSign } from "lucide-react"
 import type { Pet } from "@/lib/types/database"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -98,6 +98,26 @@ export function PetDetails({ pet }: PetDetailsProps) {
         <div className="space-y-6 lg:col-span-2">
           {/* Quick Info Cards */}
           <div className="space-y-6">
+            {pet.has_reward && pet.reward_amount && (
+              <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 to-emerald-50">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-1">
+                      <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
+                        Recompensa Oferecida
+                      </p>
+                      <p className="text-3xl font-bold text-green-700">
+                        R$ {pet.reward_amount.toLocaleString("pt-BR")}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Valor oferecido por informações que levem ao encontro
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Contact Card */}
             <Card className="sticky top-6 border-0 shadow-xl">
               <CardContent className="space-y-8 p-8">

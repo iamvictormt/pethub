@@ -37,6 +37,8 @@ export interface Pet {
   created_at: string;
   updated_at: string;
   view_count?: number;
+  has_reward?: boolean;
+  reward_amount?: number;
 }
 
 export interface Advertisement {

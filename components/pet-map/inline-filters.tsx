@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SliderInput } from '@/components/ui/slider-input';
 import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { MapPin, X, Search } from 'lucide-react';
+import { MapPin, X, Search, DollarSign } from 'lucide-react';
 
 interface InlineFiltersProps {
   status: string[];
@@ -20,6 +20,8 @@ interface InlineFiltersProps {
   onRequestLocation: () => void;
   onClearFilters: () => void;
   onSearch: (query: string) => void;
+  hasReward: boolean;
+  setHasReward: (value: boolean) => void;
 }
 
 export function InlineFilters({
@@ -35,11 +37,13 @@ export function InlineFilters({
   onRequestLocation,
   onClearFilters,
   onSearch,
+  hasReward,
+  setHasReward,
 }: InlineFiltersProps) {
   const [localSearchQuery, setLocalSearchQuery] = useState('');
 
   const hasActiveFilters =
-    status.length > 0 || petTypes.length > 0 || userLocation !== null || localSearchQuery.length > 0;
+    status.length > 0 || petTypes.length > 0 || userLocation !== null || localSearchQuery.length > 0 || hasReward;
 
   const handleSearch = () => {
     onSearch(localSearchQuery);
@@ -53,7 +57,7 @@ export function InlineFilters({
 
   useEffect(() => {
     handleSearch();
-  }, [status, petTypes, distance, sortBy, userLocation]);
+  }, [status, petTypes, distance, sortBy, userLocation, hasReward]);
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br from-background via-background to-muted/20 p-8 shadow-lg backdrop-blur-sm">
@@ -242,6 +246,24 @@ export function InlineFilters({
               </Button>
             ))}
           </div>
+        </div>
+
+        {/* Reward Filter */}
+        <div className="space-y-4 rounded-xl bg-card/50 p-6 shadow-sm backdrop-blur-sm transition-all hover:shadow-md">
+          <label className="font-semibold text-foreground">Recompensa</label>
+          <Button
+            onClick={() => setHasReward(!hasReward)}
+            variant={hasReward ? 'default' : 'outline'}
+            size="lg"
+            className={`w-full flex-col gap-1 transition-all py-8 ${
+              hasReward
+                ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 hover:bg-green-600'
+                : 'hover:border-green-500/50 hover:bg-green-500/10'
+            }`}
+          >
+            <span className="text-2xl">💵</span>
+            <span className="font-semibold">Apenas com Recompensa</span>
+          </Button>
         </div>
       </div>
     </div>

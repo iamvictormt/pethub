@@ -16,6 +16,9 @@ import { formatPhoneBR } from '@/lib/utils';
 import { validateImageFile } from '@/lib/image-validation';
 import { toast } from '@/hooks/use-toast';
 import { Label } from '@radix-ui/react-dropdown-menu';
+import { Checkbox } from '@/components/ui/checkbox';
+import { formatRewardAmount } from '@/utils/formatCurrency';
+import { parseCurrencyToNumber } from '@/utils/parseCurrency';
 
 export const PET_STATUS_OPTIONS = [
   {
@@ -66,6 +69,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
   const [contactPhone, setContactPhone] = useState('');
   const [contactEmail, setContactEmail] = useState('');
   const [lastSeenDate, setLastSeenDate] = useState(new Date().toISOString().split('T')[0]);
+  const [hasReward, setHasReward] = useState(false);
+  const [rewardAmount, setRewardAmount] = useState('');
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -117,6 +122,11 @@ export function PetReportForm({ userId }: PetReportFormProps) {
         return;
       }
 
+      if (status !== 'LOST') {
+        setHasReward(false);
+        setRewardAmount('');
+      }
+
       let photoUrl = null;
 
       // Upload photo if provided
@@ -154,6 +164,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
         contact_phone: contactPhone,
         contact_email: contactEmail || null,
         last_seen_date: lastSeenDate || null,
+        has_reward: hasReward,
+        reward_amount: hasReward && rewardAmount ? parseCurrencyToNumber(rewardAmount) : null,
       });
 
       if (insertError) throw insertError;
@@ -171,6 +183,10 @@ export function PetReportForm({ userId }: PetReportFormProps) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleAmountChangeForm = (value: string) => {
+    setRewardAmount(formatRewardAmount(value));
   };
 
   return (
@@ -301,7 +317,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                   <button
                     type="button"
                     onClick={handleRemovePhoto}
-                    className="absolute right-2 top-2 rounded-full bg-destructive p-2 text-destructive-foreground shadow-lg transition-opacity hover:opacity-90"
+                    className="absolute right-2 top-2 rounded-full bg-destructive p-2 text-destructive-foreground shadow-lg transition-opacity hover:opacity-90 cursor-pointer"
                     aria-label="Remover foto"
                   >
                     <X className="h-5 w-5" />
@@ -370,6 +386,45 @@ export function PetReportForm({ userId }: PetReportFormProps) {
           />
         </CardContent>
       </Card>
+
+      {/* Reward */}
+      {status === 'LOST' && (
+        <Card>
+          <CardContent className="space-y-4 pt-6">
+            <h2 className="text-xl font-semibold">Recompensa</h2>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="has-reward"
+                checked={hasReward}
+                onCheckedChange={(checked) => {
+                  setHasReward(checked as boolean);
+                  if (!checked) setRewardAmount('');
+                }}
+              />
+              <label
+                htmlFor="has-reward"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              >
+                Ofereço recompensa pela devolução do pet
+              </label>
+            </div>
+
+            {status === 'LOST' && hasReward && (
+              <TextInput
+                label="Valor da recompensa (R$)"
+                type="text"
+                placeholder="Ex: 500"
+                value={rewardAmount}
+                onChange={(e) => handleAmountChangeForm(e.target.value)}
+                helperText="Valor entre R$ 1 e R$ 10.000"
+                required={hasReward}
+                inputMode="numeric"
+              />
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Error Message */}
       {error && <div className="rounded-lg bg-destructive/10 p-4 text-sm text-destructive">{error}</div>}

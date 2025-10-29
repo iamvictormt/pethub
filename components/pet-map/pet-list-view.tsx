@@ -1,49 +1,61 @@
-'use client';
+"use client"
 
-import type React from 'react';
+import type React from "react"
 
-import { useState, useMemo } from 'react';
-import type { Pet, Advertisement } from '@/lib/types/database';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { MapPin, Calendar, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, Eye, Share2 } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { NativeAdCard } from '@/components/ads/native-ad-card';
-import { InlineFilters } from './inline-filters';
-import { MapFilters } from './map-filters';
+import { useState, useMemo } from "react"
+import type { Pet, Advertisement } from "@/lib/types/database"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import {
+  MapPin,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  Share2,
+  DollarSign,
+} from "lucide-react"
+import Link from "next/link"
+import Image from "next/image"
+import { NativeAdCard } from "@/components/ads/native-ad-card"
+import { InlineFilters } from "./inline-filters"
+import { MapFilters } from "./map-filters"
 
 interface PetListViewProps {
-  pets: Pet[];
-  userLocation: { lat: number; lng: number } | null;
-  ads?: Advertisement[];
-  status: string[];
-  setStatus: (value: string[]) => void;
-  petTypes: string[];
-  setPetTypes: (value: string[]) => void;
-  distance: number;
-  setDistance: (value: number) => void;
-  sortBy: string;
-  setSortBy: (value: string) => void;
-  onRequestLocation: () => void;
-  onClearFilters: () => void;
-  searchQuery: string;
-  setSearchQuery: (value: string) => void;
-  onSearch: () => void;
+  pets: Pet[]
+  userLocation: { lat: number; lng: number } | null
+  ads?: Advertisement[]
+  status: string[]
+  setStatus: (value: string[]) => void
+  petTypes: string[]
+  setPetTypes: (value: string[]) => void
+  distance: number
+  setDistance: (value: number) => void
+  sortBy: string
+  setSortBy: (value: string) => void
+  onRequestLocation: () => void
+  onClearFilters: () => void
+  searchQuery: string
+  setSearchQuery: (value: string) => void
+  onSearch: () => void
+  hasReward: boolean
+  setHasReward: (value: boolean) => void
 }
 
 function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371; // Earth's radius in km
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const R = 6371 // Earth's radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLon = ((lon2 - lon1) * Math.PI) / 180
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return R * c
 }
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 12
 
 export function PetListView({
   pets,
@@ -62,12 +74,14 @@ export function PetListView({
   searchQuery,
   setSearchQuery,
   onSearch,
+  hasReward,
+  setHasReward,
 }: PetListViewProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [showDesktopFilters, setShowDesktopFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1)
+  const [showDesktopFilters, setShowDesktopFilters] = useState(false)
 
-  const safePets = pets || [];
-  const safeSearchQuery = searchQuery || '';
+  const safePets = pets || []
+  const safeSearchQuery = searchQuery || ""
 
   const petsWithDistance = useMemo(() => {
     return safePets.map((pet) => ({
@@ -75,58 +89,58 @@ export function PetListView({
       distance: userLocation
         ? calculateDistance(userLocation.lat, userLocation.lng, pet.latitude, pet.longitude)
         : null,
-    }));
-  }, [safePets, userLocation]);
+    }))
+  }, [safePets, userLocation])
 
-  const totalPages = Math.ceil(petsWithDistance.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const endIndex = startIndex + ITEMS_PER_PAGE;
-  const currentPets = petsWithDistance.slice(startIndex, endIndex);
+  const totalPages = Math.ceil(petsWithDistance.length / ITEMS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const endIndex = startIndex + ITEMS_PER_PAGE
+  const currentPets = petsWithDistance.slice(startIndex, endIndex)
 
   const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)))
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
 
   const itemsWithAds = useMemo(() => {
-    const items: Array<{ type: 'pet'; data: (typeof currentPets)[0] } | { type: 'ad'; data: Advertisement }> = [];
-    const activeAds = ads.filter((ad) => ad.is_active);
-    let adIndex = 0;
+    const items: Array<{ type: "pet"; data: (typeof currentPets)[0] } | { type: "ad"; data: Advertisement }> = []
+    const activeAds = ads.filter((ad) => ad.is_active)
+    let adIndex = 0
 
     currentPets.forEach((pet, index) => {
-      items.push({ type: 'pet', data: pet });
+      items.push({ type: "pet", data: pet })
 
       if ((index + 1) % 6 === 0 && activeAds.length > 0) {
-        items.push({ type: 'ad', data: activeAds[adIndex % activeAds.length] });
-        adIndex++;
+        items.push({ type: "ad", data: activeAds[adIndex % activeAds.length] })
+        adIndex++
       }
-    });
+    })
 
-    return items;
-  }, [currentPets, ads]);
+    return items
+  }, [currentPets, ads])
 
   const handleShare = async (e: React.MouseEvent, petId: string, petName: string) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
-    const url = `${window.location.origin}/pet/${petId}`;
+    const url = `${window.location.origin}/pet/${petId}`
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `${petName || 'Pet'} - Farejei`,
-          text: `Ajude a encontrar ${petName || 'este pet'}!`,
+          title: `${petName || "Pet"} - Farejei`,
+          text: `Ajude a encontrar ${petName || "este pet"}!`,
           url: url,
-        });
+        })
       } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
-          await navigator.clipboard.writeText(url);
+        if ((err as Error).name !== "AbortError") {
+          await navigator.clipboard.writeText(url)
         }
       }
     } else {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(url)
     }
-  };
+  }
 
   return (
     <div className="w-full">
@@ -135,9 +149,17 @@ export function PetListView({
           <div className="flex items-center justify-between gap-3 rounded-xl border bg-background p-3 shadow-sm">
             <div className="flex items-center gap-2">
               <span className="font-medium">Filtros</span>
-              {(status.length > 0 || petTypes.length > 0 || userLocation || safeSearchQuery.length > 0) && (
+              {(status.length > 0 ||
+                petTypes.length > 0 ||
+                userLocation ||
+                safeSearchQuery.length > 0 ||
+                hasReward) && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-alert text-xs font-bold text-white">
-                  {status.length + petTypes.length + (userLocation ? 1 : 0) + (safeSearchQuery.length > 0 ? 1 : 0)}
+                  {status.length +
+                    petTypes.length +
+                    (userLocation ? 1 : 0) +
+                    (safeSearchQuery.length > 0 ? 1 : 0) +
+                    (hasReward ? 1 : 0)}
                 </span>
               )}
             </div>
@@ -175,6 +197,8 @@ export function PetListView({
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               onSearch={onSearch}
+              hasReward={hasReward}
+              setHasReward={setHasReward}
             />
           )}
         </div>
@@ -183,9 +207,17 @@ export function PetListView({
           <div className="flex items-center justify-between gap-3 rounded-xl border bg-background p-3 shadow-sm">
             <div className="flex items-center gap-2">
               <span className="font-medium">Filtros</span>
-              {(status.length > 0 || petTypes.length > 0 || userLocation || safeSearchQuery.length > 0) && (
+              {(status.length > 0 ||
+                petTypes.length > 0 ||
+                userLocation ||
+                safeSearchQuery.length > 0 ||
+                hasReward) && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-alert text-xs font-bold text-white">
-                  {status.length + petTypes.length + (userLocation ? 1 : 0) + (safeSearchQuery.length > 0 ? 1 : 0)}
+                  {status.length +
+                    petTypes.length +
+                    (userLocation ? 1 : 0) +
+                    (safeSearchQuery.length > 0 ? 1 : 0) +
+                    (hasReward ? 1 : 0)}
                 </span>
               )}
             </div>
@@ -205,13 +237,15 @@ export function PetListView({
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               onSearch={onSearch}
+              hasReward={hasReward}
+              setHasReward={setHasReward}
             />
           </div>
         </div>
 
         <div>
           <h2 className="text-2xl font-semibold">
-            {petsWithDistance.length} {petsWithDistance.length === 1 ? 'pet encontrado' : 'pets encontrados'}
+            {petsWithDistance.length} {petsWithDistance.length === 1 ? "pet encontrado" : "pets encontrados"}
           </h2>
           {userLocation && (
             <p className="text-sm text-muted-foreground">Ordenados por proximidade da sua localização</p>
@@ -229,11 +263,11 @@ export function PetListView({
           <>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {itemsWithAds.map((item, index) => {
-                if (item.type === 'ad') {
-                  return <NativeAdCard key={`ad-${index}`} ad={item.data} />;
+                if (item.type === "ad") {
+                  return <NativeAdCard key={`ad-${index}`} ad={item.data} />
                 }
 
-                const pet = item.data;
+                const pet = item.data
                 return (
                   <Link key={pet.id} href={`/pet/${pet.id}`} className="group">
                     <Card className="group relative h-full overflow-hidden border-0 bg-card shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl py-0">
@@ -241,8 +275,8 @@ export function PetListView({
                       <div className="relative aspect-[3/4] overflow-hidden">
                         {pet.photo_url ? (
                           <Image
-                            src={pet.photo_url || '/placeholder.svg'}
-                            alt={pet.name || 'Pet'}
+                            src={pet.photo_url || "/placeholder.svg"}
+                            alt={pet.name || "Pet"}
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                           />
@@ -260,48 +294,58 @@ export function PetListView({
                           {/* Status Badge */}
                           <div
                             className={`rounded-full px-3 py-1.5 text-xs font-bold text-white shadow-lg backdrop-blur-md ${
-                              pet.status === 'LOST'
-                                ? 'bg-gradient-to-r from-orange-500 to-red-500'
-                                : 'bg-gradient-to-r from-blue-500 to-cyan-500'
+                              pet.status === "LOST"
+                                ? "bg-gradient-to-r from-orange-500 to-red-500"
+                                : "bg-gradient-to-r from-blue-500 to-cyan-500"
                             }`}
                           >
-                            {pet.status === 'LOST' ? '🔍 Perdido' : '✓ Encontrado'}
+                            {pet.status === "LOST" ? "🔍 Perdido" : "✓ Encontrado"}
                           </div>
 
-                          {/* Distance Badge */}
-                          {pet.distance !== null && (
-                            <div className="rounded-full bg-black/60 px-3 py-1.5 text-xs font-bold text-white shadow-lg backdrop-blur-md">
-                              <div className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {pet.distance < 1
-                                  ? `${Math.round(pet.distance * 1000)}m`
-                                  : `${pet.distance.toFixed(1)}km`}
+                          <div className="flex flex-col gap-2">
+                            {pet.has_reward && pet.reward_amount && (
+                              <div className="rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg backdrop-blur-md">
+                                <div className="flex items-center gap-1">
+                                  R$ {pet.reward_amount.toLocaleString("pt-BR")}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            )}
+
+                            {/* Distance Badge */}
+                            {pet.distance !== null && (
+                              <div className="rounded-full bg-black/60 px-3 py-1.5 text-xs font-bold text-white shadow-lg backdrop-blur-md">
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="h-3 w-3" />
+                                  {pet.distance < 1
+                                    ? `${Math.round(pet.distance * 1000)}m`
+                                    : `${pet.distance.toFixed(1)}km`}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         {/* Bottom Content Overlay */}
                         <div className="absolute inset-x-0 bottom-0 p-4 text-white">
                           {/* Pet Name */}
                           <h3 className="mb-2 text-xl font-bold leading-tight drop-shadow-lg line-clamp-1">
-                            {pet.name || 'Sem Nome'}
+                            {pet.name || "Sem Nome"}
                           </h3>
 
                           {/* Pet Type Badge */}
                           <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-md">
-                            {pet.type === 'DOG' && '🐕'}
-                            {pet.type === 'CAT' && '🐈'}
-                            {pet.type === 'BIRD' && '🐦'}
-                            {pet.type === 'OTHER' && '🐾'}
+                            {pet.type === "DOG" && "🐕"}
+                            {pet.type === "CAT" && "🐈"}
+                            {pet.type === "BIRD" && "🐦"}
+                            {pet.type === "OTHER" && "🐾"}
                             <span>
-                              {pet.type === 'DOG'
-                                ? 'Cachorro'
-                                : pet.type === 'CAT'
-                                ? 'Gato'
-                                : pet.type === 'BIRD'
-                                ? 'Pássaro'
-                                : 'Outro'}
+                              {pet.type === "DOG"
+                                ? "Cachorro"
+                                : pet.type === "CAT"
+                                  ? "Gato"
+                                  : pet.type === "BIRD"
+                                    ? "Pássaro"
+                                    : "Outro"}
                             </span>
                             {pet.breed && <span className="opacity-80">• {pet.breed}</span>}
                           </div>
@@ -310,7 +354,7 @@ export function PetListView({
                           <div className="mb-3 flex items-start gap-2 text-sm">
                             <MapPin className="mt-0.5 h-4 w-4 flex-shrink-0 opacity-90" />
                             <span className="flex-1 drop-shadow line-clamp-1">
-                              {pet.location_description || 'Localização não especificada'}
+                              {pet.location_description || "Localização não especificada"}
                             </span>
                           </div>
 
@@ -320,9 +364,9 @@ export function PetListView({
                               <div className="flex items-center gap-1.5 opacity-90">
                                 <Calendar className="h-3.5 w-3.5" />
                                 <span>
-                                  {new Date(pet.created_at).toLocaleDateString('pt-BR', {
-                                    day: '2-digit',
-                                    month: 'short',
+                                  {new Date(pet.created_at).toLocaleDateString("pt-BR", {
+                                    day: "2-digit",
+                                    month: "short",
                                   })}
                                 </span>
                               </div>
@@ -346,7 +390,7 @@ export function PetListView({
                       </div>
                     </Card>
                   </Link>
-                );
+                )
               })}
             </div>
 
@@ -368,21 +412,21 @@ export function PetListView({
                         <Button
                           key={page}
                           onClick={() => goToPage(page)}
-                          variant={currentPage === page ? 'default' : 'outline'}
+                          variant={currentPage === page ? "default" : "outline"}
                           size="sm"
                           className="min-w-[2.5rem]"
                         >
                           {page}
                         </Button>
-                      );
+                      )
                     } else if (page === currentPage - 2 || page === currentPage + 2) {
                       return (
                         <span key={page} className="flex items-center px-2">
                           ...
                         </span>
-                      );
+                      )
                     }
-                    return null;
+                    return null
                   })}
                 </div>
 
@@ -404,5 +448,5 @@ export function PetListView({
         )}
       </div>
     </div>
-  );
+  )
 }
