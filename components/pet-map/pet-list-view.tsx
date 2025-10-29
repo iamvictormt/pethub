@@ -130,7 +130,7 @@ export function PetListView({
 
   return (
     <div className="w-full">
-      <div className="container mx-auto px-4 py-8 max-w-7xl space-y-6">
+      <div className="container mx-auto px-4 py-8 max-w-7xl space-y-6 min-h-screen">
         <div className="hidden md:block space-y-3">
           <div className="flex items-center justify-between gap-3 rounded-xl border bg-background p-3 shadow-sm">
             <div className="flex items-center gap-2">

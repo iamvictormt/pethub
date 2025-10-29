@@ -156,7 +156,7 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
             <p className="text-muted-foreground mb-6">Comece reportando um pet perdido, encontrado ou para adoção</p>
             <Button asChild className="bg-orange-500 hover:bg-orange-600">
               <Link href="/reportar">
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="h-4 w-4" />
                 Reportar Primeiro Pet
               </Link>
             </Button>

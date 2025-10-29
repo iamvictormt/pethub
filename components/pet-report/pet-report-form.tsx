@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { TextInput } from '@/components/ui/text-input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { Heart, PawPrint, Search, Upload } from 'lucide-react';
+import { Heart, PawPrint, Search, Upload, X } from 'lucide-react';
 import { LocationPicker } from './location-picker';
 import type { PetStatus, PetType } from '@/lib/types/database';
 import { formatPhoneBR } from '@/lib/utils';
@@ -83,6 +83,11 @@ export function PetReportForm({ userId }: PetReportFormProps) {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleRemovePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -267,7 +272,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
               <label className="text-sm font-medium">Visto pela última vez</label>
               <input
                 type="date"
-                className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none ring-ring transition-colors focus:border-ring focus:ring-2"
+                className="h-12 w-full rounded-2xl border border-input bg-background px-4 py-3 text-base transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                 value={lastSeenDate}
                 onChange={(e) => setLastSeenDate(e.target.value)}
                 required
@@ -278,7 +283,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
           <div className="space-y-2">
             <label className="text-sm font-medium">Descrição</label>
             <textarea
-              className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none ring-ring transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2"
+              className="min-h-24 w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none ring-ring transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2"
               placeholder="Descreva características marcantes, comportamento, etc..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -288,13 +293,19 @@ export function PetReportForm({ userId }: PetReportFormProps) {
 
           {/* Photo Upload */}
           <div className="space-y-2">
-            <label className="text-sm font-medium">
-              Foto do Pet
-            </label>
+            <label className="text-sm font-medium">Foto do Pet</label>
             <div className="flex flex-col gap-4">
               {photoPreview && (
                 <div className="relative h-[50vh] w-full overflow-hidden rounded-xl">
                   <img src={photoPreview || '/placeholder.svg'} alt="Preview" className="h-full w-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    className="absolute right-2 top-2 rounded-full bg-destructive p-2 text-destructive-foreground shadow-lg transition-opacity hover:opacity-90"
+                    aria-label="Remover foto"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
                 </div>
               )}
               <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/30 px-4 py-8 transition-colors hover:bg-muted/50">

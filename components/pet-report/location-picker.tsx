@@ -5,6 +5,7 @@ import type React from 'react';
 import { useState, useRef } from 'react';
 import { MapPin, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { TextInput } from '../ui/text-input';
 
 interface LocationPickerProps {
   latitude: string;
@@ -128,6 +129,8 @@ export function LocationPicker({
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (e.touches.length === 1) {
       setIsDragging(true);
       setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
@@ -135,6 +138,8 @@ export function LocationPicker({
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (!isDragging || e.touches.length !== 1) return;
 
     const dx = e.touches[0].clientX - dragStart.x;
@@ -182,14 +187,21 @@ export function LocationPicker({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+        <div className="flex-1">
           <h3 className="text-sm font-medium">Localização no Mapa</h3>
           <p className="text-sm text-muted-foreground">
             {hasLocation ? 'Clique no mapa para ajustar a localização' : 'Clique no mapa ou use sua localização atual'}
           </p>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={getCurrentLocation} disabled={isLoadingLocation}>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={getCurrentLocation}
+          disabled={isLoadingLocation}
+          className="w-full sm:w-auto mt-2 sm:mt-0 bg-transparent"
+        >
           {isLoadingLocation ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -216,7 +228,10 @@ export function LocationPicker({
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        style={{ cursor: isDragging ? 'grabbing' : 'crosshair' }}
+        style={{
+          cursor: isDragging ? 'grabbing' : 'crosshair',
+          touchAction: 'none',
+        }}
       >
         <div className="absolute inset-0">
           {tiles.map(({ x, y, z }) => {
@@ -304,10 +319,8 @@ export function LocationPicker({
 
       {/* Location Description */}
       <div className="space-y-2">
-        <label className="text-sm font-medium">Descrição do Local</label>
-        <input
-          type="text"
-          className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none ring-ring transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2"
+        <TextInput
+          label="Descrição do Local"
           placeholder="Ex: Próximo ao parque, na Rua X, perto do mercado..."
           value={locationDescription}
           onChange={(e) => onDescriptionChange(e.target.value)}
