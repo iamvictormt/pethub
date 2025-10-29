@@ -29,6 +29,8 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
   const [copied, setCopied] = useState(false)
   const [checking, setChecking] = useState(false)
   const [paymentStatus, setPaymentStatus] = useState<string>("pending")
+  const [timeRemaining, setTimeRemaining] = useState(30 * 60) // 30 minutes in seconds
+  const [isExpired, setIsExpired] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
 
@@ -51,7 +53,29 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
   }, [amountInCents, contributorName, contributorEmail])
 
   useEffect(() => {
-    if (!pixData || paymentStatus === "completed") return
+    if (!pixData || paymentStatus === "completed" || isExpired) return
+
+    const timer = setInterval(() => {
+      setTimeRemaining((prev) => {
+        if (prev <= 1) {
+          setIsExpired(true)
+          clearInterval(timer)
+          toast({
+            title: "QR Code expirado",
+            description: "O tempo para pagamento expirou. Gere um novo QR Code.",
+            variant: "destructive",
+          })
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [pixData, paymentStatus, isExpired, toast])
+
+  useEffect(() => {
+    if (!pixData || paymentStatus === "completed" || isExpired) return
 
     const interval = setInterval(async () => {
       try {
@@ -72,6 +96,16 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
               `/contribuir/sucesso?amount=${pixData.amount}&name=${encodeURIComponent(contributorName || "Anônimo")}`,
             )
           }, 1500)
+        } else if (result.status === "expired") {
+          setIsExpired(true)
+          setPaymentStatus("expired")
+          clearInterval(interval)
+
+          toast({
+            title: "QR Code expirado",
+            description: "O tempo para pagamento expirou. Gere um novo QR Code.",
+            variant: "destructive",
+          })
         }
       } catch (err) {
         console.error("[v0] Error checking payment status:", err)
@@ -79,7 +113,7 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
     }, 5000)
 
     return () => clearInterval(interval)
-  }, [pixData, paymentStatus, contributorName, router, toast])
+  }, [pixData, paymentStatus, isExpired, contributorName, router, toast])
 
   const handleCopyPixCode = async () => {
     if (!pixData) return
@@ -138,6 +172,12 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
     }
   }
 
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, "0")}`
+  }
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-8">
@@ -158,6 +198,32 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
     )
   }
 
+  if (isExpired || paymentStatus === "expired") {
+    return (
+      <div className="flex flex-col items-center justify-center gap-4 p-8">
+        <div className="rounded-full bg-destructive/10 p-4">
+          <svg className="h-16 w-16 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <p className="text-lg font-semibold">QR Code expirado</p>
+        <p className="text-center text-sm text-muted-foreground">
+          O tempo para pagamento expirou (30 minutos).
+          <br />
+          Por favor, gere um novo QR Code para contribuir.
+        </p>
+        <Button onClick={() => window.location.reload()} className="bg-orange-alert hover:bg-orange-alert/90">
+          Gerar Novo QR Code
+        </Button>
+      </div>
+    )
+  }
+
   if (paymentStatus === "completed") {
     return (
       <div className="flex flex-col items-center justify-center gap-4 p-8">
@@ -170,7 +236,16 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
 
   return (
     <div className="space-y-6">
-      {/* QR Code */}
+      <div className="rounded-lg bg-orange-50 p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-medium text-orange-900">Tempo restante para pagamento</p>
+            <p className="text-sm text-orange-700">O QR Code expira em 30 minutos</p>
+          </div>
+          <div className="text-2xl font-bold text-orange-600">{formatTime(timeRemaining)}</div>
+        </div>
+      </div>
+
       <div className="flex flex-col items-center gap-4">
         <div className="rounded-lg border-2 border-dashed border-muted-foreground/20 bg-white p-4">
           <Image
@@ -187,7 +262,6 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
         </div>
       </div>
 
-      {/* Instructions */}
       <div className="space-y-3">
         <h3 className="font-semibold">Como pagar:</h3>
         <ol className="space-y-2 text-sm text-muted-foreground">
@@ -210,7 +284,6 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
         </ol>
       </div>
 
-      {/* PIX Code */}
       <div className="space-y-2">
         <Label className="text-sm font-medium">Ou copie o código PIX:</Label>
         <div className="flex gap-2">
@@ -242,7 +315,6 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
         )}
       </Button>
 
-      {/* Success message */}
       <div className="rounded-lg bg-blue-50 p-4 text-sm">
         <p className="font-medium text-blue-900">💙 Verificação Automática</p>
         <p className="mt-1 text-blue-700">

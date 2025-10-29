@@ -8,8 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Heart, DollarSign, AlertCircle, Coins } from 'lucide-react';
 import PixCheckout from './pix-checkout';
 
-const MINIMUM_AMOUNT = 500; // R$ 5.00 in cents
-const SUGGESTED_AMOUNTS = [1000, 2500, 5000, 10000]; // R$ 10, 25, 50, 100
+const MINIMUM_AMOUNT = 100; // R$ 5.00 in cents
+const SUGGESTED_AMOUNTS = [500, 2500, 5000, 10000]; // R$ 5, 25, 50, 100
 
 interface ContributionDialogProps {
   open: boolean;
@@ -54,8 +54,8 @@ export default function ContributionDialog({ open, onOpenChange }: ContributionD
     setCustomAmount(formatted);
 
     // Validação simples
-    if (floatValue < 5) {
-      setError('O valor mínimo é R$ 5,00');
+    if (floatValue < 1) {
+      setError('O valor mínimo é R$ 1,00');
     } else {
       setError('');
     }

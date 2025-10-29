@@ -82,12 +82,6 @@ export async function POST(request: NextRequest) {
 
     console.log("[v0] Payment status:", payment.status)
 
-    // Only process approved payments
-    if (payment.status !== "approved") {
-      return NextResponse.json({ received: true })
-    }
-
-    // Update contribution in database
     const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
       auth: {
         autoRefreshToken: false,
@@ -106,22 +100,32 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Contribution not found" }, { status: 404 })
     }
 
-    // Update contribution status
-    const { error: updateError } = await supabase
-      .from("contributions")
-      .update({
-        status: "completed",
-        payment_data: payment,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", contribution.id)
+    // Update contribution based on payment status
+    let newStatus = contribution.status
 
-    if (updateError) {
-      console.error("[v0] Failed to update contribution:", updateError)
-      return NextResponse.json({ error: "Failed to update contribution" }, { status: 500 })
+    if (payment.status === "approved") {
+      newStatus = "completed"
+    } else if (payment.status === "cancelled" || payment.status === "expired") {
+      newStatus = "expired"
     }
 
-    console.log("[v0] Contribution marked as completed:", contribution.id)
+    if (newStatus !== contribution.status) {
+      const { error: updateError } = await supabase
+        .from("contributions")
+        .update({
+          status: newStatus,
+          payment_data: payment,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", contribution.id)
+
+      if (updateError) {
+        console.error("[v0] Failed to update contribution:", updateError)
+        return NextResponse.json({ error: "Failed to update contribution" }, { status: 500 })
+      }
+
+      console.log("[v0] Contribution updated to status:", newStatus)
+    }
 
     return NextResponse.json({ received: true, updated: true })
   } catch (error) {

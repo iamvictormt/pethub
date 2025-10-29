@@ -4,7 +4,8 @@ import { createClient as createSupabaseClient } from "@/lib/supabase/server"
 import { createClient } from "@supabase/supabase-js"
 import { getMercadoPagoClient } from "@/lib/mercadopago"
 
-const MINIMUM_AMOUNT = 500 // R$ 5.00 in cents
+const MINIMUM_AMOUNT = 100 // R$ 5.00 in cents
+const EXPIRATION_TIME_MS = 30 * 60 * 1000 // 30 minutes
 
 export async function createPixContribution(
   amountInCents: number,
@@ -105,6 +106,79 @@ export async function checkPaymentStatus(contributionId: string) {
   // If already completed, return success
   if (contribution.status === "completed") {
     return { status: "completed", contribution }
+  }
+
+  if (contribution.status === "expired") {
+    return { status: "expired", contribution }
+  }
+
+  const createdAt = new Date(contribution.created_at).getTime()
+  const now = Date.now()
+  const isExpired = now - createdAt > EXPIRATION_TIME_MS
+
+  if (isExpired && contribution.status === "pending") {
+    // Check with Mercado Pago to confirm expiration
+    if (contribution.payment_id) {
+      try {
+        const mpClient = getMercadoPagoClient()
+        const payment = await mpClient.getPayment(contribution.payment_id)
+
+        console.log("[v0] Payment status from Mercado Pago:", payment.status)
+
+        // If payment was approved, update to completed
+        if (payment.status === "approved") {
+          const { error: updateError } = await supabaseAdmin
+            .from("contributions")
+            .update({
+              status: "completed",
+              payment_data: payment,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", contributionId)
+
+          if (updateError) {
+            console.error("[v0] Failed to update contribution:", updateError)
+          }
+
+          return { status: "completed", contribution: { ...contribution, status: "completed" } }
+        }
+
+        // If payment is cancelled or expired in Mercado Pago, mark as expired
+        if (payment.status === "cancelled" || payment.status === "expired") {
+          const { error: updateError } = await supabaseAdmin
+            .from("contributions")
+            .update({
+              status: "expired",
+              payment_data: payment,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", contributionId)
+
+          if (updateError) {
+            console.error("[v0] Failed to update contribution:", updateError)
+          }
+
+          return { status: "expired", contribution: { ...contribution, status: "expired" } }
+        }
+      } catch (error) {
+        console.error("[v0] Error checking payment status:", error)
+      }
+    }
+
+    // Mark as expired if 30 minutes have passed
+    const { error: updateError } = await supabaseAdmin
+      .from("contributions")
+      .update({
+        status: "expired",
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", contributionId)
+
+    if (updateError) {
+      console.error("[v0] Failed to mark contribution as expired:", updateError)
+    }
+
+    return { status: "expired", contribution: { ...contribution, status: "expired" } }
   }
 
   // Check with Mercado Pago API
