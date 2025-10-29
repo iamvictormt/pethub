@@ -246,6 +246,23 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
         </div>
       </div>
 
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+        <h3 className="mb-3 font-semibold text-blue-900">ℹ️ Informações do Recebedor</h3>
+        <div className="space-y-2 text-sm text-blue-800">
+          <div className="flex justify-between">
+            <span className="font-medium">Nome:</span>
+            <span>Victor Monteiro Torres</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="font-medium">Banco:</span>
+            <span>MERCADO PAGO IP LTDA</span>
+          </div>
+          <p className="mt-3 text-xs text-blue-700">
+           Victor, criador da plataforma Farejei, conta com o seu apoio! Como ainda não temos CNPJ, as contribuições estão sendo recebidas diretamente em sua conta pessoal do Mercado Pago. Cada ajuda faz a diferença para manter nossa plataforma funcionando e ajudando pets e tutores.
+          </p>
+        </div>
+      </div>
+
       <div className="flex flex-col items-center gap-4">
         <div className="rounded-lg border-2 border-dashed border-muted-foreground/20 bg-white p-4">
           <Image

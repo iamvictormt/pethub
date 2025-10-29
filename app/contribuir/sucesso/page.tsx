@@ -84,7 +84,6 @@ function SuccessContent() {
                 {/* Impact Message */}
                 <div className="space-y-4 rounded-2xl border bg-muted/30 p-6 text-left">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-orange-alert" />
                     <h3 className="font-semibold">Seu impacto:</h3>
                   </div>
                   <ul className="space-y-2 text-sm text-muted-foreground md:text-base">
