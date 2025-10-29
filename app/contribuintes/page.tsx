@@ -1,31 +1,31 @@
-import { createClient } from "@/lib/supabase/server"
-import { formatCurrency } from "@/lib/contribution-tiers"
-import { Heart, Cat, Wrench, TrendingUp, Users, Instagram } from "lucide-react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import { createClient } from '@/lib/supabase/server';
+import { formatCurrency } from '@/lib/contribution-tiers';
+import { Heart, Cat, Wrench, TrendingUp, Users, Instagram } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default async function ContributorsPage() {
-  const supabase = await createClient()
+  const supabase = await createClient();
 
-  const thirtyDaysAgo = new Date()
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
   const { data: contributions } = await supabase
-    .from("contributions")
-    .select("*")
-    .eq("status", "completed")
-    .gte("created_at", thirtyDaysAgo.toISOString())
-    .order("amount_in_cents", { ascending: false })
+    .from('contributions')
+    .select('*')
+    .eq('status', 'completed')
+    .gte('created_at', thirtyDaysAgo.toISOString())
+    .order('amount_in_cents', { ascending: false });
 
   // Get total stats
   const { data: allContributions } = await supabase
-    .from("contributions")
-    .select("amount_in_cents")
-    .eq("status", "completed")
+    .from('contributions')
+    .select('amount_in_cents')
+    .eq('status', 'completed');
 
-  const totalRaised = allContributions?.reduce((sum, c) => sum + c.amount_in_cents, 0) || 0
-  const totalContributors = new Set(contributions?.map((c) => c.contributor_email)).size
-  const monthlyTotal = contributions?.reduce((sum, c) => sum + c.amount_in_cents, 0) || 0
+  const totalRaised = allContributions?.reduce((sum, c) => sum + c.amount_in_cents, 0) || 0;
+  const totalContributors = new Set(contributions?.map((c) => c.contributor_email)).size;
+  const monthlyTotal = contributions?.reduce((sum, c) => sum + c.amount_in_cents, 0) || 0;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -42,7 +42,7 @@ export default async function ContributorsPage() {
           {/* Hero Content */}
           <div className="text-center">
             <h1 className="mb-6 text-balance text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl">
-              Nossos{" "}
+              Nossos{' '}
               <span className="bg-gradient-to-r from-orange-alert via-orange-500 to-blue-farejei bg-clip-text text-transparent">
                 Heróis
               </span>
@@ -156,23 +156,23 @@ export default async function ContributorsPage() {
           {contributions && contributions.length > 0 ? (
             <div className="mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {contributions.map((contribution) => {
-                const name = contribution.contributor_name || "Apoiador Anônimo"
+                const name = contribution.contributor_name || 'Apoiador Anônimo';
                 const initials = name
-                  .split(" ")
+                  .split(' ')
                   .map((n) => n[0])
-                  .join("")
+                  .join('')
                   .toUpperCase()
-                  .slice(0, 2)
+                  .slice(0, 2);
 
                 const colors = [
-                  "bg-orange-alert/10 text-orange-alert",
-                  "bg-blue-farejei/10 text-blue-farejei",
-                  "bg-purple-500/10 text-purple-500",
-                  "bg-pink-500/10 text-pink-500",
-                  "bg-green-500/10 text-green-500",
-                  "bg-yellow-500/10 text-yellow-500",
-                ]
-                const colorClass = colors[Math.floor(Math.random() * colors.length)]
+                  'bg-orange-alert/10 text-orange-alert',
+                  'bg-blue-farejei/10 text-blue-farejei',
+                  'bg-purple-500/10 text-purple-500',
+                  'bg-pink-500/10 text-pink-500',
+                  'bg-green-500/10 text-green-500',
+                  'bg-yellow-500/10 text-yellow-500',
+                ];
+                const colorClass = colors[Math.floor(Math.random() * colors.length)];
 
                 return (
                   <div
@@ -189,14 +189,14 @@ export default async function ContributorsPage() {
                       </div>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground">
                         <Heart className="h-4 w-4 fill-pink-500 text-pink-500" />
-                        {new Date(contribution.created_at).toLocaleDateString("pt-BR", {
-                          day: "2-digit",
-                          month: "short",
+                        {new Date(contribution.created_at).toLocaleDateString('pt-BR', {
+                          day: '2-digit',
+                          month: 'short',
                         })}
                       </div>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           ) : (
@@ -211,7 +211,7 @@ export default async function ContributorsPage() {
         </div>
       </section>
 
-      <section className="border-t bg-gradient-to-br from-orange-alert via-orange-600 to-orange-700 px-4 py-16 text-white md:py-24">
+      <section className="border-t bg-gradient-to-br from-orange-alert via-orange-alert/90 to-orange-alert/80 px-4 py-16 text-white md:py-24">
         <div className="container mx-auto max-w-4xl text-center">
           <Heart className="mx-auto mb-6 h-16 w-16" />
           <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">Faça Parte Desta História</h2>
@@ -238,5 +238,5 @@ export default async function ContributorsPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

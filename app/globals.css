@@ -168,3 +168,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes infinite-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50%));
+  }
+}
+
+.animate-infinite-scroll {
+  animation: infinite-scroll 20s linear infinite;
+  will-change: transform;
+}
+
+/* Pause animation on hover for better UX */
+.animate-infinite-scroll:hover {
+  animation-play-state: paused;
+}

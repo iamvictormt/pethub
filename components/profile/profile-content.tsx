@@ -112,8 +112,6 @@ export function ProfileContent({ profile, pets }: ProfileContentProps) {
   const handleSave = async () => {
     if (!profile) return;
 
-    console.log('Saving profile:', { name, phone, state, city, bio });
-
     const { error } = await supabase
       .from('profiles')
       .update({

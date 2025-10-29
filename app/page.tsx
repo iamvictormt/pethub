@@ -1,7 +1,50 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { MapPin, Heart, Search, Shield, Users, Clock, CheckCircle2, ArrowRight, Sparkles, Dog } from 'lucide-react';
+import { MapPin, Heart, Search, Shield, Users, Clock, ArrowRight, Dog } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+
+const SUPPORTERS = [
+  {
+    name: 'Seu nome aqui 💛',
+    instagram: '@farejeiapp',
+    photo: '/placeholder.svg?height=80&width=80',
+  },
+  {
+    name: 'Seu nome aqui 💛',
+    instagram: '@farejeiapp',
+    photo: '/placeholder.svg?height=80&width=80',
+  },
+  {
+    name: 'Seu nome aqui 💛',
+    instagram: '@farejeiapp',
+    photo: '/placeholder.svg?height=80&width=80',
+  },
+  {
+    name: 'Seu nome aqui 💛',
+    instagram: '@farejeiapp',
+    photo: '/placeholder.svg?height=80&width=80',
+  },
+  {
+    name: 'Seu nome aqui 💛',
+    instagram: '@farejeiapp',
+    photo: '/placeholder.svg?height=80&width=80',
+  },
+  {
+    name: 'Seu nome aqui 💛',
+    instagram: '@farejeiapp',
+    photo: '/placeholder.svg?height=80&width=80',
+  },
+  {
+    name: 'Seu nome aqui 💛',
+    instagram: '@farejeiapp',
+    photo: '/placeholder.svg?height=80&width=80',
+  },
+  {
+    name: 'Seu nome aqui 💛',
+    instagram: '@farejeiapp',
+    photo: '/placeholder.svg?height=80&width=80',
+  },
+];
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -86,7 +129,7 @@ export default async function HomePage() {
                   <div className="text-sm text-muted-foreground">Pets reunidos</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-blue-farejei">{activeUsers * 50}+</div>
+                  <div className="text-3xl font-bold text-blue-farejei">{activeUsers * 5}+</div>
                   <div className="text-sm text-muted-foreground">Usuários ativos</div>
                 </div>
                 <div>
@@ -128,7 +171,7 @@ export default async function HomePage() {
           <div className="mb-16 text-center">
             <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">Como funciona</h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Três passos simples para reunir você com seu pet
+              Três passos simples para reunir você com seu pet.
             </p>
           </div>
 
@@ -239,8 +282,50 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Supporters Section with infinite scroll */}
+      <section className="border-t bg-background px-4 py-16 md:py-20">
+        <div className="container mx-auto max-w-7xl px-4">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Seja um Parceiro do Farejei</h2>
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+              Sua parceria nos ajuda a manter a plataforma totalmente gratuita e a levar mais pets de volta para casa.
+            </p>
+          </div>
+
+          {/* Infinite Scroll Container */}
+          <div className="relative w-full overflow-hidden mask-[linear-gradient(to_right,transparent_0%,black_12.5%,black_87.5%,transparent_100%)]">
+            <div className="animate-infinite-scroll flex w-max items-center gap-8 py-4">
+              {/* Render supporters 3 times for seamless loop */}
+              {[...SUPPORTERS, ...SUPPORTERS].map((supporter, index) => (
+                <div
+                  key={`supporter-${index}`}
+                  className="flex min-w-[280px] flex-col items-center gap-4 rounded-2xl border bg-card p-6 shadow-sm transition-transform hover:scale-105 infinite-scroll-item"
+                >
+                  <img
+                    src={supporter.photo || '/placeholder.svg'}
+                    alt={supporter.name}
+                    className="h-20 w-20 rounded-full object-cover ring-2 ring-orange-alert/20"
+                  />
+                  <div className="text-center">
+                    <h3 className="font-semibold">{supporter.name}</h3>
+                    <a
+                      href={`https://instagram.com/${supporter.instagram.replace('@', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-muted-foreground hover:text-orange-alert transition-colors"
+                    >
+                      {supporter.instagram}
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
-      <section className="border-t bg-background px-4 py-16 md:py-24">
+      <section className="border-t bg-muted/30 px-4 py-16 md:py-24">
         <div className="container mx-auto max-w-7xl px-4">
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
             <div className="flex flex-col justify-center">
