@@ -58,7 +58,10 @@ export default async function HomePage() {
             {/* Left Column - Text */}
             <div className="flex flex-col justify-center">
               <h1 className="mb-6 text-balance text-4xl font-bold leading-tight tracking-tight md:text-5xl lg:text-6xl">
-                Seu pet perdido está mais perto do que você imagina
+                Seu pet perdido está{' '}
+                <span className="bg-gradient-to-r from-orange-alert via-orange-500 to-blue-farejei bg-clip-text text-transparent">
+                  mais perto do que você imagina
+                </span>
               </h1>
 
               <p className="mb-8 text-pretty text-lg text-muted-foreground md:text-xl">
