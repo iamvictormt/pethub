@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Heart, Coffee, Users, Shield, TrendingUp, Zap, CheckCircle2, ArrowRight, Award } from 'lucide-react';
+import { Heart, Coffee, Users, Shield, TrendingUp, Zap, CheckCircle2, ArrowRight, Award, Laugh } from 'lucide-react';
 import Link from 'next/link';
 import ContributionDialog from '@/components/contributions/contribution-dialog';
 
@@ -244,7 +244,7 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
       {/* Final CTA */}
       <section className="border-t bg-gradient-to-br from-orange-alert via-orange-alert/90 to-orange-alert/80 px-4 py-16 text-white md:py-24">
         <div className="container mx-auto max-w-4xl text-center">
-          <Shield className="mx-auto mb-6 h-16 w-16" />
+          <Laugh className="mx-auto mb-6 h-16 w-16" />
           <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">Pronto para fazer a diferença?</h2>
           <p className="mb-8 text-lg text-orange-50 md:text-xl">
             Cada contribuição, grande ou pequena, nos ajuda a reunir mais pets com suas famílias. Junte-se a nós nessa

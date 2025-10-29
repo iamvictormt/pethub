@@ -214,7 +214,7 @@ export default async function ContributorsPage() {
       <section className="border-t bg-gradient-to-br from-orange-alert via-orange-alert/90 to-orange-alert/80 px-4 py-16 text-white md:py-24">
         <div className="container mx-auto max-w-4xl text-center">
           <Heart className="mx-auto mb-6 h-16 w-16" />
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">Faça Parte Desta História</h2>
+          <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">Faça parte desta história</h2>
           <p className="mb-8 text-lg text-orange-50 md:text-xl">
             Sua contribuição ajuda a manter o Farejei gratuito para todos e a reunir mais pets com suas famílias.
             Juntos, fazemos a diferença!
