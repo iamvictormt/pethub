@@ -77,11 +77,6 @@ export function MobileNav() {
           highlight: true,
         },
     {
-      href: '/notificacoes',
-      icon: Bell,
-      label: 'Alertas',
-    },
-    {
       href: user ? '/perfil' : '/auth/login',
       icon: User,
       label: 'Perfil',
