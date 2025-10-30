@@ -77,12 +77,6 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
           <h1 className="text-3xl font-bold">Meus Pets</h1>
           <p className="text-muted-foreground mt-1">Gerencie os pets que você reportou</p>
         </div>
-        <Button asChild size="lg" className="bg-orange-500 hover:bg-orange-600">
-          <Link href="/reportar">
-            <Plus className="mr-2 h-5 w-5" />
-            Reportar Pet
-          </Link>
-        </Button>
       </div>
 
       {/* Stats */}
