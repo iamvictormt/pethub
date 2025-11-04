@@ -219,7 +219,7 @@ export function LocationPicker({
       {/* Map */}
       <div
         ref={mapRef}
-        className="relative h-80 w-full overflow-hidden rounded-xl border bg-gray-200"
+        className="relative h-100 md:h-120 w-full overflow-hidden rounded-xl border bg-gray-200"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}

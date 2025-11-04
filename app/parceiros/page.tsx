@@ -75,22 +75,6 @@ export default function ParceirosPage() {
                 </Link>
               </Button>
             </div>
-
-            {/* Stats */}
-            <div className="mt-12 grid grid-cols-3 gap-6 pt-8">
-              <div>
-                <div className="text-3xl font-bold text-orange-alert">{ngos.length}+</div>
-                <div className="text-sm text-muted-foreground">Parceiros na causa animal</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-blue-farejei">100%</div>
-                <div className="text-sm text-muted-foreground">Comprometidas</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-purple-500">1000+</div>
-                <div className="text-sm text-muted-foreground">Pets Ajudados</div>
-              </div>
-            </div>
           </div>
         </div>
       </section>

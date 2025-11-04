@@ -15,6 +15,8 @@ export default async function ProfilePage() {
   }
 
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single()
+const { data, error } = await supabase.from("profiles").select("*");
+console.log(error, data);
 
   if (!profile) {
     redirect("/auth/login")

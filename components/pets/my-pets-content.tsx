@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { petTypeEmoji, statusConfig } from '@/utils/configPet';
+import { toast } from '@/hooks/use-toast';
 
 interface MyPetsContentProps {
   pets: Pet[];
@@ -61,9 +62,23 @@ export function MyPetsContent({ pets: initialPets }: MyPetsContentProps) {
 
     setIsDeleting(true);
     const { error } = await supabase.from('pets').delete().eq('id', deleteId);
-
+    
+    if (error) {
+      toast({
+        title: 'Erro ao excluir pet',
+        description: error.message ?? 'Não foi possível excluir o pet. Tente novamente mais tarde.',
+        variant: 'destructive',
+      });
+    }
     if (!error) {
       setPets(pets.filter((pet) => pet.id !== deleteId));
+      // success (replace placeholder)
+      toast({
+        title: 'Pet excluído',
+        description: 'O pet foi removido com sucesso.',
+      });
+
+      // (also add this after the supabase call for the error path, outside the if (!error) block)
     }
     setIsDeleting(false);
     setDeleteId(null);
