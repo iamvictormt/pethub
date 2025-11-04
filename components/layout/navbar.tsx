@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Menu, User, LogOut, Store, AlertTriangle, Search, Heart, Users, X, MessageSquare } from 'lucide-react';
+import { Menu, User, LogOut, Store, AlertTriangle, Search, Heart, Users, X, MessageSquare, HeartHandshake } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
@@ -82,7 +82,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/pets', label: 'Buscar Pets', icon: Search },
     { href: '/contribuir', label: 'Contribuir', icon: Heart },
-    { href: '/contribuintes', label: 'Contribuintes', icon: Users },
+    { href: '/parceiros', label: 'Parceiros', icon: HeartHandshake },
   ];
 
   return (

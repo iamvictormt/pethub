@@ -6,12 +6,7 @@ import { Heart, Coffee, Users, Shield, TrendingUp, Zap, CheckCircle2, ArrowRight
 import Link from 'next/link';
 import ContributionDialog from '@/components/contributions/contribution-dialog';
 
-interface ContribuirContentProps {
-  totalAmount: number;
-  uniqueContributors: number;
-}
-
-export default function ContribuirContent({ totalAmount, uniqueContributors }: ContribuirContentProps) {
+export default function ContribuirContent() {
   const [showContributionDialog, setShowContributionDialog] = useState(false);
 
   return (
@@ -57,24 +52,6 @@ export default function ContribuirContent({ totalAmount, uniqueContributors }: C
                   Ver Contribuintes
                 </Link>
               </Button>
-            </div>
-
-            {/* Stats - Using real data from props */}
-            <div className="mt-12 grid grid-cols-3 gap-6 pt-8">
-              <div>
-                <div className="text-3xl font-bold text-orange-alert">
-                  R$ {totalAmount >= 1000 ? `${(totalAmount / 1000).toFixed(1)}k` : totalAmount.toFixed(0)}+
-                </div>
-                <div className="text-sm text-muted-foreground">Arrecadado</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-blue-farejei">{uniqueContributors}</div>
-                <div className="text-sm text-muted-foreground">Contribuintes</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold text-purple-500">100%</div>
-                <div className="text-sm text-muted-foreground">Transparente</div>
-              </div>
             </div>
           </div>
         </div>

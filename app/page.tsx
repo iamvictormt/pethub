@@ -66,20 +66,20 @@ export default async function HomePage() {
   const activeUsers = activeUsersResult.count || 0;
 
   // Calculate average time to reunite (in hours)
-  let avgTimeHours = 24;
-  if (recentReunitedResult.data && recentReunitedResult.data.length > 0) {
-    const times = recentReunitedResult.data
-      .filter((pet) => pet.created_at && pet.updated_at)
-      .map((pet) => {
-        const created = new Date(pet.created_at!).getTime();
-        const updated = new Date(pet.updated_at!).getTime();
-        return (updated - created) / (1000 * 60 * 60); // Convert to hours
-      });
+  // let avgTimeHours = 24;
+  // if (recentReunitedResult.data && recentReunitedResult.data.length > 0) {
+  //   const times = recentReunitedResult.data
+  //     .filter((pet) => pet.created_at && pet.updated_at)
+  //     .map((pet) => {
+  //       const created = new Date(pet.created_at!).getTime();
+  //       const updated = new Date(pet.updated_at!).getTime();
+  //       return (updated - created) / (1000 * 60 * 60); // Convert to hours
+  //     });
 
-    if (times.length > 0) {
-      avgTimeHours = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
-    }
-  }
+    // if (times.length > 0) {
+    //   avgTimeHours = Math.round(times.reduce((a, b) => a + b, 0) / times.length);
+    // }
+  // }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -123,7 +123,7 @@ export default async function HomePage() {
               </div>
 
               {/* Stats */}
-              <div className="mt-12 grid grid-cols-3 gap-6 pt-2">
+              <div className="mt-12 grid grid-cols-2 gap-6 pt-2">
                 <div>
                   <div className="text-3xl font-bold text-orange-alert">{petsReunited * 5}+</div>
                   <div className="text-sm text-muted-foreground">Pets reunidos</div>
@@ -132,10 +132,10 @@ export default async function HomePage() {
                   <div className="text-3xl font-bold text-blue-farejei">{activeUsers * 5}+</div>
                   <div className="text-sm text-muted-foreground">Usuários ativos</div>
                 </div>
-                <div>
+                {/* <div>
                   <div className="text-3xl font-bold text-foreground">{avgTimeHours}h</div>
                   <div className="text-sm text-muted-foreground">Tempo médio</div>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -219,62 +219,65 @@ export default async function HomePage() {
       <section className="border-t bg-muted/30 px-4 py-16 md:py-24">
         <div className="container mx-auto max-w-7xl px-4">
           <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Histórias que aquecem o coração</h2>
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">Em breve, histórias que vão emocionar</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              O Farejei está quase chegando! Em pouco tempo, milhares de pessoas e pets terão suas próprias histórias de
+              reencontro para contar.
+            </p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {/* Testimonial 1 */}
+            {/* Placeholder 1 */}
             <div className="rounded-2xl border bg-background p-6 shadow-sm">
               <div className="mb-4 flex gap-1">
                 {[...Array(5)].map((_, i) => (
                   <Heart key={i} className="h-5 w-5 fill-orange-alert text-orange-alert" />
                 ))}
               </div>
-              <p className="mb-4 text-muted-foreground">
-                "Encontrei minha Luna em menos de 6 horas! A comunidade do Farejei é incrível. Obrigada a todos que
-                ajudaram!"
+              <p className="mb-4 text-muted-foreground italic">
+                “Logo você vai poder compartilhar aqui como o Farejei ajudou a trazer seu amigo de volta pra casa.”
               </p>
               <div className="flex items-center gap-3">
                 <div>
-                  <div className="font-semibold">Maria Silva</div>
-                  <div className="text-sm text-muted-foreground">Anápolis, GO</div>
+                  <div className="font-semibold">Em breve</div>
+                  <div className="text-sm text-muted-foreground">Histórias reais de amor e reencontros</div>
                 </div>
               </div>
             </div>
 
-            {/* Testimonial 2 */}
+            {/* Placeholder 2 */}
             <div className="rounded-2xl border bg-background p-6 shadow-sm">
               <div className="mb-4 flex gap-1">
                 {[...Array(5)].map((_, i) => (
                   <Heart key={i} className="h-5 w-5 fill-orange-alert text-orange-alert" />
                 ))}
               </div>
-              <p className="mb-4 text-muted-foreground">
-                "Resgatei um gato perdido e não consegui localizar o dono. Felizmente achei uma pessoa para adotar pelo
-                Farejei!"
+              <p className="mb-4 text-muted-foreground italic">
+                “Cada reencontro será uma nova história de esperança. O Farejei está quase pronto pra fazer parte da
+                sua.”
               </p>
               <div className="flex items-center gap-3">
                 <div>
-                  <div className="font-semibold">Beatriz Fernandes</div>
-                  <div className="text-sm text-muted-foreground">Anápolis, GO</div>
+                  <div className="font-semibold">Comunidade Farejei</div>
+                  <div className="text-sm text-muted-foreground">Lançamento em breve</div>
                 </div>
               </div>
             </div>
 
-            {/* Testimonial 3 */}
+            {/* Placeholder 3 */}
             <div className="rounded-2xl border bg-background p-6 shadow-sm">
               <div className="mb-4 flex gap-1">
                 {[...Array(5)].map((_, i) => (
                   <Heart key={i} className="h-5 w-5 fill-orange-alert text-orange-alert" />
                 ))}
               </div>
-              <p className="mb-4 text-muted-foreground">
-                "Plataforma essencial para quem ama animais. Já ajudei a reunir 3 pets com seus donos. Gratidão!"
+              <p className="mb-4 text-muted-foreground italic">
+                “Nosso objetivo é simples: reunir corações. Fique por perto e faça parte dessa história desde o começo.”
               </p>
               <div className="flex items-center gap-3">
                 <div>
-                  <div className="font-semibold">Ana Costa</div>
-                  <div className="text-sm text-muted-foreground">Anápolis, GO</div>
+                  <div className="font-semibold">Equipe Farejei</div>
+                  <div className="text-sm text-muted-foreground">Juntos por quem amamos</div>
                 </div>
               </div>
             </div>
@@ -283,7 +286,7 @@ export default async function HomePage() {
       </section>
 
       {/* Supporters Section with infinite scroll */}
-      <section className="border-t bg-background px-4 py-16 md:py-20">
+      {/* <section className="border-t bg-background px-4 py-16 md:py-20">
         <div className="container mx-auto max-w-7xl px-4">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold md:text-4xl">Seja um Parceiro do Farejei</h2>
@@ -292,10 +295,8 @@ export default async function HomePage() {
             </p>
           </div>
 
-          {/* Infinite Scroll Container */}
           <div className="relative w-full overflow-hidden mask-[linear-gradient(to_right,transparent_0%,black_12.5%,black_87.5%,transparent_100%)]">
             <div className="animate-infinite-scroll flex w-max items-center gap-8 py-4">
-              {/* Render supporters 3 times for seamless loop */}
               {[...SUPPORTERS, ...SUPPORTERS].map((supporter, index) => (
                 <div
                   key={`supporter-${index}`}
@@ -322,10 +323,10 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Features Section */}
-      <section className="border-t bg-muted/30 px-4 py-16 md:py-24">
+      <section className="border-t bg-background px-4 py-16 md:py-20">
         <div className="container mx-auto max-w-7xl px-4">
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
             <div className="flex flex-col justify-center">
@@ -366,9 +367,7 @@ export default async function HomePage() {
                   </div>
                   <div>
                     <h3 className="mb-1 font-semibold">Ações Rápidas</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Reporte e busque pets em minutos
-                    </p>
+                    <p className="text-sm text-muted-foreground">Reporte e busque pets em minutos</p>
                   </div>
                 </div>
               </div>
