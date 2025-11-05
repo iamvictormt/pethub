@@ -23,8 +23,8 @@ export function LocationPicker({
 }: LocationPickerProps) {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [mapCenter, setMapCenter] = useState({
-    lat: latitude ? Number.parseFloat(latitude) : -23.5505,
-    lng: longitude ? Number.parseFloat(longitude) : -46.6333,
+    lat: latitude ? Number.parseFloat(latitude) : -16.6868,
+    lng: longitude ? Number.parseFloat(longitude) : -49.2708,
   });
   const [zoom, setZoom] = useState(16);
   const [isDragging, setIsDragging] = useState(false);
@@ -252,7 +252,7 @@ export function LocationPicker({
       {/* Map */}
       <div
         ref={mapRef}
-        className="relative h-120 w-full overflow-hidden rounded-xl border bg-gray-200"
+        className="relative h-140 md:h-160 w-full overflow-hidden rounded-xl border bg-gray-200"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
