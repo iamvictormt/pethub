@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     const { data: pets, error, count } = await query;
 
     if (error) {
-      console.error('[v0] Error fetching pets:', error);
+      console.error('Error fetching pets:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
@@ -106,7 +106,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('[v0] Error in pets API:', error);
+    console.error('Error in pets API:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

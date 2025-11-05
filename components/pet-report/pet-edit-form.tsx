@@ -1,129 +1,130 @@
-'use client';
+"use client"
 
-import type React from 'react';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { TextInput } from '@/components/ui/text-input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { Upload, ArrowLeft, X } from 'lucide-react';
-import { LocationPicker } from './location-picker';
-import type { Pet, PetStatus, PetType } from '@/lib/types/database';
-import Link from 'next/link';
-import { formatPhoneBR } from '@/lib/utils';
-import { validateImageFile } from '@/lib/image-validation';
-import { toast } from '@/hooks/use-toast';
-import { Label } from '@radix-ui/react-dropdown-menu';
-import { PET_STATUS_OPTIONS } from './pet-report-form';
-import { Checkbox } from '@/components/ui/checkbox';
-import { formatRewardAmount } from '@/utils/formatCurrency';
-import { parseCurrencyToNumber } from '@/utils/parseCurrency';
-import { DateInput } from '../ui/date-input';
+import type React from "react"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { TextInput } from "@/components/ui/text-input"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { SelectDropdown } from "@/components/ui/select-dropdown"
+import { Upload, ArrowLeft, X } from "lucide-react"
+import { LocationPicker } from "./location-picker"
+import type { Pet, PetStatus, PetType } from "@/lib/types/database"
+import Link from "next/link"
+import { formatPhoneBR } from "@/lib/utils"
+import { validateImageFile } from "@/lib/image-validation"
+import { toast } from "@/hooks/use-toast"
+import { Label } from "@radix-ui/react-dropdown-menu"
+import { PET_STATUS_OPTIONS } from "./pet-report-form"
+import { Checkbox } from "@/components/ui/checkbox"
+import { formatRewardAmount } from "@/utils/formatCurrency"
+import { parseCurrencyToNumber } from "@/utils/parseCurrency"
+import { DateInput } from "../ui/date-input"
+import { uploadFileWithRetry } from "@/lib/upload-helper"
 
 interface PetEditFormProps {
-  pet: Pet;
+  pet: Pet
 }
 
 export function PetEditForm({ pet }: PetEditFormProps) {
-  const router = useRouter();
-  const supabase = createClient();
+  const router = useRouter()
+  const supabase = createClient()
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
 
-  const [photoFiles, setPhotoFiles] = useState<(File | null)[]>([null, null, null, null]);
+  const [photoFiles, setPhotoFiles] = useState<(File | null)[]>([null, null, null, null])
   const [photoPreviews, setPhotoPreviews] = useState<(string | null)[]>([
     pet.photo_url || null,
     pet.photo_url_2 || null,
     pet.photo_url_3 || null,
     pet.photo_url_4 || null,
-  ]);
+  ])
 
-  const [status, setStatus] = useState<PetStatus>(pet.status);
-  const [name, setName] = useState(pet.name);
-  const [type, setType] = useState<PetType>(pet.type);
-  const [breed, setBreed] = useState(pet.breed || '');
-  const [color, setColor] = useState(pet.color || '');
-  const [age, setAge] = useState(pet.age?.toString() || '');
-  const [description, setDescription] = useState(pet.description || '');
-  const [latitude, setLatitude] = useState(pet.latitude?.toString() || '');
-  const [longitude, setLongitude] = useState(pet.longitude?.toString() || '');
-  const [locationDescription, setLocationDescription] = useState(pet.location_description || '');
-  const [contactName, setContactName] = useState(pet.contact_name);
-  const [contactPhone, setContactPhone] = useState(pet.contact_phone);
-  const [contactEmail, setContactEmail] = useState(pet.contact_email || '');
-  const [lastSeenDate, setLastSeenDate] = useState(new Date(pet.last_seen_date || '').toISOString().split('T')[0]);
-  const [hasReward, setHasReward] = useState(pet.has_reward || false);
+  const [status, setStatus] = useState<PetStatus>(pet.status)
+  const [name, setName] = useState(pet.name)
+  const [type, setType] = useState<PetType>(pet.type)
+  const [breed, setBreed] = useState(pet.breed || "")
+  const [color, setColor] = useState(pet.color || "")
+  const [age, setAge] = useState(pet.age?.toString() || "")
+  const [description, setDescription] = useState(pet.description || "")
+  const [latitude, setLatitude] = useState(pet.latitude?.toString() || "")
+  const [longitude, setLongitude] = useState(pet.longitude?.toString() || "")
+  const [locationDescription, setLocationDescription] = useState(pet.location_description || "")
+  const [contactName, setContactName] = useState(pet.contact_name)
+  const [contactPhone, setContactPhone] = useState(pet.contact_phone)
+  const [contactEmail, setContactEmail] = useState(pet.contact_email || "")
+  const [lastSeenDate, setLastSeenDate] = useState(new Date(pet.last_seen_date || "").toISOString().split("T")[0])
+  const [hasReward, setHasReward] = useState(pet.has_reward || false)
   const [rewardAmount, setRewardAmount] = useState(
-    pet.reward_amount ? formatRewardAmount(pet.reward_amount.toString()) : ''
-  );
-  const [unknownName, setUnknownName] = useState(pet.name === 'Não informado');
-  const [unknownBreed, setUnknownBreed] = useState(pet.breed === 'Não informado');
-  const [unknownAge, setUnknownAge] = useState(pet.age === null);
+    pet.reward_amount ? formatRewardAmount(pet.reward_amount.toString()) : "",
+  )
+  const [unknownName, setUnknownName] = useState(pet.name === "Não informado")
+  const [unknownBreed, setUnknownBreed] = useState(pet.breed === "Não informado")
+  const [unknownAge, setUnknownAge] = useState(pet.age === null)
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      const validation = validateImageFile(file);
+      const validation = validateImageFile(file)
       if (!validation.valid) {
         toast({
           title: validation.title,
-          description: validation.error || 'Arquivo inválido',
-          variant: 'destructive',
-        });
-        return;
+          description: validation.error || "Arquivo inválido",
+          variant: "destructive",
+        })
+        return
       }
 
-      const newPhotoFiles = [...photoFiles];
-      newPhotoFiles[index] = file;
-      setPhotoFiles(newPhotoFiles);
+      const newPhotoFiles = [...photoFiles]
+      newPhotoFiles[index] = file
+      setPhotoFiles(newPhotoFiles)
 
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onloadend = () => {
-        const newPreviews = [...photoPreviews];
-        newPreviews[index] = reader.result as string;
-        setPhotoPreviews(newPreviews);
-      };
-      reader.readAsDataURL(file);
+        const newPreviews = [...photoPreviews]
+        newPreviews[index] = reader.result as string
+        setPhotoPreviews(newPreviews)
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   const handleRemovePhoto = (index: number) => {
-    const newPhotoFiles = [...photoFiles];
-    newPhotoFiles[index] = null;
-    setPhotoFiles(newPhotoFiles);
+    const newPhotoFiles = [...photoFiles]
+    newPhotoFiles[index] = null
+    setPhotoFiles(newPhotoFiles)
 
-    const newPreviews = [...photoPreviews];
-    newPreviews[index] = null;
-    setPhotoPreviews(newPreviews);
-  };
+    const newPreviews = [...photoPreviews]
+    newPreviews[index] = null
+    setPhotoPreviews(newPreviews)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault()
+    setIsLoading(true)
 
     try {
       if (!photoFiles[0] && !photoPreviews[0]) {
         toast({
-          title: 'Foto obrigatória',
-          description: 'Por favor, mantenha ou faça upload de pelo menos uma foto do pet',
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-        return;
+          title: "Foto obrigatória",
+          description: "Por favor, mantenha ou faça upload de pelo menos uma foto do pet",
+          variant: "destructive",
+        })
+        setIsLoading(false)
+        return
       }
 
       // Validate required fields
       if (!contactName || !contactPhone || !latitude || !longitude) {
         toast({
-          title: 'Campos obrigatórios',
-          description: 'Por favor, preencha todos os campos obrigatórios',
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-        return;
+          title: "Campos obrigatórios",
+          description: "Por favor, preencha todos os campos obrigatórios",
+          variant: "destructive",
+        })
+        setIsLoading(false)
+        return
       }
 
       const photoUrls: (string | null)[] = [
@@ -131,47 +132,58 @@ export function PetEditForm({ pet }: PetEditFormProps) {
         pet.photo_url_2 || null,
         pet.photo_url_3 || null,
         pet.photo_url_4 || null,
-      ];
+      ]
+      const uploadErrors: string[] = []
 
       for (let i = 0; i < photoFiles.length; i++) {
-        const file = photoFiles[i];
-        if (!file) continue;
+        const file = photoFiles[i]
+        if (!file) continue
 
-        try {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${pet.user_id}-${Date.now()}-${i}.${fileExt}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('pet-photos')
-            .upload(fileName, file, { contentType: file.type || 'image/jpeg' });
+        console.log(`Uploading photo ${i + 1}...`)
+        const result = await uploadFileWithRetry(file, pet.user_id, i)
 
-          if (uploadError) {
-            console.error('Erro no upload da foto', uploadError);
-            continue;
+        if (result.success && result.url) {
+          photoUrls[i] = result.url
+          console.log(`Photo ${i + 1} uploaded successfully`)
+        } else {
+          console.error(`Failed to upload photo ${i + 1}:`, result.error)
+          uploadErrors.push(`Foto ${i + 1}: ${result.error}`)
+
+          // If first photo fails and there's no existing photo, stop the process
+          if (i === 0 && !photoPreviews[0]) {
+            toast({
+              title: "Erro no upload da foto principal",
+              description: result.error || "Não foi possível fazer upload da primeira foto. Tente novamente.",
+              variant: "destructive",
+            })
+            setIsLoading(false)
+            return
           }
-
-          const {
-            data: { publicUrl },
-          } = supabase.storage.from('pet-photos').getPublicUrl(fileName);
-
-          photoUrls[i] = publicUrl;
-        } catch (err) {
-          console.error('Erro inesperado no upload', err);
         }
       }
 
-      if (status !== 'LOST') {
-        setHasReward(false);
-        setRewardAmount('');
+      // Show warning if some photos failed
+      if (uploadErrors.length > 0) {
+        toast({
+          title: "Algumas fotos não foram enviadas",
+          description: uploadErrors.join(", "),
+          variant: "destructive",
+        })
       }
 
-      const finalName = unknownName ? 'Não informado' : name || 'Não informado';
-      const finalBreed = unknownBreed ? 'Não informado' : breed || null;
-      const finalAge = unknownAge ? null : age ? Number.parseInt(age) : null;
+      if (status !== "LOST") {
+        setHasReward(false)
+        setRewardAmount("")
+      }
 
-      const expirationDate = status === 'SIGHTED' ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() : null;
+      const finalName = unknownName ? "Não informado" : name || "Não informado"
+      const finalBreed = unknownBreed ? "Não informado" : breed || null
+      const finalAge = unknownAge ? null : age ? Number.parseInt(age) : null
+
+      const expirationDate = status === "SIGHTED" ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() : null
 
       const { error: updateError } = await supabase
-        .from('pets')
+        .from("pets")
         .update({
           name: finalName,
           type,
@@ -195,31 +207,34 @@ export function PetEditForm({ pet }: PetEditFormProps) {
           reward_amount: hasReward && rewardAmount ? parseCurrencyToNumber(rewardAmount) : null,
           expiration_date: expirationDate,
         })
-        .eq('id', pet.id);
-console.log('Update error:', updateError);
+        .eq("id", pet.id)
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        console.error("Update error:", updateError)
+        throw updateError
+      }
 
       toast({
-        title: 'Pet salvo com sucesso!',
-        description: 'As informações do pet foram atualizadas.',
-      });
+        title: "Pet salvo com sucesso!",
+        description: "As informações do pet foram atualizadas.",
+      })
 
-      router.push('/meus-pets');
+      router.push("/meus-pets")
     } catch (err) {
+      console.error("Error in handleSubmit:", err)
       toast({
-        title: 'Erro ao salvar pet!',
-        description: err instanceof Error ? err.message : 'Ocorreu um erro ao salvar o pet.',
-        variant: 'destructive',
-      });
+        title: "Erro ao salvar pet!",
+        description: err instanceof Error ? err.message : "Ocorreu um erro ao salvar o pet.",
+        variant: "destructive",
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleAmountChangeForm = (value: string) => {
-    setRewardAmount(formatRewardAmount(value));
-  };
+    setRewardAmount(formatRewardAmount(value))
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -234,8 +249,8 @@ console.log('Update error:', updateError);
                   key={option.value}
                   className={`flex items-start space-x-3 rounded-lg border p-3 transition-colors cursor-pointer ${
                     status === option.value
-                      ? 'border-orange-alert bg-orange-alert/5'
-                      : 'border-border hover:border-orange-alert/50'
+                      ? "border-orange-alert bg-orange-alert/5"
+                      : "border-border hover:border-orange-alert/50"
                   }`}
                 >
                   <RadioGroupItem value={option.value} id={option.value} className="mt-1" />
@@ -246,7 +261,7 @@ console.log('Update error:', updateError);
                     <p className="mt-1 text-xs text-muted-foreground">{option.description}</p>
                   </label>
                 </div>
-              );
+              )
             })}
           </RadioGroup>
         </CardContent>
@@ -263,17 +278,17 @@ console.log('Update error:', updateError);
               placeholder="Ex: Rex, Mimi..."
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required={status !== 'SIGHTED' && status !== 'RESCUED' && !unknownName}
-              disabled={(status === 'SIGHTED' || status === 'RESCUED') && unknownName}
+              required={status !== "SIGHTED" && status !== "RESCUED" && !unknownName}
+              disabled={(status === "SIGHTED" || status === "RESCUED") && unknownName}
             />
-            {(status === 'SIGHTED' || status === 'RESCUED') && (
+            {(status === "SIGHTED" || status === "RESCUED") && (
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="unknown-name"
                   checked={unknownName}
                   onCheckedChange={(checked) => {
-                    setUnknownName(checked as boolean);
-                    if (checked) setName('');
+                    setUnknownName(checked as boolean)
+                    if (checked) setName("")
                   }}
                 />
                 <label htmlFor="unknown-name" className="text-sm text-muted-foreground cursor-pointer">
@@ -287,10 +302,10 @@ console.log('Update error:', updateError);
             <SelectDropdown
               label="Tipo de Animal"
               options={[
-                { value: 'DOG', label: 'Cachorro' },
-                { value: 'CAT', label: 'Gato' },
-                { value: 'BIRD', label: 'Pássaro' },
-                { value: 'OTHER', label: 'Outro' },
+                { value: "DOG", label: "Cachorro" },
+                { value: "CAT", label: "Gato" },
+                { value: "BIRD", label: "Pássaro" },
+                { value: "OTHER", label: "Outro" },
               ]}
               value={type}
               onChange={(value) => setType(value as PetType)}
@@ -310,8 +325,8 @@ console.log('Update error:', updateError);
                   id="unknown-breed"
                   checked={unknownBreed}
                   onCheckedChange={(checked) => {
-                    setUnknownBreed(checked as boolean);
-                    if (checked) setBreed('');
+                    setUnknownBreed(checked as boolean)
+                    if (checked) setBreed("")
                   }}
                 />
                 <label htmlFor="unknown-breed" className="text-sm text-muted-foreground cursor-pointer">
@@ -337,11 +352,11 @@ console.log('Update error:', updateError);
                 placeholder="Ex: 3"
                 value={age}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, '');
-                  let numberValue = Number(value);
-                  if (numberValue < 0) numberValue = 0;
-                  if (numberValue > 25) numberValue = 25;
-                  setAge(numberValue.toString());
+                  const value = e.target.value.replace(/\D/g, "")
+                  let numberValue = Number(value)
+                  if (numberValue < 0) numberValue = 0
+                  if (numberValue > 25) numberValue = 25
+                  setAge(numberValue.toString())
                 }}
                 helperText="Aproximada, se não souber exatamente"
                 required={!unknownAge}
@@ -352,8 +367,8 @@ console.log('Update error:', updateError);
                   id="unknown-age"
                   checked={unknownAge}
                   onCheckedChange={(checked) => {
-                    setUnknownAge(checked as boolean);
-                    if (checked) setAge('');
+                    setUnknownAge(checked as boolean)
+                    if (checked) setAge("")
                   }}
                 />
                 <label htmlFor="unknown-age" className="text-sm text-muted-foreground cursor-pointer">
@@ -392,7 +407,7 @@ console.log('Update error:', updateError);
                   {photoPreviews[index] && (
                     <div className="relative h-48 w-full overflow-hidden rounded-xl">
                       <img
-                        src={photoPreviews[index] || '/placeholder.svg'}
+                        src={photoPreviews[index] || "/placeholder.svg"}
                         alt={`Preview ${index + 1}`}
                         className="h-full w-full object-cover"
                       />
@@ -409,7 +424,7 @@ console.log('Update error:', updateError);
                   <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/30 px-4 py-6 transition-colors hover:bg-muted/50">
                     <Upload className="h-4 w-4 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">
-                      {photoPreviews[index] ? 'Alterar' : index === 0 ? 'Foto principal *' : `Foto ${index + 1}`}
+                      {photoPreviews[index] ? "Alterar" : index === 0 ? "Foto principal *" : `Foto ${index + 1}`}
                     </span>
                     <input
                       type="file"
@@ -432,8 +447,8 @@ console.log('Update error:', updateError);
             latitude={latitude}
             longitude={longitude}
             onLocationChange={(lat, lng) => {
-              setLatitude(lat);
-              setLongitude(lng);
+              setLatitude(lat)
+              setLongitude(lng)
             }}
             locationDescription={locationDescription}
             onDescriptionChange={setLocationDescription}
@@ -462,7 +477,7 @@ console.log('Update error:', updateError);
               value={contactPhone}
               onChange={(e) => setContactPhone(formatPhoneBR(e.target.value))}
               onBlur={() => {
-                if (contactPhone.length < 14) setContactPhone('');
+                if (contactPhone.length < 14) setContactPhone("")
               }}
               required
             />
@@ -479,7 +494,7 @@ console.log('Update error:', updateError);
       </Card>
 
       {/* Reward */}
-      {status === 'LOST' && (
+      {status === "LOST" && (
         <Card>
           <CardContent className="space-y-4 pt-6">
             <h2 className="text-xl font-semibold">Recompensa</h2>
@@ -489,8 +504,8 @@ console.log('Update error:', updateError);
                 id="has-reward"
                 checked={hasReward}
                 onCheckedChange={(checked) => {
-                  setHasReward(checked as boolean);
-                  if (!checked) setRewardAmount('');
+                  setHasReward(checked as boolean)
+                  if (!checked) setRewardAmount("")
                 }}
               />
               <label
@@ -531,9 +546,9 @@ console.log('Update error:', updateError);
           className="flex-1 bg-orange-alert text-orange-alert-foreground hover:bg-orange-alert/90"
           disabled={isLoading}
         >
-          {isLoading ? 'Salvando...' : 'Salvar Alterações'}
+          {isLoading ? "Salvando..." : "Salvar Alterações"}
         </Button>
       </div>
     </form>
-  );
+  )
 }

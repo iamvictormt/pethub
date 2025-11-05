@@ -114,7 +114,7 @@ export function PetMapInterface() {
         setTotalPets(data.pagination.total)
         setCurrentPage(page)
       } catch (error) {
-        console.error("[v0] Error fetching pets:", error)
+        console.error("Error fetching pets:", error)
         toast({
           title: "Erro",
           description: "Não foi possível carregar os pets. Tente novamente.",

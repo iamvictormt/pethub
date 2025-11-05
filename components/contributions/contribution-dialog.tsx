@@ -84,7 +84,7 @@ export default function ContributionDialog({ open, onOpenChange }: ContributionD
       return;
     }
 
-    console.log('[v0] Amount in cents:', cents);
+    console.log('Amount in cents:', cents);
     setAmountInCents(cents);
   };
 
@@ -233,7 +233,7 @@ export default function ContributionDialog({ open, onOpenChange }: ContributionD
             <Button
               variant="outline"
               onClick={() => {
-                console.log('[v0] Going back to amount selection');
+                console.log('Going back to amount selection');
                 setAmountInCents(null);
               }}
               className="h-12 w-full sm:h-auto"

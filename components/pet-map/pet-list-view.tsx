@@ -1,13 +1,10 @@
 'use client';
 
-import type { Pet, Advertisement } from '@/lib/types/database';
+import type { Pet } from '@/lib/types/database';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MapPin, Calendar, ChevronLeft, ChevronRight, Eye, Share2, SlidersHorizontal } from 'lucide-react';
-import Link from 'next/link';
-import Image from 'next/image';
+import { ChevronLeft, ChevronRight, SlidersHorizontal } from 'lucide-react';
 import { Badge } from '../ui/badge';
-import { petTypeEmoji, statusConfig } from '@/utils/configPet';
 import { MapFilters } from './map-filters';
 import {
   Dialog,
@@ -19,6 +16,8 @@ import {
 } from '@/components/ui/dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import React from 'react';
+import { PetCard } from '@/components/pets/pet-card';
+import { PetCardSkeleton } from '../pets/pet-card-skeleton';
 
 interface PetListViewProps {
   pets: Pet[];
@@ -213,11 +212,9 @@ export function PetListView({
           </div>
 
           {isLoading ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 12 }).map((_, i) => (
-                <Card key={i} className="overflow-hidden border-0 bg-card shadow-md py-0">
-                  <Skeleton className="aspect-[3/4] w-full" />
-                </Card>
+                <PetCardSkeleton key={i} />
               ))}
             </div>
           ) : currentPets.length === 0 ? (
@@ -229,112 +226,10 @@ export function PetListView({
             </div>
           ) : (
             <>
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {currentPets.map((item) => {
-                  const pet = item;
-                  return (
-                    <Link key={pet.id} href={`/pet/${pet.id}`} className="group">
-                      <Card className="group relative h-full overflow-hidden border-0 bg-card shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl py-0">
-                        <div className="relative aspect-[3/4] overflow-hidden">
-                          {pet.photo_url ? (
-                            <Image
-                              src={pet.photo_url || '/placeholder.svg'}
-                              alt={pet.name || 'Pet'}
-                              fill
-                              className="object-cover transition-transform duration-500 group-hover:scale-105"
-                            />
-                          ) : (
-                            <div className="flex h-full items-center justify-center bg-gradient-to-br from-orange-100 via-orange-50 to-blue-100">
-                              <span className="text-8xl opacity-40">🐾</span>
-                            </div>
-                          )}
-
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-                          <div className="absolute left-0 right-0 top-0 flex items-start justify-between p-3">
-                            <div className="absolute top-3 right-4 z-10">
-                              <Badge
-                                className={`${
-                                  statusConfig[pet.status].color
-                                } text-white border-0 shadow-lg text-sm px-3 py-1.5`}
-                              >
-                                {statusConfig[pet.status].emoji} {statusConfig[pet.status].label}
-                              </Badge>
-                            </div>
-
-                            <div className="flex flex-col gap-2">
-                              {pet.has_reward && pet.reward_amount && (
-                                <div className="rounded-full bg-gradient-to-r from-green-500 to-emerald-500 px-3 py-1.5 text-xs font-bold text-white shadow-lg backdrop-blur-md">
-                                  <div className="flex items-center gap-1">
-                                    R$ {pet.reward_amount.toLocaleString('pt-BR')}
-                                  </div>
-                                </div>
-                              )}
-
-                              {pet.distance !== null && (
-                                <div className="rounded-full bg-black/60 text-xs font-bold text-white shadow-lg backdrop-blur-md p-2">
-                                  <div className="flex items-center gap-1">
-                                    <MapPin className="h-3 w-3" />
-                                    {pet.distance < 1
-                                      ? `${Math.round(pet.distance * 1000)}m`
-                                      : `${pet.distance.toFixed(1)}km`}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-                            <h3 className="mb-2 text-xl font-bold leading-tight drop-shadow-lg line-clamp-1">
-                              {pet.name || 'Sem Nome'}
-                            </h3>
-
-                            <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold backdrop-blur-md">
-                              {petTypeEmoji[pet.type]}
-                              <span>
-                                {pet.type === 'DOG'
-                                  ? 'Cachorro'
-                                  : pet.type === 'CAT'
-                                  ? 'Gato'
-                                  : pet.type === 'BIRD'
-                                  ? 'Pássaro'
-                                  : 'Outro'}
-                              </span>
-                            </div>
-
-                            <div className="flex items-center justify-between gap-2">
-                              <div className="flex items-center gap-3 text-xs">
-                                <div className="flex items-center gap-1.5 opacity-90">
-                                  <Calendar className="h-3.5 w-3.5" />
-                                  <span>
-                                    {new Date(pet.created_at).toLocaleDateString('pt-BR', {
-                                      day: '2-digit',
-                                      month: 'short',
-                                    })}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-1.5 opacity-90">
-                                  <Eye className="h-3.5 w-3.5" />
-                                  <span>{pet.view_count || 0}</span>
-                                </div>
-                              </div>
-
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-8 gap-1.5 rounded-full bg-white/20 px-3 text-white backdrop-blur-md transition-all hover:bg-white/30 hover:text-white"
-                                onClick={(e) => handleShare(e, pet.id, pet.name)}
-                              >
-                                <Share2 className="h-3.5 w-3.5" />
-                                <span className="text-xs font-medium">Compartilhar</span>
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    </Link>
-                  );
-                })}
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {currentPets.map((pet) => (
+                  <PetCard key={pet.id} pet={pet} variant="listing" distance={pet.distance} />
+                ))}
               </div>
 
               {totalPages > 1 && (

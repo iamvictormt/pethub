@@ -109,7 +109,7 @@ export function ProfileContent({ profile, pets }: ProfileContentProps) {
   const handleSave = async () => {
     if (!profile) return
 
-    console.log("[v0] Saving profile:", { name, phone, state, city, bio })
+    console.log("Saving profile:", { name, phone, state, city, bio })
 
     const { error } = await supabase
       .from("profiles")
@@ -123,7 +123,7 @@ export function ProfileContent({ profile, pets }: ProfileContentProps) {
       .eq("id", profile.id)
 
     if (error) {
-      console.error("[v0] Error saving profile:", error)
+      console.error("Error saving profile:", error)
       toast({
         title: "Erro ao salvar",
         description: error.message,
@@ -132,7 +132,7 @@ export function ProfileContent({ profile, pets }: ProfileContentProps) {
       return
     }
 
-    console.log("[v0] Profile saved successfully")
+    console.log("Profile saved successfully")
     toast({
       title: "Perfil atualizado!",
       description: "Suas informações foram salvas com sucesso.",

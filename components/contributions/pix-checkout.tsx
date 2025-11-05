@@ -37,12 +37,12 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
   useEffect(() => {
     async function generatePix() {
       try {
-        console.log('[v0] Generating PIX for amount:', amountInCents);
+        console.log('Generating PIX for amount:', amountInCents);
         const data = await createPixContribution(amountInCents, contributorName, contributorEmail);
-        console.log('[v0] PIX generated successfully');
+        console.log('PIX generated successfully');
         setPixData(data);
       } catch (err) {
-        console.error('[v0] Error generating PIX:', err);
+        console.error('Error generating PIX:', err);
         setError(err instanceof Error ? err.message : 'Falha ao gerar PIX');
       } finally {
         setLoading(false);
@@ -79,7 +79,7 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
 
     const interval = setInterval(async () => {
       try {
-        console.log('[v0] Checking payment status...');
+        console.log('Checking payment status...');
         const result = await checkPaymentStatus(pixData.contributionId);
 
         if (result.status === 'completed') {
@@ -108,7 +108,7 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
           });
         }
       } catch (err) {
-        console.error('[v0] Error checking payment status:', err);
+        console.error('Error checking payment status:', err);
       }
     }, 5000);
 
@@ -161,7 +161,7 @@ export default function PixCheckout({ amountInCents, contributorName, contributo
         });
       }
     } catch (err) {
-      console.error('[v0] Error checking payment:', err);
+      console.error('Error checking payment:', err);
       toast({
         title: 'Erro ao verificar pagamento',
         description: 'Tente novamente em alguns instantes',

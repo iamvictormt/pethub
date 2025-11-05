@@ -1,192 +1,204 @@
-'use client';
+"use client"
 
-import type React from 'react';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { TextInput } from '@/components/ui/text-input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { SelectDropdown } from '@/components/ui/select-dropdown';
-import { Heart, PawPrint, Search, Upload, X } from 'lucide-react';
-import { LocationPicker } from './location-picker';
-import type { PetStatus, PetType } from '@/lib/types/database';
-import { formatPhoneBR } from '@/lib/utils';
-import { validateImageFile } from '@/lib/image-validation';
-import { toast } from '@/hooks/use-toast';
-import { Label } from '@radix-ui/react-dropdown-menu';
-import { Checkbox } from '@/components/ui/checkbox';
-import { formatRewardAmount } from '@/utils/formatCurrency';
-import { parseCurrencyToNumber } from '@/utils/parseCurrency';
-import { DateInput } from '../ui/date-input';
+import type React from "react"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { TextInput } from "@/components/ui/text-input"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { SelectDropdown } from "@/components/ui/select-dropdown"
+import { Heart, PawPrint, Search, Upload, X } from "lucide-react"
+import { LocationPicker } from "./location-picker"
+import type { PetStatus, PetType } from "@/lib/types/database"
+import { formatPhoneBR } from "@/lib/utils"
+import { validateImageFile } from "@/lib/image-validation"
+import { toast } from "@/hooks/use-toast"
+import { Label } from "@radix-ui/react-dropdown-menu"
+import { Checkbox } from "@/components/ui/checkbox"
+import { formatRewardAmount } from "@/utils/formatCurrency"
+import { parseCurrencyToNumber } from "@/utils/parseCurrency"
+import { DateInput } from "../ui/date-input"
+import { uploadFileWithRetry } from "@/lib/upload-helper"
 
 export const PET_STATUS_OPTIONS = [
   {
-    value: 'LOST',
-    label: 'Perdido',
-    description: 'Estou procurando meu pet desaparecido',
+    value: "LOST",
+    label: "Perdido",
+    description: "Estou procurando meu pet desaparecido",
     icon: Search,
   },
   {
-    value: 'SIGHTED',
-    label: 'Avistado',
-    description: 'Vi um pet, mas não consegui resgatar',
+    value: "SIGHTED",
+    label: "Avistado",
+    description: "Vi um pet, mas não consegui resgatar",
     icon: PawPrint,
   },
   {
-    value: 'RESCUED',
-    label: 'Resgatado',
-    description: 'Resgatei um pet e estou com ele',
+    value: "RESCUED",
+    label: "Resgatado",
+    description: "Resgatei um pet e estou com ele",
     icon: Heart,
   },
   {
-    value: 'ADOPTION',
-    label: 'Adoção',
-    description: 'Este pet está disponível para adoção',
+    value: "ADOPTION",
+    label: "Adoção",
+    description: "Este pet está disponível para adoção",
     icon: Heart,
   },
-];
+]
 
 interface PetReportFormProps {
-  userId: string;
+  userId: string
 }
 
 export function PetReportForm({ userId }: PetReportFormProps) {
-  const router = useRouter();
-  const supabase = createClient();
+  const router = useRouter()
+  const supabase = createClient()
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false)
 
-  const [photoFiles, setPhotoFiles] = useState<(File | null)[]>([null, null, null, null]);
-  const [photoPreviews, setPhotoPreviews] = useState<(string | null)[]>([null, null, null, null]);
+  const [photoFiles, setPhotoFiles] = useState<(File | null)[]>([null, null, null, null])
+  const [photoPreviews, setPhotoPreviews] = useState<(string | null)[]>([null, null, null, null])
 
   // Form fields
-  const [status, setStatus] = useState<PetStatus>('LOST');
-  const [name, setName] = useState('');
-  const [type, setType] = useState<PetType>('DOG');
-  const [breed, setBreed] = useState('');
-  const [color, setColor] = useState('');
-  const [age, setAge] = useState('');
-  const [description, setDescription] = useState('');
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
-  const [locationDescription, setLocationDescription] = useState('');
-  const [contactName, setContactName] = useState('');
-  const [contactPhone, setContactPhone] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [lastSeenDate, setLastSeenDate] = useState(new Date().toISOString().split('T')[0]);
-  const [hasReward, setHasReward] = useState(false);
-  const [rewardAmount, setRewardAmount] = useState('');
+  const [status, setStatus] = useState<PetStatus>("LOST")
+  const [name, setName] = useState("")
+  const [type, setType] = useState<PetType>("DOG")
+  const [breed, setBreed] = useState("")
+  const [color, setColor] = useState("")
+  const [age, setAge] = useState("")
+  const [description, setDescription] = useState("")
+  const [latitude, setLatitude] = useState("")
+  const [longitude, setLongitude] = useState("")
+  const [locationDescription, setLocationDescription] = useState("")
+  const [contactName, setContactName] = useState("")
+  const [contactPhone, setContactPhone] = useState("")
+  const [contactEmail, setContactEmail] = useState("")
+  const [lastSeenDate, setLastSeenDate] = useState(new Date().toISOString().split("T")[0])
+  const [hasReward, setHasReward] = useState(false)
+  const [rewardAmount, setRewardAmount] = useState("")
 
   // New states for "unknown" fields in SIGHTED and RESCUED statuses
-  const [unknownName, setUnknownName] = useState(false);
-  const [unknownBreed, setUnknownBreed] = useState(false);
-  const [unknownAge, setUnknownAge] = useState(false);
+  const [unknownName, setUnknownName] = useState(false)
+  const [unknownBreed, setUnknownBreed] = useState(false)
+  const [unknownAge, setUnknownAge] = useState(false)
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      const validation = validateImageFile(file);
+      const validation = validateImageFile(file)
       if (!validation.valid) {
         toast({
           title: validation.title,
-          description: validation.error || 'Arquivo inválido',
-          variant: 'destructive',
-        });
-        return;
+          description: validation.error || "Arquivo inválido",
+          variant: "destructive",
+        })
+        return
       }
 
-      const newPhotoFiles = [...photoFiles];
-      newPhotoFiles[index] = file;
-      setPhotoFiles(newPhotoFiles);
+      const newPhotoFiles = [...photoFiles]
+      newPhotoFiles[index] = file
+      setPhotoFiles(newPhotoFiles)
 
-      const reader = new FileReader();
+      const reader = new FileReader()
       reader.onloadend = () => {
-        const newPreviews = [...photoPreviews];
-        newPreviews[index] = reader.result as string;
-        setPhotoPreviews(newPreviews);
-      };
-      reader.readAsDataURL(file);
+        const newPreviews = [...photoPreviews]
+        newPreviews[index] = reader.result as string
+        setPhotoPreviews(newPreviews)
+      }
+      reader.readAsDataURL(file)
     }
-  };
+  }
 
   const handleRemovePhoto = (index: number) => {
-    const newPhotoFiles = [...photoFiles];
-    newPhotoFiles[index] = null;
-    setPhotoFiles(newPhotoFiles);
+    const newPhotoFiles = [...photoFiles]
+    newPhotoFiles[index] = null
+    setPhotoFiles(newPhotoFiles)
 
-    const newPreviews = [...photoPreviews];
-    newPreviews[index] = null;
-    setPhotoPreviews(newPreviews);
-  };
+    const newPreviews = [...photoPreviews]
+    newPreviews[index] = null
+    setPhotoPreviews(newPreviews)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault()
+    setIsLoading(true)
 
     try {
       if (!photoFiles[0]) {
         toast({
-          title: 'Foto obrigatória',
-          description: 'Por favor, faça upload de pelo menos uma foto do pet',
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-        return;
+          title: "Foto obrigatória",
+          description: "Por favor, faça upload de pelo menos uma foto do pet",
+          variant: "destructive",
+        })
+        setIsLoading(false)
+        return
       }
 
       // Validate required fields
       if (!contactName || !contactPhone || !latitude || !longitude) {
         toast({
-          title: 'Campos obrigatórios',
-          description: 'Por favor, preencha todos os campos obrigatórios',
-          variant: 'destructive',
-        });
-        setIsLoading(false);
-        return;
+          title: "Campos obrigatórios",
+          description: "Por favor, preencha todos os campos obrigatórios",
+          variant: "destructive",
+        })
+        setIsLoading(false)
+        return
       }
 
-      if (status !== 'LOST') {
-        setHasReward(false);
-        setRewardAmount('');
+      if (status !== "LOST") {
+        setHasReward(false)
+        setRewardAmount("")
       }
 
-      const photoUrls: (string | null)[] = [null, null, null, null];
+      const photoUrls: (string | null)[] = [null, null, null, null]
+      const uploadErrors: string[] = []
 
       for (let i = 0; i < photoFiles.length; i++) {
-        const file = photoFiles[i];
-        if (!file) continue;
+        const file = photoFiles[i]
+        if (!file) continue
 
-        try {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${userId}-${Date.now()}-${i}.${fileExt}`;
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from('pet-photos')
-            .upload(fileName, file, { contentType: file.type || 'image/jpeg' });
+        console.log(`Uploading photo ${i + 1}...`)
+        const result = await uploadFileWithRetry(file, userId, i)
 
-          if (uploadError) {
-            console.error('Erro no upload da foto', uploadError);
-            continue;
+        if (result.success && result.url) {
+          photoUrls[i] = result.url
+          console.log(`Photo ${i + 1} uploaded successfully`)
+        } else {
+          console.error(`Failed to upload photo ${i + 1}:`, result.error)
+          uploadErrors.push(`Foto ${i + 1}: ${result.error}`)
+
+          // If first photo fails, stop the process
+          if (i === 0) {
+            toast({
+              title: "Erro no upload da foto principal",
+              description: result.error || "Não foi possível fazer upload da primeira foto. Tente novamente.",
+              variant: "destructive",
+            })
+            setIsLoading(false)
+            return
           }
-
-          const {
-            data: { publicUrl },
-          } = supabase.storage.from('pet-photos').getPublicUrl(fileName);
-
-          photoUrls[i] = publicUrl;
-        } catch (err) {
-          console.error('Erro inesperado no upload', err);
         }
       }
 
-      const finalName = unknownName ? 'Não informado' : name || 'Não informado';
-      const finalBreed = unknownBreed ? 'Não informado' : breed || null;
-      const finalAge = unknownAge ? null : age ? Number.parseInt(age) : null;
+      // Show warning if some photos failed (but not the first one)
+      if (uploadErrors.length > 0) {
+        toast({
+          title: "Algumas fotos não foram enviadas",
+          description: uploadErrors.join(", "),
+          variant: "destructive",
+        })
+      }
 
-      const expirationDate = status === 'SIGHTED' ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() : null;
+      const finalName = unknownName ? "Não informado" : name || "Não informado"
+      const finalBreed = unknownBreed ? "Não informado" : breed || null
+      const finalAge = unknownAge ? null : age ? Number.parseInt(age) : null
 
-      const { error: insertError } = await supabase.from('pets').insert({
+      const expirationDate = status === "SIGHTED" ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() : null
+
+      const { error: insertError } = await supabase.from("pets").insert({
         user_id: userId,
         name: finalName,
         type,
@@ -209,28 +221,29 @@ export function PetReportForm({ userId }: PetReportFormProps) {
         has_reward: hasReward,
         reward_amount: hasReward && rewardAmount ? parseCurrencyToNumber(rewardAmount) : null,
         expiration_date: expirationDate,
-      });
+      })
 
-      if (insertError) throw insertError;
+      if (insertError) throw insertError
       toast({
-        title: 'Pet reportado com sucesso!',
-        description: 'Obrigado por ajudar a reunir pets perdidos com seus donos.',
-      });
-      router.push('/meus-pets');
+        title: "Pet reportado com sucesso!",
+        description: "Obrigado por ajudar a reunir pets perdidos com seus donos.",
+      })
+      router.push("/meus-pets")
     } catch (err) {
+      console.error("Error in handleSubmit:", err)
       toast({
-        title: 'Erro ao reportar pet!',
-        description: '' + (err instanceof Error ? err.message : 'Ocorreu um erro ao reportar o pet'),
-        variant: 'destructive',
-      });
+        title: "Erro ao reportar pet!",
+        description: "" + (err instanceof Error ? err.message : "Ocorreu um erro ao reportar o pet"),
+        variant: "destructive",
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleAmountChangeForm = (value: string) => {
-    setRewardAmount(formatRewardAmount(value));
-  };
+    setRewardAmount(formatRewardAmount(value))
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -246,8 +259,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                     key={option.value}
                     className={`flex items-start space-x-3 rounded-lg border p-3 transition-colors cursor-pointer ${
                       status === option.value
-                        ? 'border-orange-alert bg-orange-alert/5'
-                        : 'border-border hover:border-orange-alert/50'
+                        ? "border-orange-alert bg-orange-alert/5"
+                        : "border-border hover:border-orange-alert/50"
                     }`}
                   >
                     <RadioGroupItem value={option.value} id={option.value} className="mt-1" />
@@ -258,7 +271,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                       <p className="mt-1 text-xs text-muted-foreground">{option.description}</p>
                     </label>
                   </div>
-                );
+                )
               })}
             </RadioGroup>
           </div>
@@ -276,17 +289,17 @@ export function PetReportForm({ userId }: PetReportFormProps) {
               placeholder="Ex: Rex, Mimi..."
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required={status !== 'SIGHTED' && status !== 'RESCUED' && !unknownName}
-              disabled={(status === 'SIGHTED' || status === 'RESCUED') && unknownName}
+              required={status !== "SIGHTED" && status !== "RESCUED" && !unknownName}
+              disabled={(status === "SIGHTED" || status === "RESCUED") && unknownName}
             />
-            {(status === 'SIGHTED' || status === 'RESCUED') && (
+            {(status === "SIGHTED" || status === "RESCUED") && (
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="unknown-name"
                   checked={unknownName}
                   onCheckedChange={(checked) => {
-                    setUnknownName(checked as boolean);
-                    if (checked) setName('');
+                    setUnknownName(checked as boolean)
+                    if (checked) setName("")
                   }}
                 />
                 <label htmlFor="unknown-name" className="text-sm text-muted-foreground cursor-pointer">
@@ -300,10 +313,10 @@ export function PetReportForm({ userId }: PetReportFormProps) {
             <SelectDropdown
               label="Tipo de Animal"
               options={[
-                { value: 'DOG', label: 'Cachorro' },
-                { value: 'CAT', label: 'Gato' },
-                { value: 'BIRD', label: 'Pássaro' },
-                { value: 'OTHER', label: 'Outro' },
+                { value: "DOG", label: "Cachorro" },
+                { value: "CAT", label: "Gato" },
+                { value: "BIRD", label: "Pássaro" },
+                { value: "OTHER", label: "Outro" },
               ]}
               value={type}
               onChange={(value) => setType(value as PetType)}
@@ -323,8 +336,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                   id="unknown-breed"
                   checked={unknownBreed}
                   onCheckedChange={(checked) => {
-                    setUnknownBreed(checked as boolean);
-                    if (checked) setBreed('');
+                    setUnknownBreed(checked as boolean)
+                    if (checked) setBreed("")
                   }}
                 />
                 <label htmlFor="unknown-breed" className="text-sm text-muted-foreground cursor-pointer">
@@ -350,11 +363,11 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                 placeholder="Ex: 3"
                 value={age}
                 onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, '');
-                  let numberValue = Number(value);
-                  if (numberValue < 0) numberValue = 0;
-                  if (numberValue > 25) numberValue = 25;
-                  setAge(numberValue.toString());
+                  const value = e.target.value.replace(/\D/g, "")
+                  let numberValue = Number(value)
+                  if (numberValue < 0) numberValue = 0
+                  if (numberValue > 25) numberValue = 25
+                  setAge(numberValue.toString())
                 }}
                 helperText="Aproximada, se não souber exatamente"
                 required={!unknownAge}
@@ -366,8 +379,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                     id="unknown-age"
                     checked={unknownAge}
                     onCheckedChange={(checked) => {
-                      setUnknownAge(checked as boolean);
-                      if (checked) setAge('');
+                      setUnknownAge(checked as boolean)
+                      if (checked) setAge("")
                     }}
                   />
                   <label htmlFor="unknown-age" className="text-sm text-muted-foreground cursor-pointer">
@@ -407,7 +420,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                   {photoPreviews[index] && (
                     <div className="relative h-48 w-full overflow-hidden rounded-xl">
                       <img
-                        src={photoPreviews[index] || '/placeholder.svg'}
+                        src={photoPreviews[index] || "/placeholder.svg"}
                         alt={`Preview ${index + 1}`}
                         className="h-full w-full object-cover"
                       />
@@ -424,7 +437,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                   <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/30 px-4 py-6 transition-colors hover:bg-muted/50">
                     <Upload className="h-4 w-4 text-muted-foreground" />
                     <span className="text-xs text-muted-foreground">
-                      {photoPreviews[index] ? 'Alterar' : index === 0 ? 'Foto principal *' : `Foto ${index + 1}`}
+                      {photoPreviews[index] ? "Alterar" : index === 0 ? "Foto principal *" : `Foto ${index + 1}`}
                     </span>
                     <input
                       type="file"
@@ -448,8 +461,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
             latitude={latitude}
             longitude={longitude}
             onLocationChange={(lat, lng) => {
-              setLatitude(lat);
-              setLongitude(lng);
+              setLatitude(lat)
+              setLongitude(lng)
             }}
             locationDescription={locationDescription}
             onDescriptionChange={setLocationDescription}
@@ -478,7 +491,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
               value={contactPhone}
               onChange={(e) => setContactPhone(formatPhoneBR(e.target.value))}
               onBlur={() => {
-                if (contactPhone.length < 14) setContactPhone('');
+                if (contactPhone.length < 14) setContactPhone("")
               }}
               required
             />
@@ -495,7 +508,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
       </Card>
 
       {/* Reward */}
-      {status === 'LOST' && (
+      {status === "LOST" && (
         <Card>
           <CardContent className="space-y-4 pt-6">
             <h2 className="text-xl font-semibold">Recompensa</h2>
@@ -505,8 +518,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                 id="has-reward"
                 checked={hasReward}
                 onCheckedChange={(checked) => {
-                  setHasReward(checked as boolean);
-                  if (!checked) setRewardAmount('');
+                  setHasReward(checked as boolean)
+                  if (!checked) setRewardAmount("")
                 }}
               />
               <label
@@ -540,8 +553,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
         className="w-full bg-orange-alert text-orange-alert-foreground hover:bg-orange-alert/90"
         disabled={isLoading}
       >
-        {isLoading ? 'Reportando...' : 'Reportar Pet'}
+        {isLoading ? "Reportando..." : "Reportar Pet"}
       </Button>
     </form>
-  );
+  )
 }

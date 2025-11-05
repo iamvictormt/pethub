@@ -113,7 +113,7 @@ export function MapFilters({
             <div className="flex items-center justify-between text-sm">
               <span className="text-sm font-semibold">Raio de busca</span>
             </div>
-            <SliderInput value={distance} onChange={setDistance} min={1} max={50} unit="km" />
+            <SliderInput value={distance} onChange={setDistance} min={1} max={100} unit="km" />
           </div>
         )}
       </div>
