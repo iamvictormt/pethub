@@ -314,7 +314,7 @@ export function ProfileContent({ profile, pets }: ProfileContentProps) {
                         />
                       ) : (
                         <p className="text-pretty text-sm text-muted-foreground">
-                          {bio || "Amante de animais e membro ativo da comunidade PetHub."}
+                          {bio || "Amante de animais e membro ativo da comunidade Farejei."}
                         </p>
                       )}
                     </div>
