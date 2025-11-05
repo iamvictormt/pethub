@@ -24,7 +24,7 @@ export default async function ContributorsPage() {
     .eq('status', 'completed');
 
   const totalRaised = allContributions?.reduce((sum, c) => sum + c.amount_in_cents, 0) || 0;
-  const totalContributors = new Set(contributions?.map((c) => c.contributor_email)).size;
+  const totalContributors = contributions?.length;
   const monthlyTotal = contributions?.reduce((sum, c) => sum + c.amount_in_cents, 0) || 0;
 
   return (
