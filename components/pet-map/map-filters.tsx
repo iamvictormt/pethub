@@ -1,11 +1,12 @@
 "use client"
 import { Button } from "@/components/ui/button"
-import type React from "react"
-import { useState, useMemo } from "react"
 import { SliderInput } from "@/components/ui/slider-input"
 import { SelectDropdown } from "@/components/ui/select-dropdown"
-import { Filter, X, MapPin, ChevronUp, DollarSign } from "lucide-react"
+import { Filter, MapPin, Search } from "lucide-react"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Separator } from "@/components/ui/separator"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 
 interface MapFiltersProps {
   isMobile?: boolean
@@ -20,11 +21,11 @@ interface MapFiltersProps {
   userLocation: { lat: number; lng: number } | null
   onRequestLocation: () => void
   onClearFilters: () => void
-  searchQuery: string
-  setSearchQuery: (value: string) => void
-  onSearch: (query: string) => void
   hasReward: boolean
   setHasReward: (value: boolean) => void
+  onApplyFilters: () => void
+  searchQuery: string
+  setSearchQuery: (value: string) => void
 }
 
 export function MapFilters({
@@ -40,261 +41,213 @@ export function MapFilters({
   userLocation,
   onRequestLocation,
   onClearFilters,
-  searchQuery,
-  setSearchQuery,
-  onSearch,
   hasReward,
   setHasReward,
+  onApplyFilters,
+  searchQuery,
+  setSearchQuery,
 }: MapFiltersProps) {
-  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery || "")
-
   const hasActiveFilters =
-    status.length > 0 || petTypes.length > 0 || userLocation !== null || localSearchQuery.length > 0 || hasReward
+    status.length > 0 || petTypes.length > 0 || userLocation !== null || hasReward || searchQuery.trim().length > 0
+  const activeFilterCount =
+    status.length +
+    petTypes.length +
+    (userLocation ? 1 : 0) +
+    (hasReward ? 1 : 0) +
+    (searchQuery.trim().length > 0 ? 1 : 0)
 
-  const handleSearch = () => {
-    onSearch(localSearchQuery)
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault()
-      handleSearch()
-    }
-  }
-
-  const FilterContent = useMemo(() => {
-    return (
-      <div className="space-y-6 p-6">
+  const FilterContent = (
+    <div className="space-y-6">
+      {/* Header with Clear Button */}
+      {!isMobile && (
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-alert to-pink-500 shadow-lg">
-              <Filter className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold">Filtros</h2>
-              <p className="text-sm text-muted-foreground">Refine sua busca</p>
-            </div>
+          <div>
+            <h2 className="text-lg font-bold">Filtros</h2>
+            {hasActiveFilters && (
+              <p className="text-xs text-muted-foreground mt-1">{activeFilterCount} filtro(s) ativo(s)</p>
+            )}
           </div>
           {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-muted-foreground hover:text-foreground border-1"
-              onClick={() => {
-                setLocalSearchQuery("")
-                onClearFilters()
-              }}
-            >
-              <X className="h-4 w-4" />
-              Limpar
+            <Button variant="ghost" size="sm" onClick={onClearFilters} className="text-xs">
+              Limpar tudo
             </Button>
           )}
         </div>
+      )}
 
-        {/* Search */}
-        <div className="space-y-3 rounded-xl bg-muted/30 p-4">
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold">Buscar Pet</label>
-          </div>
-          <p className="text-xs text-muted-foreground">Pesquise por nome, descrição, cor ou raça</p>
-          <div className="flex flex-col gap-2">
-            <input
-              type="text"
-              value={localSearchQuery}
-              onChange={(e) => setLocalSearchQuery(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Digite sua busca..."
-              autoComplete="off"
-              className="w-full rounded-lg border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            />
-          </div>
-        </div>
+      <Separator />
 
-        {/* Location */}
-        <div className="space-y-3 rounded-xl bg-muted/30 p-4">
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-semibold">Localização</label>
-          </div>
-          <Button
-            onClick={onRequestLocation}
-            variant={userLocation ? "default" : "outline"}
-            size="lg"
-            className={`w-full ${
-              userLocation
-                ? "bg-gradient-to-r from-orange-alert to-pink-500 text-white shadow-lg"
-                : "hover:border-orange-alert/50"
-            }`}
-          >
-            <MapPin className="h-4 w-4" />
-            {userLocation ? "Localização ativa" : "Ativar localização"}
-          </Button>
-          {userLocation && (
-            <>
-              <p className="rounded-lg bg-background/50 p-2 text-center text-sm font-medium">Raio: {distance}km</p>
-              <SliderInput value={distance} onChange={setDistance} min={1} max={50} unit="km" />
-            </>
-          )}
-        </div>
-
-        {/* Status */}
-        <div className="space-y-3 rounded-xl bg-muted/30 p-4">
-          <h3 className="text-sm font-semibold">Status do Pet</h3>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              onClick={() =>
-                setStatus(status.includes("LOST") ? status.filter((s) => s !== "LOST") : [...status, "LOST"])
-              }
-              variant={status.includes("LOST") ? "default" : "outline"}
-              size="lg"
-              className={`flex-col gap-1 p-7 ${
-                status.includes("LOST")
-                  ? "bg-orange-500 text-white shadow-lg shadow-orange-500/30"
-                  : "hover:border-orange-500/50"
-              }`}
-            >
-              <span className="text-2xl">😢</span>
-              <span className="text-xs font-semibold">Perdidos</span>
-            </Button>
-            <Button
-              onClick={() =>
-                setStatus(status.includes("SIGHTED") ? status.filter((s) => s !== "SIGHTED") : [...status, "SIGHTED"])
-              }
-              variant={status.includes("SIGHTED") ? "default" : "outline"}
-              size="lg"
-              className={`flex-col gap-1 p-7 ${
-                status.includes("SIGHTED")
-                  ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30"
-                  : "hover:border-blue-500/50"
-              }`}
-            >
-              <span className="text-2xl">👀</span>
-              <span className="text-xs font-semibold">Avistados</span>
-            </Button>
-            <Button
-              onClick={() =>
-                setStatus(status.includes("RESCUED") ? status.filter((s) => s !== "RESCUED") : [...status, "RESCUED"])
-              }
-              variant={status.includes("RESCUED") ? "default" : "outline"}
-              size="lg"
-              className={`flex-col gap-1 p-7 ${
-                status.includes("RESCUED")
-                  ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/30"
-                  : "hover:border-cyan-500/50"
-              }`}
-            >
-              <span className="text-2xl">🏥</span>
-              <span className="text-xs font-semibold">Resgatados</span>
-            </Button>
-            <Button
-              onClick={() =>
-                setStatus(
-                  status.includes("ADOPTION") ? status.filter((s) => s !== "ADOPTION") : [...status, "ADOPTION"],
-                )
-              }
-              variant={status.includes("ADOPTION") ? "default" : "outline"}
-              size="lg"
-              className={`flex-col gap-1 p-7 ${
-                status.includes("ADOPTION")
-                  ? "bg-green-500 text-white shadow-lg shadow-green-500/30"
-                  : "hover:border-green-500/50"
-              }`}
-            >
-              <span className="text-2xl">💚</span>
-              <span className="text-xs font-semibold">Adoção</span>
-            </Button>
-          </div>
-        </div>
-
-        {/* Pet Types */}
-        <div className="space-y-3 rounded-xl bg-muted/30 p-4">
-          <h3 className="text-sm font-semibold">Tipo de Animal</h3>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { id: "DOG", label: "Cachorro", emoji: "🐕" },
-              { id: "CAT", label: "Gato", emoji: "🐈" },
-              { id: "BIRD", label: "Pássaro", emoji: "🦜" },
-              { id: "OTHER", label: "Outro", emoji: "🐾" },
-            ].map((type) => (
-              <Button
-                key={type.id}
-                onClick={() =>
-                  setPetTypes(
-                    petTypes.includes(type.id) ? petTypes.filter((t) => t !== type.id) : [...petTypes, type.id],
-                  )
-                }
-                variant={petTypes.includes(type.id) ? "default" : "outline"}
-                size="lg"
-                className={`gap-2 ${
-                  petTypes.includes(type.id)
-                    ? "bg-gradient-to-r from-pink-500 to-orange-alert text-white shadow-lg"
-                    : "hover:border-pink-500/50"
-                }`}
-              >
-                <span className="text-lg">{type.emoji}</span>
-                <span className="text-sm font-semibold">{type.label}</span>
-              </Button>
-            ))}
-          </div>
-        </div>
-
-        {/* Sort */}
-        <div className="space-y-3 rounded-xl bg-muted/30 p-4">
-          <h3 className="text-sm font-semibold">Ordenar por</h3>
-          <SelectDropdown
-            options={[
-              { value: "recent", label: "⏰ Mais recentes" },
-              { value: "distance", label: "📍 Mais próximos" },
-              { value: "oldest", label: "📅 Mais antigos" },
-            ]}
-            value={sortBy}
-            onChange={setSortBy}
+      {/* Search Input Section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold">Buscar Pet</h3>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Nome, raça, cor, descrição..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10 py-6"
           />
         </div>
+        <p className="text-xs text-muted-foreground">Pesquise por nome, raça, cor ou descrição do pet</p>
+      </div>
 
-        {/* Reward */}
-        <div className="space-y-3 rounded-xl bg-muted/30 p-4">
-          <h3 className="text-sm font-semibold">Recompensa</h3>
-          <Button
-            onClick={() => setHasReward(!hasReward)}
-            variant={hasReward ? "default" : "outline"}
-            size="lg"
-            className={`w-full flex-col gap-1 transition-all py-8 ${
-              hasReward
-                  ? "bg-green-500 text-white shadow-lg shadow-green-500/30"
-                  : "hover:border-green-500/50"
-            }`}
-          >
-            <span className="text-2xl">💵</span>
-            <span className="font-semibold">Apenas com Recompensa</span>
-          </Button>
+      <Separator />
+
+      {/* Location Section */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-sm">
+          <h3 className="text-sm font-semibold">Localização</h3>
+        </div>
+        <Button
+          onClick={onRequestLocation}
+          variant={userLocation ? "default" : "outline"}
+          className={`w-full justify-center py-6 ${userLocation ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
+        >
+          <MapPin className="h-4 w-4 mr-2" />
+          {userLocation ? "Localização ativa" : "Usar minha localização"}
+        </Button>
+        {userLocation && (
+          <div className="space-y-2 pt-2">
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-sm font-semibold">Raio de busca</span>
+            </div>
+            <SliderInput value={distance} onChange={setDistance} min={1} max={50} unit="km" />
+          </div>
+        )}
+      </div>
+
+      <Separator />
+
+      {/* Status Section */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-semibold">Status do Pet</h3>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { id: "LOST", label: "Perdido", emoji: "😢", color: "bg-orange-500 hover:bg-orange-600" },
+            { id: "SIGHTED", label: "Avistado", emoji: "👀", color: "bg-blue-500 hover:bg-blue-600" },
+            { id: "RESCUED", label: "Resgatado", emoji: "🏥", color: "bg-cyan-500 hover:bg-cyan-600" },
+            { id: "ADOPTION", label: "Adoção", emoji: "💚", color: "bg-green-500 hover:bg-green-600" },
+          ].map((item) => {
+            const isActive = status.includes(item.id)
+            return (
+              <Button
+                key={item.id}
+                onClick={() => setStatus(isActive ? status.filter((s) => s !== item.id) : [...status, item.id])}
+                variant={isActive ? "default" : "outline"}
+                className={`flex-col gap-1.5 h-auto py-3 ${isActive ? `${item.color} text-white border-0` : "hover:bg-accent"}`}
+              >
+                <span className="text-xl">{item.emoji}</span>
+                <span className="text-sm font-medium">{item.label}</span>
+              </Button>
+            )
+          })}
         </div>
       </div>
-    )
-  }, [localSearchQuery, hasActiveFilters, status, petTypes, distance, userLocation, sortBy, hasReward])
+
+      <Separator />
+
+      {/* Pet Type Section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold">Tipo de Animal</h3>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { id: "DOG", label: "Cachorro", emoji: "🐕" },
+            { id: "CAT", label: "Gato", emoji: "🐈" },
+            { id: "BIRD", label: "Pássaro", emoji: "🦜" },
+            { id: "OTHER", label: "Outro", emoji: "🐾" },
+          ].map((type) => {
+            const isActive = petTypes.includes(type.id)
+            return (
+              <Button
+                key={type.id}
+                onClick={() => setPetTypes(isActive ? petTypes.filter((t) => t !== type.id) : [...petTypes, type.id])}
+                variant={isActive ? "default" : "outline"}
+                className={`gap-1.5 py-6 ${isActive ? "bg-primary text-primary-foreground" : "hover:bg-accent"}`}
+              >
+                <span>{type.emoji}</span>
+                <span className="text-sm">{type.label}</span>
+              </Button>
+            )
+          })}
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Reward Section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold">Recompensa</h3>
+        <Button
+          onClick={() => setHasReward(!hasReward)}
+          variant={hasReward ? "default" : "outline"}
+          className={`w-full justify-center py-6 ${
+            hasReward ? "bg-green-600 hover:bg-green-700 text-white" : "hover:bg-accent"
+          }`}
+        >
+          <span className="text-lg mr-2">💵</span>
+          <span className="text-sm">Apenas com recompensa</span>
+        </Button>
+      </div>
+
+      <Separator />
+
+      {/* Sort Section */}
+      <div className="space-y-3">
+        <h3 className="text-sm font-semibold">Ordenar por</h3>
+        <SelectDropdown
+          options={[
+            { value: "recent", label: "Mais recentes" },
+            { value: "distance", label: "Mais próximos" },
+            { value: "oldest", label: "Mais antigos" },
+          ]}
+          value={sortBy}
+          onChange={setSortBy}
+        />
+      </div>
+
+      {/* Apply Button */}
+      <Button
+        onClick={onApplyFilters}
+        className="w-full py-6 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold shadow-lg"
+      >
+        <Search className="h-4 w-4 mr-2" />
+        Aplicar Filtros
+      </Button>
+    </div>
+  )
 
   if (isMobile) {
     return (
-      <Sheet
-        onOpenChange={(open) => {
-          if (!open) {
-            handleSearch()
-          }
-        }}
-      >
+      <Sheet>
         <SheetTrigger asChild>
-          <Button variant="ghost" size="sm" className="gap-2">
-            Mostrar <ChevronUp className="h-4 w-4" />
+          <Button variant="outline" size="default" className="w-full gap-2 relative bg-transparent">
+            <Filter className="h-4 w-4" />
+            Filtros
+            {hasActiveFilters && (
+              <Badge className="ml-auto bg-orange-500 text-white hover:bg-orange-600">{activeFilterCount}</Badge>
+            )}
           </Button>
         </SheetTrigger>
-        <SheetContent side="bottom" className="h-[85vh]" onOpenAutoFocus={(e) => e.preventDefault()}>
-          <SheetHeader>
-            <SheetTitle>Filtros Inteligentes</SheetTitle>
+        <SheetContent side="bottom" className="h-[90vh] overflow-hidden">
+          <SheetHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <SheetTitle>Filtros</SheetTitle>
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" onClick={onClearFilters} className="text-xs">
+                  Limpar tudo
+                </Button>
+              )}
+            </div>
           </SheetHeader>
-          <div className="overflow-y-auto h-[calc(85vh-80px)]">{FilterContent}</div>
+          <div className="overflow-y-auto h-[calc(90vh-80px)] pb-6">{FilterContent}</div>
         </SheetContent>
       </Sheet>
     )
   }
 
-  return <div className="h-full overflow-y-auto">{FilterContent}</div>
+  return <div className="space-y-4">{FilterContent}</div>
 }

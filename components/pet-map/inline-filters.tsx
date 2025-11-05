@@ -1,3 +1,4 @@
+// Keeping it for backwards compatibility but it's not used anymore
 "use client"
 
 import type React from "react"
@@ -5,7 +6,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { SliderInput } from "@/components/ui/slider-input"
 import { SelectDropdown } from "@/components/ui/select-dropdown"
-import { MapPin, X, Search, DollarSign } from "lucide-react"
+import { MapPin, X } from "lucide-react"
 
 interface InlineFiltersProps {
   status: string[]
@@ -19,6 +20,8 @@ interface InlineFiltersProps {
   userLocation: { lat: number; lng: number } | null
   onRequestLocation: () => void
   onClearFilters: () => void
+  searchQuery: string
+  setSearchQuery: (value: string) => void
   onSearch: (query: string) => void
   hasReward: boolean
   setHasReward: (value: boolean) => void
@@ -36,11 +39,13 @@ export function InlineFilters({
   userLocation,
   onRequestLocation,
   onClearFilters,
+  searchQuery,
+  setSearchQuery,
   onSearch,
   hasReward,
   setHasReward,
 }: InlineFiltersProps) {
-  const [localSearchQuery, setLocalSearchQuery] = useState("")
+  const [localSearchQuery, setLocalSearchQuery] = useState(searchQuery || "")
 
   const hasActiveFilters =
     status.length > 0 || petTypes.length > 0 || userLocation !== null || localSearchQuery.length > 0 || hasReward
@@ -61,12 +66,10 @@ export function InlineFilters({
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-border/40 bg-gradient-to-br from-background via-background to-muted/20 p-8 shadow-lg backdrop-blur-sm">
-      {/* Decorative gradient orb */}
       <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-orange-alert/10 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-blue-500/10 blur-3xl" />
 
       <div className="relative space-y-8">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div>
@@ -107,9 +110,7 @@ export function InlineFilters({
           </div>
         </div>
 
-        {/* Main Filters Grid */}
         <div className="grid gap-6 lg:grid-cols-2">
-          {/* Location Section */}
           <div className="space-y-4 rounded-xl bg-card/50 p-6 shadow-sm backdrop-blur-sm transition-all hover:shadow-md">
             <div className="flex items-center gap-2">
               <label className="font-semibold text-foreground">Localização</label>
@@ -140,7 +141,6 @@ export function InlineFilters({
             )}
           </div>
 
-          {/* Status & Sort Section */}
           <div className="space-y-4 rounded-xl bg-card/50 p-6 shadow-sm backdrop-blur-sm transition-all hover:shadow-md">
             <label className="font-semibold text-foreground">Status do Pet</label>
             <div className="grid grid-cols-2 gap-2">
@@ -223,7 +223,6 @@ export function InlineFilters({
           </div>
         </div>
 
-        {/* Pet Type Pills */}
         <div className="space-y-4 rounded-xl bg-card/50 p-6 shadow-sm backdrop-blur-sm transition-all hover:shadow-md">
           <label className="font-semibold text-foreground">Tipo de Animal</label>
           <div className="flex flex-wrap gap-3">
@@ -255,7 +254,6 @@ export function InlineFilters({
           </div>
         </div>
 
-        {/* Reward Filter */}
         <div className="space-y-4 rounded-xl bg-card/50 p-6 shadow-sm backdrop-blur-sm transition-all hover:shadow-md">
           <label className="font-semibold text-foreground">Recompensa</label>
           <Button
@@ -264,8 +262,8 @@ export function InlineFilters({
             size="lg"
             className={`w-full flex-col gap-1 transition-all py-8 ${
               hasReward
-                ? 'bg-green-500 text-white shadow-lg shadow-green-500/30 hover:bg-green-600'
-                : 'hover:border-green-500/50 hover:bg-green-500/10'
+                ? "bg-green-500 text-white shadow-lg shadow-green-500/30 hover:bg-green-600"
+                : "hover:border-green-500/50 hover:bg-green-500/10"
             }`}
           >
             <span className="text-2xl">💵</span>

@@ -1,29 +1,31 @@
-"use client"
+'use client';
 
-import { Card, CardContent } from "@/components/ui/card"
-import { MapPin, Calendar, Phone, Mail, User, Eye, Clock, ExternalLink, DollarSign } from "lucide-react"
-import type { Pet } from "@/lib/types/database"
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { useState } from "react"
-import { statusConfig } from "@/utils/configPet"
+import { Card, CardContent } from '@/components/ui/card';
+import { MapPin, Calendar, Phone, Mail, User, Eye, Clock, ExternalLink, DollarSign, Bone } from 'lucide-react';
+import type { Pet } from '@/lib/types/database';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
+import { statusConfig } from '@/utils/configPet';
 
 interface PetDetailsProps {
   pet: Pet & {
     profiles: {
-      id: string
-      name: string
-      avatar_url?: string
-    }
-  }
+      id: string;
+      name: string;
+      avatar_url?: string;
+    };
+  };
 }
 
 export function PetDetails({ pet }: PetDetailsProps) {
-  const config = statusConfig[pet.status as keyof typeof statusConfig] || statusConfig.LOST
+  const config = statusConfig[pet.status as keyof typeof statusConfig] || statusConfig.LOST;
 
-  const photos = [pet.photo_url, pet.photo_url_2, pet.photo_url_3, pet.photo_url_4].filter(Boolean) as string[]
+  const photos = [pet.photo_url, pet.photo_url_2, pet.photo_url_3, pet.photo_url_4].filter(Boolean) as string[];
 
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0)
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
+
+  console.log(pet);
 
   return (
     <div className="space-y-6">
@@ -33,7 +35,7 @@ export function PetDetails({ pet }: PetDetailsProps) {
             <div className="relative w-full min-h-[50vh] md:min-h-[80vh] overflow-hidden bg-muted group">
               <div className="relative w-full h-[50vh] md:h-[80vh]">
                 <Image
-                  src={photos[selectedPhotoIndex] || "/placeholder.svg"}
+                  src={photos[selectedPhotoIndex] || '/placeholder.svg'}
                   alt={pet.name}
                   fill
                   className="object-cover"
@@ -62,20 +64,14 @@ export function PetDetails({ pet }: PetDetailsProps) {
             <h1 className="mb-2 text-4xl font-bold drop-shadow-lg lg:text-5xl">{pet.name}</h1>
             <div className="flex flex-wrap items-center gap-3 text-lg mb-4">
               <span className="font-medium">
-                {pet.type === "DOG"
-                  ? "🐕 Cachorro"
-                  : pet.type === "CAT"
-                    ? "🐈 Gato"
-                    : pet.type === "BIRD"
-                      ? "🐦 Pássaro"
-                      : "🐾 Outro"}
+                {pet.type === 'DOG'
+                  ? '🐕 Cachorro'
+                  : pet.type === 'CAT'
+                  ? '🐈 Gato'
+                  : pet.type === 'BIRD'
+                  ? '🐦 Pássaro'
+                  : '🐾 Outro'}
               </span>
-              {pet.breed && (
-                <>
-                  <span className="opacity-70">•</span>
-                  <span className="opacity-90">{pet.breed}</span>
-                </>
-              )}
             </div>
 
             {photos.length > 1 && (
@@ -86,12 +82,12 @@ export function PetDetails({ pet }: PetDetailsProps) {
                     onClick={() => setSelectedPhotoIndex(index)}
                     className={`relative h-16 w-16 overflow-hidden rounded-lg border-2 shadow-lg transition-all hover:scale-110 ${
                       selectedPhotoIndex === index
-                        ? "border-white ring-2 ring-white ring-offset-2 ring-offset-black/20 scale-110"
-                        : "border-white/50"
+                        ? 'border-white ring-2 ring-white ring-offset-2 ring-offset-black/20 scale-110'
+                        : 'border-white/50'
                     }`}
                   >
                     <Image
-                      src={photo || "/placeholder.svg"}
+                      src={photo || '/placeholder.svg'}
                       alt={`${pet.name} - Foto ${index + 1}`}
                       fill
                       className="object-cover"
@@ -119,7 +115,7 @@ export function PetDetails({ pet }: PetDetailsProps) {
                         Recompensa Oferecida
                       </p>
                       <p className="text-3xl font-bold text-green-700">
-                        R$ {pet.reward_amount.toLocaleString("pt-BR")}
+                        R$ {pet.reward_amount.toLocaleString('pt-BR')}
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">
                         Valor oferecido por informações que levem ao encontro
@@ -179,7 +175,7 @@ export function PetDetails({ pet }: PetDetailsProps) {
                     <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-orange-100 to-blue-100">
                       {pet.profiles.avatar_url ? (
                         <Image
-                          src={pet.profiles.avatar_url || "/placeholder.svg"}
+                          src={pet.profiles.avatar_url || '/placeholder.svg'}
                           alt={pet.profiles.name}
                           width={56}
                           height={56}
@@ -213,15 +209,15 @@ export function PetDetails({ pet }: PetDetailsProps) {
               </Card>
             )}
 
-            {pet.age && (
+            {pet.breed && (
               <Card className="border-0 shadow-md">
                 <CardContent className="flex items-center gap-4 p-4">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-100 to-cyan-100">
-                    <Calendar className="h-6 w-6 text-blue-600" />
+                    <Bone className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-muted-foreground">Idade aproximada</p>
-                    <p className="text-lg font-bold">{pet.age} anos</p>
+                    <p className="text-xs font-medium text-muted-foreground">Raça</p>
+                    <p className="text-lg font-bold">{pet.breed}</p>
                   </div>
                 </CardContent>
               </Card>
@@ -247,10 +243,10 @@ export function PetDetails({ pet }: PetDetailsProps) {
                 <div>
                   <p className="text-xs font-medium text-muted-foreground">Publicado</p>
                   <p className="text-sm font-bold">
-                    {new Date(pet.created_at).toLocaleDateString("pt-BR", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
+                    {new Date(pet.created_at).toLocaleDateString('pt-BR', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
                     })}
                   </p>
                 </div>
@@ -271,14 +267,13 @@ export function PetDetails({ pet }: PetDetailsProps) {
             <CardContent className="space-y-4 p-6">
               <h2 className="text-xl font-bold">Localização aproximada</h2>
               <div className="space-y-4">
-                <div className="flex items-start gap-3 rounded-xl bg-orange-50 p-4">
-                  <MapPin className="mt-1 h-5 w-5 flex-shrink-0 text-orange-600" />
-                  <div className="flex-1">
-                    <p className="text-base font-semibold text-foreground">
-                      {pet.location_description || "Localização registrada no mapa"}
-                    </p>
+                {pet.location_description && (
+                  <div className="flex items-start gap-3 rounded-xl bg-orange-50 p-4">
+                    <div className="flex-1">
+                      <p className="text-base font-semibold text-foreground">{pet.location_description}</p>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 <div className="overflow-hidden rounded-xl border-2 border-orange-100">
                   <iframe
@@ -317,11 +312,11 @@ export function PetDetails({ pet }: PetDetailsProps) {
                 <div className="flex items-center gap-3 rounded-xl bg-blue-50 p-4">
                   <Calendar className="h-5 w-5 text-blue-600" />
                   <p className="font-medium">
-                    {new Date(pet.last_seen_date).toLocaleDateString("pt-BR", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
+                    {new Date(pet.last_seen_date).toLocaleDateString('pt-BR', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
                     })}
                   </p>
                 </div>
@@ -331,5 +326,5 @@ export function PetDetails({ pet }: PetDetailsProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
