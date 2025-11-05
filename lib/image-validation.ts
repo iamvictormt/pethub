@@ -1,9 +1,10 @@
 export const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
 
-export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+export const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 export interface ImageValidationResult {
   valid: boolean;
+  title?: string;
   error?: string;
 }
 
@@ -15,7 +16,8 @@ export function validateImageFile(file: File): ImageValidationResult {
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     return {
       valid: false,
-      error: 'Formato inválido. Use apenas JPG, PNG, GIF ou WEBP',
+      title: 'Formato inválido',
+      error: 'Use apenas JPG, PNG ou WEBP',
     };
   }
 
@@ -23,7 +25,8 @@ export function validateImageFile(file: File): ImageValidationResult {
     const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
     return {
       valid: false,
-      error: `Arquivo muito grande (${sizeMB}MB). Tamanho máximo: 2MB`,
+      title: `Arquivo muito grande (${sizeMB}MB).`,
+      error: `Tamanho máximo: 2MB`,
     };
   }
 

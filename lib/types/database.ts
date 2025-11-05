@@ -26,6 +26,9 @@ export interface Pet {
   age?: number
   description?: string
   photo_url?: string
+  photo_url_2?: string
+  photo_url_3?: string
+  photo_url_4?: string
   status: PetStatus
   latitude: number
   longitude: number

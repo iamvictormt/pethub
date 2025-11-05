@@ -1,8 +1,11 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, Calendar, Phone, Mail, User, Eye, Clock, ExternalLink, DollarSign } from "lucide-react"
 import type { Pet } from "@/lib/types/database"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { useState } from "react"
 import { statusConfig } from "@/utils/configPet"
 
 interface PetDetailsProps {
@@ -18,15 +21,26 @@ interface PetDetailsProps {
 export function PetDetails({ pet }: PetDetailsProps) {
   const config = statusConfig[pet.status as keyof typeof statusConfig] || statusConfig.LOST
 
+  const photos = [pet.photo_url, pet.photo_url_2, pet.photo_url_3, pet.photo_url_4].filter(Boolean) as string[]
+
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0)
+
   return (
     <div className="space-y-6">
       <Card className="overflow-hidden border-0 shadow-xl py-0">
         <div className="relative">
-          {/* Hero Image */}
-          {pet.photo_url ? (
-            <div className="relative w-full min-h-[50vh] md:min-h-[80vh] overflow-hidden bg-muted">
-              <Image src={pet.photo_url || "/placeholder.svg"} alt={pet.name} fill className="object-cover" priority />
-              {/* Gradient Overlay */}
+          {photos.length > 0 ? (
+            <div className="relative w-full min-h-[50vh] md:min-h-[80vh] overflow-hidden bg-muted group">
+              <div className="relative w-full h-[50vh] md:h-[80vh]">
+                <Image
+                  src={photos[selectedPhotoIndex] || "/placeholder.svg"}
+                  alt={pet.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </div>
+
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
             </div>
           ) : (
@@ -35,7 +49,6 @@ export function PetDetails({ pet }: PetDetailsProps) {
             </div>
           )}
 
-          {/* Floating Status Badge */}
           <div className="absolute right-6 top-6">
             <div
               className={`flex items-center gap-2 rounded-full bg-gradient-to-r px-5 py-2.5 text-sm font-bold text-white shadow-2xl backdrop-blur-sm ${config.color}`}
@@ -45,10 +58,9 @@ export function PetDetails({ pet }: PetDetailsProps) {
             </div>
           </div>
 
-          {/* Pet Name Overlay */}
           <div className="absolute inset-x-0 bottom-0 p-6 text-white lg:p-8">
             <h1 className="mb-2 text-4xl font-bold drop-shadow-lg lg:text-5xl">{pet.name}</h1>
-            <div className="flex flex-wrap items-center gap-3 text-lg">
+            <div className="flex flex-wrap items-center gap-3 text-lg mb-4">
               <span className="font-medium">
                 {pet.type === "DOG"
                   ? "🐕 Cachorro"
@@ -65,18 +77,43 @@ export function PetDetails({ pet }: PetDetailsProps) {
                 </>
               )}
             </div>
+
+            {photos.length > 1 && (
+              <div className="flex gap-3 flex-wrap">
+                {photos.map((photo, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedPhotoIndex(index)}
+                    className={`relative h-16 w-16 overflow-hidden rounded-lg border-2 shadow-lg transition-all hover:scale-110 ${
+                      selectedPhotoIndex === index
+                        ? "border-white ring-2 ring-white ring-offset-2 ring-offset-black/20 scale-110"
+                        : "border-white/50"
+                    }`}
+                  >
+                    <Image
+                      src={photo || "/placeholder.svg"}
+                      alt={`${pet.name} - Foto ${index + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </Card>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-6 lg:col-span-2">
-          {/* Quick Info Cards */}
           <div className="space-y-6">
             {pet.has_reward && pet.reward_amount && (
               <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 to-emerald-50">
                 <CardContent className="p-8">
                   <div className="flex items-center gap-4">
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-500 shadow-lg">
+                      <DollarSign className="h-8 w-8 text-white" />
+                    </div>
                     <div className="flex-1">
                       <p className="text-sm font-medium uppercase tracking-wide text-muted-foreground">
                         Recompensa Oferecida
@@ -93,7 +130,6 @@ export function PetDetails({ pet }: PetDetailsProps) {
               </Card>
             )}
 
-            {/* Contact Card */}
             <Card className="sticky top-6 border-0 shadow-xl">
               <CardContent className="space-y-8 p-8">
                 <div className="space-y-3">
@@ -222,7 +258,6 @@ export function PetDetails({ pet }: PetDetailsProps) {
             </Card>
           </div>
 
-          {/* Description */}
           {pet.description && (
             <Card className="border-0 shadow-md">
               <CardContent className="space-y-3 p-6">
@@ -232,7 +267,6 @@ export function PetDetails({ pet }: PetDetailsProps) {
             </Card>
           )}
 
-          {/* Location */}
           <Card className="border-0 shadow-md">
             <CardContent className="space-y-4 p-6">
               <h2 className="text-xl font-bold">Localização aproximada</h2>
@@ -246,7 +280,6 @@ export function PetDetails({ pet }: PetDetailsProps) {
                   </div>
                 </div>
 
-                {/* Embedded map to show location visually */}
                 <div className="overflow-hidden rounded-xl border-2 border-orange-100">
                   <iframe
                     width="100%"
@@ -259,7 +292,6 @@ export function PetDetails({ pet }: PetDetailsProps) {
                   />
                 </div>
 
-                {/* Button to open in Google Maps for navigation */}
                 <Button
                   asChild
                   className="w-full bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600"
@@ -278,7 +310,6 @@ export function PetDetails({ pet }: PetDetailsProps) {
             </CardContent>
           </Card>
 
-          {/* Last Seen */}
           {pet.last_seen_date && (
             <Card className="border-0 shadow-md">
               <CardContent className="space-y-4 p-6">
