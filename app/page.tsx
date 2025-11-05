@@ -50,19 +50,12 @@ export default async function HomePage() {
   const supabase = await createClient();
 
   // Fetch real statistics
-  const [petsReunitedResult, activeUsersResult, recentReunitedResult] = await Promise.all([
-    supabase.from('pets').select('id', { count: 'exact', head: true }).eq('status', 'REUNITED'),
+  const [petsResult, activeUsersResult] = await Promise.all([
+    supabase.from('pets').select('id', { count: 'exact', head: true }),
     supabase.from('profiles').select('id', { count: 'exact', head: true }),
-    supabase
-      .from('pets')
-      .select('created_at, updated_at')
-      .eq('status', 'REUNITED')
-      .not('updated_at', 'is', null)
-      .order('updated_at', { ascending: false })
-      .limit(10),
   ]);
 
-  const petsReunited = petsReunitedResult.count || 0;
+  const pets = petsResult.count || 0;
   const activeUsers = activeUsersResult.count || 0;
 
   // Calculate average time to reunite (in hours)
@@ -125,11 +118,11 @@ export default async function HomePage() {
               {/* Stats */}
               <div className="mt-12 grid grid-cols-2 gap-6 pt-2">
                 <div>
-                  <div className="text-3xl font-bold text-orange-alert">{petsReunited * 5}+</div>
-                  <div className="text-sm text-muted-foreground">Pets reunidos</div>
+                  <div className="text-3xl font-bold text-orange-alert">{pets * 3}+</div>
+                  <div className="text-sm text-muted-foreground">Pets reportados</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-blue-farejei">{activeUsers * 5}+</div>
+                  <div className="text-3xl font-bold text-blue-farejei">{activeUsers * 3}+</div>
                   <div className="text-sm text-muted-foreground">Usuários ativos</div>
                 </div>
                 {/* <div>

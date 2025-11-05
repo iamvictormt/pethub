@@ -156,29 +156,33 @@ export function PetReportForm({ userId }: PetReportFormProps) {
 
       for (let i = 0; i < photoFiles.length; i++) {
         const file = photoFiles[i];
-        if (file) {
+        if (!file) continue;
+
+        try {
           const fileExt = file.name.split('.').pop();
           const fileName = `${userId}-${Date.now()}-${i}.${fileExt}`;
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('pet-photos')
             .upload(fileName, file);
 
-          if (uploadError) throw uploadError;
+          if (uploadError) {
+            console.error('Erro no upload', uploadError);
+            continue; // não trava
+          }
 
           const {
             data: { publicUrl },
           } = supabase.storage.from('pet-photos').getPublicUrl(fileName);
 
           photoUrls[i] = publicUrl;
+        } catch (err) {
+          console.error('Erro inesperado no upload', err);
         }
       }
 
-      const finalName =
-        (status === 'SIGHTED' || status === 'RESCUED') && unknownName ? 'Não informado' : name || 'Não informado';
-      const finalBreed =
-        (status === 'SIGHTED' || status === 'RESCUED') && unknownBreed ? 'Não informado' : breed || null;
-      const finalAge =
-        (status === 'SIGHTED' || status === 'RESCUED') && unknownAge ? null : age ? Number.parseInt(age) : null;
+      const finalName = unknownName ? 'Não informado' : name || 'Não informado';
+      const finalBreed = unknownBreed ? 'Não informado' : breed || null;
+      const finalAge = unknownAge ? null : age ? Number.parseInt(age) : null;
 
       const expirationDate = status === 'SIGHTED' ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() : null;
 
@@ -311,23 +315,22 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                 placeholder="Ex: Labrador, Siamês..."
                 value={breed}
                 onChange={(e) => setBreed(e.target.value)}
-                disabled={(status === 'SIGHTED' || status === 'RESCUED') && unknownBreed}
+                required={!unknownBreed}
+                disabled={unknownBreed}
               />
-              {(status === 'SIGHTED' || status === 'RESCUED') && (
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="unknown-breed"
-                    checked={unknownBreed}
-                    onCheckedChange={(checked) => {
-                      setUnknownBreed(checked as boolean);
-                      if (checked) setBreed('');
-                    }}
-                  />
-                  <label htmlFor="unknown-breed" className="text-sm text-muted-foreground cursor-pointer">
-                    Não sei a raça
-                  </label>
-                </div>
-              )}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="unknown-breed"
+                  checked={unknownBreed}
+                  onCheckedChange={(checked) => {
+                    setUnknownBreed(checked as boolean);
+                    if (checked) setBreed('');
+                  }}
+                />
+                <label htmlFor="unknown-breed" className="text-sm text-muted-foreground cursor-pointer">
+                  Não sei a raça
+                </label>
+              </div>
             </div>
 
             <TextInput
@@ -354,10 +357,10 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                   setAge(numberValue.toString());
                 }}
                 helperText="Aproximada, se não souber exatamente"
-                required={status !== 'SIGHTED' && status !== 'RESCUED' && !unknownAge}
-                disabled={(status === 'SIGHTED' || status === 'RESCUED') && unknownAge}
+                required={!unknownAge}
+                disabled={unknownAge}
               />
-              {(status === 'SIGHTED' || status === 'RESCUED') && (
+              {
                 <div className="flex items-center space-x-2">
                   <Checkbox
                     id="unknown-age"
@@ -371,7 +374,7 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                     Não sei a idade
                   </label>
                 </div>
-              )}
+              }
             </div>
 
             <div className="space-y-2">

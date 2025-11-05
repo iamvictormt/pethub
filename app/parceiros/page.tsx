@@ -1,16 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  Heart,
-  Instagram,
-  Shield,
-  Users,
-  Zap,
-  TrendingUp,
-  ArrowRight,
-  HeartHandshake,
-  Handshake,
-} from 'lucide-react';
+import { Heart, Instagram, Shield, Users, Zap, TrendingUp, ArrowRight, HeartHandshake, Handshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const ngos = [
@@ -185,11 +175,13 @@ export default function ParceirosPage() {
       <section className="border-t bg-gradient-to-br from-orange-alert via-orange-alert/90 to-orange-alert/80 px-4 py-16 text-white md:py-24">
         <div className="container mx-auto max-w-4xl text-center">
           <Handshake className="mx-auto mb-6 h-16 w-16" />
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">Seja uma ONG parceira do Farejei</h2>
+          <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
+            Faça parte da rede de parceiros do Farejei
+          </h2>
           <p className="mb-8 text-lg text-orange-50 md:text-xl">
-            Nosso propósito é unir forças com ONGs e protetores que acreditam no poder da comunidade. Ao se tornar
-            parceira, sua ONG ajuda a divulgar o Farejei e ganha destaque aqui no site como parte da nossa rede de apoio
-            à causa animal.
+            O Farejei nasceu da união de pessoas, páginas e ONGs que acreditam no poder da colaboração. Ao se tornar
+            parceiro, você ajuda a divulgar pets perdidos, amplia o alcance das buscas e ainda ganha destaque aqui no
+            site como parte da nossa rede de apoio à causa animal.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Button asChild size="lg" variant="secondary" className="bg-white text-orange-alert hover:bg-white/90">

@@ -24,8 +24,8 @@ export function LocationPicker({
 }: LocationPickerProps) {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [mapCenter, setMapCenter] = useState({
-    lat: latitude ? Number.parseFloat(latitude) : -23.5505,
-    lng: longitude ? Number.parseFloat(longitude) : -46.6333,
+    lat: latitude ? Number.parseFloat(latitude) : -16.6868,
+    lng: longitude ? Number.parseFloat(longitude) : -49.2708,
   });
   const [zoom, setZoom] = useState(13);
   const [isDragging, setIsDragging] = useState(false);
