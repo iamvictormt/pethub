@@ -192,8 +192,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
         })
       }
 
-      const finalName = unknownName ? "Não informado" : name || "Não informado"
-      const finalBreed = unknownBreed ? "Não informado" : breed || null
+      const finalName = unknownName ? "Nome não informado" : name || "Não informado"
+      const finalBreed = unknownBreed ? "Raça não informada" : breed || null
       const finalAge = unknownAge ? null : age ? Number.parseInt(age) : null
 
       const expirationDate = status === "SIGHTED" ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() : null
@@ -252,27 +252,25 @@ export function PetReportForm({ userId }: PetReportFormProps) {
         <CardContent className="pt-6">
           <div>
             <Label className="mb-3 block text-sm font-medium">Status do Pet</Label>
-            <RadioGroup value={status} onValueChange={setStatus} className="space-y-3">
-              {PET_STATUS_OPTIONS.map((option) => {
-                return (
-                  <div
-                    key={option.value}
-                    className={`flex items-start space-x-3 rounded-lg border p-3 transition-colors cursor-pointer ${
-                      status === option.value
-                        ? "border-orange-alert bg-orange-alert/5"
-                        : "border-border hover:border-orange-alert/50"
-                    }`}
-                  >
-                    <RadioGroupItem value={option.value} id={option.value} className="mt-1" />
-                    <label htmlFor={option.value} className="flex-1 cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{option.label}</span>
-                      </div>
-                      <p className="mt-1 text-xs text-muted-foreground">{option.description}</p>
-                    </label>
-                  </div>
-                )
-              })}
+            <RadioGroup value={status} onValueChange={setStatus} className="grid grid-cols-2 gap-3">
+              {PET_STATUS_OPTIONS.map((option) => (
+                <div
+                  key={option.value}
+                  className={`flex items-start space-x-3 rounded-lg border p-3 transition-colors cursor-pointer ${
+                    status === option.value
+                      ? "border-orange-alert bg-orange-alert/5"
+                      : "border-border hover:border-orange-alert/50"
+                  }`}
+                >
+                  <RadioGroupItem value={option.value} id={option.value} className="mt-1" />
+                  <label htmlFor={option.value} className="flex-1 cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{option.label}</span>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">{option.description}</p>
+                  </label>
+                </div>
+              ))}
             </RadioGroup>
           </div>
         </CardContent>
@@ -417,8 +415,8 @@ export function PetReportForm({ userId }: PetReportFormProps) {
             <div className="grid gap-4 sm:grid-cols-2">
               {[0, 1, 2, 3].map((index) => (
                 <div key={index} className="space-y-2">
-                  {photoPreviews[index] && (
-                    <div className="relative h-48 w-full overflow-hidden rounded-xl">
+                  {photoPreviews[index] ? (
+                    <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border-2 border-border">
                       <img
                         src={photoPreviews[index] || "/placeholder.svg"}
                         alt={`Preview ${index + 1}`}
@@ -433,20 +431,27 @@ export function PetReportForm({ userId }: PetReportFormProps) {
                         <X className="h-4 w-4" />
                       </button>
                     </div>
+                  ) : (
+                    <label className="flex aspect-[4/3] cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-border bg-muted/30 transition-all hover:border-orange-alert/50 hover:bg-muted/50">
+                      <div className="rounded-full bg-muted p-3">
+                        <Upload className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-foreground">
+                          {index === 0 ? "Foto principal *" : `Foto ${index + 1}`}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">Clique para selecionar</p>
+                      </div>
+                      <input
+                        key={`photo-${index}-${photoPreviews[index] || "empty"}`}
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handlePhotoChange(e, index)}
+                        className="hidden"
+                        required={index === 0}
+                      />
+                    </label>
                   )}
-                  <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/30 px-4 py-6 transition-colors hover:bg-muted/50">
-                    <Upload className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-xs text-muted-foreground">
-                      {photoPreviews[index] ? "Alterar" : index === 0 ? "Foto principal *" : `Foto ${index + 1}`}
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handlePhotoChange(e, index)}
-                      className="hidden"
-                      required={index === 0}
-                    />
-                  </label>
                 </div>
               ))}
             </div>

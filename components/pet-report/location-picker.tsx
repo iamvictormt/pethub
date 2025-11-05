@@ -2,10 +2,9 @@
 
 import type React from 'react';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { MapPin, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { TextInput } from '../ui/text-input';
 
 interface LocationPickerProps {
   latitude: string;
@@ -24,24 +23,35 @@ export function LocationPicker({
 }: LocationPickerProps) {
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [mapCenter, setMapCenter] = useState({
-    lat: latitude ? Number.parseFloat(latitude) : -16.6868,
-    lng: longitude ? Number.parseFloat(longitude) : -49.2708,
+    lat: latitude ? Number.parseFloat(latitude) : -23.5505,
+    lng: longitude ? Number.parseFloat(longitude) : -46.6333,
   });
-  const [zoom, setZoom] = useState(13);
+  const [zoom, setZoom] = useState(16);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [totalDragDistance, setTotalDragDistance] = useState(0);
+  const [markerCoords, setMarkerCoords] = useState<{ lat: number; lng: number } | null>(
+    latitude && longitude ? { lat: Number.parseFloat(latitude), lng: Number.parseFloat(longitude) } : null
+  );
   const mapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (latitude && longitude) {
+      setMarkerCoords({ lat: Number.parseFloat(latitude), lng: Number.parseFloat(longitude) });
+    }
+  }, [latitude, longitude]);
 
   const getCurrentLocation = () => {
     setIsLoadingLocation(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const lat = position.coords.latitude.toString();
-          const lng = position.coords.longitude.toString();
-          onLocationChange(lat, lng);
-          setMapCenter({ lat: position.coords.latitude, lng: position.coords.longitude });
-          setZoom(15);
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          onLocationChange(lat.toString(), lng.toString());
+          setMapCenter({ lat, lng });
+          setMarkerCoords({ lat, lng });
+          setZoom(16);
           setIsLoadingLocation(false);
         },
         (error) => {
@@ -52,6 +62,31 @@ export function LocationPicker({
     } else {
       setIsLoadingLocation(false);
     }
+  };
+
+  const latLngToPixelOffset = (lat: number, lng: number): { x: number; y: number } => {
+    const tileSize = 256;
+    const scale = Math.pow(2, zoom);
+
+    // Meters per pixel at this zoom level and latitude
+    const metersPerPixel = (40075016.686 * Math.cos((mapCenter.lat * Math.PI) / 180)) / (tileSize * scale);
+
+    // Calculate pixel offset from center
+    const x = ((lng - mapCenter.lng) * 111320) / metersPerPixel;
+    const y = -((lat - mapCenter.lat) * 110540) / metersPerPixel;
+
+    return { x, y };
+  };
+
+  const pixelOffsetToLatLng = (x: number, y: number): { lat: number; lng: number } => {
+    const tileSize = 256;
+    const scale = Math.pow(2, zoom);
+    const metersPerPixel = (40075016.686 * Math.cos((mapCenter.lat * Math.PI) / 180)) / (tileSize * scale);
+
+    const lng = mapCenter.lng + (x * metersPerPixel) / 111320;
+    const lat = mapCenter.lat - (y * metersPerPixel) / 110540;
+
+    return { lat, lng };
   };
 
   const getTilesToDisplay = () => {
@@ -86,6 +121,7 @@ export function LocationPicker({
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true);
     setDragStart({ x: e.clientX, y: e.clientY });
+    setTotalDragDistance(0);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
@@ -93,6 +129,8 @@ export function LocationPicker({
 
     const dx = e.clientX - dragStart.x;
     const dy = e.clientY - dragStart.y;
+
+    setTotalDragDistance((prev) => prev + Math.abs(dx) + Math.abs(dy));
 
     const tileSize = 256;
     const scale = Math.pow(2, zoom);
@@ -110,7 +148,9 @@ export function LocationPicker({
   };
 
   const handleMapClick = (e: React.MouseEvent) => {
-    if (isDragging) return;
+    if (totalDragDistance > 5) {
+      return;
+    }
 
     const rect = mapRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -118,32 +158,27 @@ export function LocationPicker({
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
 
-    const tileSize = 256;
-    const scale = Math.pow(2, zoom);
-    const metersPerPixel = (40075016.686 * Math.cos((mapCenter.lat * Math.PI) / 180)) / (tileSize * scale);
+    const coords = pixelOffsetToLatLng(x, y);
 
-    const newLng = mapCenter.lng + (x * metersPerPixel) / 111320;
-    const newLat = mapCenter.lat - (y * metersPerPixel) / 110540;
-
-    onLocationChange(newLat.toString(), newLng.toString());
+    setMarkerCoords(coords);
+    onLocationChange(coords.lat.toString(), coords.lng.toString());
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
     if (e.touches.length === 1) {
       setIsDragging(true);
       setDragStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+      setTotalDragDistance(0);
     }
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
     if (!isDragging || e.touches.length !== 1) return;
 
     const dx = e.touches[0].clientX - dragStart.x;
     const dy = e.touches[0].clientY - dragStart.y;
+
+    setTotalDragDistance((prev) => prev + Math.abs(dx) + Math.abs(dy));
 
     const tileSize = 256;
     const scale = Math.pow(2, zoom);
@@ -157,12 +192,12 @@ export function LocationPicker({
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (isDragging) {
-      setIsDragging(false);
+    setIsDragging(false);
+
+    if (totalDragDistance > 5) {
       return;
     }
 
-    // Handle tap to set location
     if (e.changedTouches.length === 1) {
       const rect = mapRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -170,18 +205,16 @@ export function LocationPicker({
       const x = e.changedTouches[0].clientX - rect.left - rect.width / 2;
       const y = e.changedTouches[0].clientY - rect.top - rect.height / 2;
 
-      const tileSize = 256;
-      const scale = Math.pow(2, zoom);
-      const metersPerPixel = (40075016.686 * Math.cos((mapCenter.lat * Math.PI) / 180)) / (tileSize * scale);
+      const coords = pixelOffsetToLatLng(x, y);
 
-      const newLng = mapCenter.lng + (x * metersPerPixel) / 111320;
-      const newLat = mapCenter.lat - (y * metersPerPixel) / 110540;
-
-      onLocationChange(newLat.toString(), newLng.toString());
+      setMarkerCoords(coords);
+      onLocationChange(coords.lat.toString(), coords.lng.toString());
     }
   };
 
   const { tiles, centerTileX, centerTileY } = getTilesToDisplay();
+
+  const markerPixelPosition = markerCoords ? latLngToPixelOffset(markerCoords.lat, markerCoords.lng) : null;
 
   const hasLocation = latitude && longitude;
 
@@ -219,7 +252,7 @@ export function LocationPicker({
       {/* Map */}
       <div
         ref={mapRef}
-        className="relative h-100 md:h-120 w-full overflow-hidden rounded-xl border bg-gray-200"
+        className="relative h-120 w-full overflow-hidden rounded-xl border bg-gray-200"
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -257,8 +290,15 @@ export function LocationPicker({
         </div>
 
         {/* Selected Location Marker */}
-        {hasLocation && (
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full z-10 pointer-events-none">
+        {hasLocation && markerPixelPosition && (
+          <div
+            className="absolute z-10 pointer-events-none"
+            style={{
+              left: `calc(50% + ${markerPixelPosition.x}px)`,
+              top: `calc(50% + ${markerPixelPosition.y}px)`,
+              transform: 'translate(-50%, -100%)',
+            }}
+          >
             <svg
               width="40"
               height="48"
@@ -319,8 +359,10 @@ export function LocationPicker({
 
       {/* Location Description */}
       <div className="space-y-2">
-        <TextInput
-          label="Descrição do Local"
+        <label className="text-sm font-medium">Descrição do Local</label>
+        <input
+          type="text"
+          className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none ring-ring transition-colors placeholder:text-muted-foreground focus:border-ring focus:ring-2"
           placeholder="Ex: Próximo ao parque, na Rua X, perto do mercado..."
           value={locationDescription}
           onChange={(e) => onDescriptionChange(e.target.value)}
