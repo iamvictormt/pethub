@@ -242,7 +242,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
       <Card>
         <CardContent className="pt-6">
           <Label className="mb-3 block text-sm font-medium">Status do Pet</Label>
-          <RadioGroup value={status} onValueChange={setStatus} className="grid grid-cols-2 gap-3">
+          <RadioGroup value={status} onValueChange={setStatus} className="grid md:grid-cols-2 gap-3">
             {PET_STATUS_OPTIONS.map((option) => (
               <div
                 key={option.value}
