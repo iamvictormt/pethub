@@ -7,6 +7,7 @@ import { PetListView } from './pet-list-view';
 import { AdSupportBanner } from '@/components/ads/ad-support-banner';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Map, List } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 interface PetMapInterfaceProps {
   pets: Pet[];
@@ -33,7 +34,7 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
   const [pendingHasReward, setPendingHasReward] = useState(false);
   const [status, setStatus] = useState<string[]>(['LOST', 'SIGHTED', 'RESCUED', 'ADOPTION']);
   const [petTypes, setPetTypes] = useState<string[]>([]);
-  const [distance, setDistance] = useState(10);
+  const [distance, setDistance] = useState(100);
   const [sortBy, setSortBy] = useState('recent');
   const [hasReward, setHasReward] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -84,7 +85,11 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
         }
       );
     } else {
-      alert('Geolocalização não é suportada pelo seu navegador.');
+      toast({
+        title: 'Erro',
+        description: 'Geolocalização não é suportada pelo seu navegador.',
+        variant: 'destructive'
+      });
     }
   };
 
@@ -101,7 +106,7 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
     setAppliedSearchQuery('');
     setPendingStatus(['LOST', 'SIGHTED', 'RESCUED', 'ADOPTION']);
     setPendingPetTypes([]);
-    setPendingDistance(10);
+    setPendingDistance(100);
     setPendingSortBy('recent');
     setPendingHasReward(false);
     setStatus(['LOST', 'SIGHTED', 'RESCUED', 'ADOPTION']);
@@ -195,7 +200,7 @@ export function PetMapInterface({ pets, ads }: PetMapInterfaceProps) {
 
       <div className="flex-1 overflow-y-auto">
         {viewMode === 'map' ? (
-          <div className="flex h-[calc(75vh)] flex-col md:h-[calc(100vh-4rem)]">
+          <div className="flex h-[calc(75vh)] flex-col md:h-[calc(90vh-4rem)]">
             <PetMap pets={filteredPets} userLocation={userLocation} />
           </div>
         ) : (

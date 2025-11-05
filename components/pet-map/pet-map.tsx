@@ -14,7 +14,7 @@ interface PetMapProps {
 
 export function PetMap({ pets, userLocation }: PetMapProps) {
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
-  const [mapCenter, setMapCenter] = useState({ lat: -23.5505, lng: -46.6333 }); // São Paulo
+  const [mapCenter, setMapCenter] = useState({ lat: -16.6868, lng: -49.2708 });
   const [zoom, setZoom] = useState(13);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });

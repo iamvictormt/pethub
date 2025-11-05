@@ -193,14 +193,14 @@ export function MapFilters({
               }
               variant={status.includes("ADOPTION") ? "default" : "outline"}
               size="lg"
-              className={`col-span-2 flex-col gap-1 p-7 ${
+              className={`flex-col gap-1 p-7 ${
                 status.includes("ADOPTION")
                   ? "bg-green-500 text-white shadow-lg shadow-green-500/30"
                   : "hover:border-green-500/50"
               }`}
             >
               <span className="text-2xl">💚</span>
-              <span className="text-xs font-semibold">Para Adoção</span>
+              <span className="text-xs font-semibold">Adoção</span>
             </Button>
           </div>
         </div>

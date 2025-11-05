@@ -61,9 +61,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
   );
   const [unknownName, setUnknownName] = useState(pet.name === 'Não informado');
   const [unknownBreed, setUnknownBreed] = useState(pet.breed === 'Não informado');
-  const [unknownAge, setUnknownAge] = useState(
-    pet.age === null && (pet.status === 'SIGHTED' || pet.status === 'RESCUED')
-  );
+  const [unknownAge, setUnknownAge] = useState(pet.age === null);
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const file = e.target.files?.[0];
@@ -137,23 +135,27 @@ export function PetEditForm({ pet }: PetEditFormProps) {
 
       for (let i = 0; i < photoFiles.length; i++) {
         const file = photoFiles[i];
-        if (file) {
+        if (!file) continue;
+
+        try {
           const fileExt = file.name.split('.').pop();
           const fileName = `${pet.user_id}-${Date.now()}-${i}.${fileExt}`;
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('pet-photos')
-            .upload(fileName, file);
+            .upload(fileName, file, { contentType: file.type || 'image/jpeg' });
 
-          if (uploadError) throw uploadError;
+          if (uploadError) {
+            console.error('Erro no upload da foto', uploadError);
+            continue;
+          }
 
           const {
             data: { publicUrl },
           } = supabase.storage.from('pet-photos').getPublicUrl(fileName);
 
           photoUrls[i] = publicUrl;
-        } else if (!photoPreviews[i]) {
-          // Photo was removed
-          photoUrls[i] = null;
+        } catch (err) {
+          console.error('Erro inesperado no upload', err);
         }
       }
 
@@ -162,12 +164,9 @@ export function PetEditForm({ pet }: PetEditFormProps) {
         setRewardAmount('');
       }
 
-      const finalName =
-        (status === 'SIGHTED' || status === 'RESCUED') && unknownName ? 'Não informado' : name || 'Não informado';
-      const finalBreed =
-        (status === 'SIGHTED' || status === 'RESCUED') && unknownBreed ? 'Não informado' : breed || null;
-      const finalAge =
-        (status === 'SIGHTED' || status === 'RESCUED') && unknownAge ? null : age ? Number.parseInt(age) : null;
+      const finalName = unknownName ? 'Não informado' : name || 'Não informado';
+      const finalBreed = unknownBreed ? 'Não informado' : breed || null;
+      const finalAge = unknownAge ? null : age ? Number.parseInt(age) : null;
 
       const expirationDate = status === 'SIGHTED' ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() : null;
 
@@ -197,6 +196,7 @@ export function PetEditForm({ pet }: PetEditFormProps) {
           expiration_date: expirationDate,
         })
         .eq('id', pet.id);
+console.log('Update error:', updateError);
 
       if (updateError) throw updateError;
 
@@ -206,7 +206,6 @@ export function PetEditForm({ pet }: PetEditFormProps) {
       });
 
       router.push('/meus-pets');
-      router.refresh();
     } catch (err) {
       toast({
         title: 'Erro ao salvar pet!',
@@ -303,23 +302,22 @@ export function PetEditForm({ pet }: PetEditFormProps) {
                 placeholder="Ex: Labrador, Siamês..."
                 value={breed}
                 onChange={(e) => setBreed(e.target.value)}
-                disabled={(status === 'SIGHTED' || status === 'RESCUED') && unknownBreed}
+                required={!unknownBreed}
+                disabled={unknownBreed}
               />
-              {(status === 'SIGHTED' || status === 'RESCUED') && (
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="unknown-breed"
-                    checked={unknownBreed}
-                    onCheckedChange={(checked) => {
-                      setUnknownBreed(checked as boolean);
-                      if (checked) setBreed('');
-                    }}
-                  />
-                  <label htmlFor="unknown-breed" className="text-sm text-muted-foreground cursor-pointer">
-                    Não sei a raça
-                  </label>
-                </div>
-              )}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="unknown-breed"
+                  checked={unknownBreed}
+                  onCheckedChange={(checked) => {
+                    setUnknownBreed(checked as boolean);
+                    if (checked) setBreed('');
+                  }}
+                />
+                <label htmlFor="unknown-breed" className="text-sm text-muted-foreground cursor-pointer">
+                  Não sei a raça
+                </label>
+              </div>
             </div>
 
             <TextInput
@@ -346,24 +344,22 @@ export function PetEditForm({ pet }: PetEditFormProps) {
                   setAge(numberValue.toString());
                 }}
                 helperText="Aproximada, se não souber exatamente"
-                required={status !== 'SIGHTED' && status !== 'RESCUED' && !unknownAge}
-                disabled={(status === 'SIGHTED' || status === 'RESCUED') && unknownAge}
+                required={!unknownAge}
+                disabled={unknownAge}
               />
-              {(status === 'SIGHTED' || status === 'RESCUED') && (
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="unknown-age"
-                    checked={unknownAge}
-                    onCheckedChange={(checked) => {
-                      setUnknownAge(checked as boolean);
-                      if (checked) setAge('');
-                    }}
-                  />
-                  <label htmlFor="unknown-age" className="text-sm text-muted-foreground cursor-pointer">
-                    Não sei a idade
-                  </label>
-                </div>
-              )}
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="unknown-age"
+                  checked={unknownAge}
+                  onCheckedChange={(checked) => {
+                    setUnknownAge(checked as boolean);
+                    if (checked) setAge('');
+                  }}
+                />
+                <label htmlFor="unknown-age" className="text-sm text-muted-foreground cursor-pointer">
+                  Não sei a idade
+                </label>
+              </div>
             </div>
 
             <div className="space-y-2">

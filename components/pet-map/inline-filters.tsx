@@ -104,14 +104,6 @@ export function InlineFilters({
               placeholder="Digite sua busca..."
               className="flex-1 rounded-lg border border-input bg-background px-4 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
-            <Button
-              onClick={handleSearch}
-              size="lg"
-              className="bg-gradient-to-r from-orange-alert to-pink-500 text-white shadow-lg hover:shadow-xl transition-all"
-            >
-              <Search className="h-5 w-5 mr-2" />
-              Pesquisar
-            </Button>
           </div>
         </div>
 
@@ -151,7 +143,7 @@ export function InlineFilters({
           {/* Status & Sort Section */}
           <div className="space-y-4 rounded-xl bg-card/50 p-6 shadow-sm backdrop-blur-sm transition-all hover:shadow-md">
             <label className="font-semibold text-foreground">Status do Pet</label>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               <Button
                 onClick={() =>
                   setStatus(status.includes("LOST") ? status.filter((s) => s !== "LOST") : [...status, "LOST"])

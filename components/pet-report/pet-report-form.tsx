@@ -163,11 +163,11 @@ export function PetReportForm({ userId }: PetReportFormProps) {
           const fileName = `${userId}-${Date.now()}-${i}.${fileExt}`;
           const { data: uploadData, error: uploadError } = await supabase.storage
             .from('pet-photos')
-            .upload(fileName, file);
+            .upload(fileName, file, { contentType: file.type || 'image/jpeg' });
 
           if (uploadError) {
-            console.error('Erro no upload', uploadError);
-            continue; // não trava
+            console.error('Erro no upload da foto', uploadError);
+            continue;
           }
 
           const {
